@@ -42,7 +42,7 @@
 1. **Безпекові прогалини** (див. `docs/security-coverage.md`): P1, P2 і P3 за CWE закрито (t142–t146, t157–t164, t166–t168: скидання пароля, CRLF у заголовках, ціна/ліміти на сервері). Критерії capstone (OWASP LLM Top 10 у M4/M6, SBOM/cosign/DAST у M7) додано. Єдине, що лишилось: сам threat model (№165) пише студент для свого проєкту, зразка в репозиторії немає навмисно.
 1b. Ще завдання з автоперевіркою: БД (t24 зроблено на кроках SQLite VM та EXPLAIN замість секунд), решта каталогу (api, observability, sysdesign, AI-завдання без автоперевірки).
 2. Проєкт «Knowledge Assistant» у `D:\Code\knowledge-assistant` (окремий репозиторій, git не ініціалізовано): готові M0–M3 (скелет і RFC 7807; PostgreSQL+pgvector, Alembic, Redis-кеш; JWT/refresh, ролі, rate limit, Idempotency-Key; завантаження файлів у локальне сховище або S3 presigned POST, чанкінг, embeddings, воркер ARQ з ретраями, dead letters і outbox). 205 тестів зелені, включно з інтеграційними на справжніх PostgreSQL, Redis і MinIO (docker compose). Далі M4 (`/ask`, hybrid search, SSE; підключити кеш) і далі за `docs/capstone.md`.
-3. Ініціалізація git і приватний репозиторій на GitHub (команди в README; Roman робить сам), GitHub Pages для сайту.
+3. ~~Git і GitHub~~ зроблено: публічний репозиторій `ShumykR/skillbooster` (гілка `main`), сайт на GitHub Pages: https://shumykr.github.io/skillbooster/ (публічний, бо Pages на безкоштовному тарифі потребують public). Для `check.py` з Pages: `SKILLBOOSTER_URL=https://shumykr.github.io/skillbooster/`. Проєкт скрізь називається `skillbooster` (раніше `skillboost`; `app.js` читає і старий ключ localStorage).
 
 ## Правила роботи над завданнями (важливо)
 
