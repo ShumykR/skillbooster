@@ -24,7 +24,7 @@
 | `docs/free-resources.md` | Підбірка безкоштовних ресурсів з перевіреними умовами/лімітами |
 | `docs/platform-design.md`, `docs/capstone.md` | Задум платформи, наскрізний проєкт «Knowledge Assistant» |
 | `tasks/` | Завдання з автоперевіркою: `tNN_назва/{README.md, solution.py, test_solution.py}`, раннер `tasks/check.py` |
-| `ci/tasks.yml` | CI-воркфлоу. Має бути скопійований як `.github/workflows/tasks.yml` (Roman це зробив) |
+| `ci/tasks.yml` | CI-воркфлоу: `repo-check` (gen_data без diff + структура завдань, завжди зелений) і тести лише змінених завдань (`continue-on-error`; усі: Run workflow). Копія для `.github/workflows/tasks.yml`, яку Roman оновлює вручну |
 
 ## Як запускати
 
