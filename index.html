@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkillBooster: Python Backend + DevOps + AI</title>
+<meta name="description" content="Інтерактивний шлях для Python-бекендера: від FastAPI до Kubernetes та AI-інженерії.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#/">⚡ SkillBooster</a>
+    <nav id="nav" aria-label="Етапи"></nav>
+    <div class="side-foot">
+      <a href="#/capstone">Наскрізний проєкт</a>
+      <a href="#/legacy">Що змінилось з 2023</a>
+      <a href="#/settings">Налаштування</a>
+    </div>
+  </aside>
+  <div class="main-wrap">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Меню">☰</button>
+      <div class="top-progress">
+        <div class="bar"><span id="topBar"></span></div>
+        <small id="topText"></small>
+      </div>
+      <button class="theme-btn" id="themeBtn" aria-label="Тема">🌓</button>
+    </header>
+    <main id="view" tabindex="-1"></main>
+  </div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

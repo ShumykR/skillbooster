@@ -1,0 +1,7 @@
+.env
+__pycache__/
+.pytest_cache/
+.venv/
+skillbooster-progress.json
+skillbooster-sync.html
+.playwright-mcp/
