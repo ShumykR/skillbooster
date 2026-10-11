@@ -1,23 +1,68 @@
 name: tasks
 
+# repo-check: швидка перевірка репозиторію, має бути зеленою завжди.
+# tasks: тести лише змінених завдань (усі: Actions → Run workflow). Червоне завдання не червонить пуш:
+# заглушки в solution.py падають за задумом, доки ти не напишеш рішення.
+
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
+  repo-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: data.js і звіти актуальні
+        run: |
+          python tools/gen_data.py
+          git diff --exit-code -- data.js docs tasks/README.md
+      - name: у кожного завдання є README, solution.py і test_solution.py
+        run: |
+          missing=0
+          for d in tasks/t*_*/; do
+            for f in README.md solution.py test_solution.py; do
+              [ -f "$d$f" ] || { echo "::error::нема $d$f"; missing=1; }
+            done
+          done
+          exit $missing
+
   discover:
     runs-on: ubuntu-latest
     outputs:
       tasks: ${{ steps.list.outputs.tasks }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - id: list
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          BASE: ${{ github.event.pull_request.base.sha }}
         run: |
-          echo "tasks=$(ls -d tasks/t*_* | xargs -n1 basename | jq -R . | jq -sc .)" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            names=$(ls -d tasks/t*_*/ | xargs -n1 basename)
+          else
+            from="$BASE"
+            [ "$EVENT" = "push" ] && from="$BEFORE"
+            if [ -z "$from" ] || [ "$from" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$from" 2>/dev/null; then
+              names=$(ls -d tasks/t*_*/ | xargs -n1 basename)
+            else
+              names=$(git diff --name-only "$from" HEAD -- 'tasks/t*_*' | cut -d/ -f2 | sort -u)
+            fi
+          fi
+          echo "tasks=$(printf '%s\n' $names | while read -r n; do [ -n "$n" ] && [ -d "tasks/$n" ] && echo "$n"; done | jq -R . | jq -sc .)" >> "$GITHUB_OUTPUT"
 
   test:
     needs: discover
+    if: needs.discover.outputs.tasks != '[]'
     runs-on: ubuntu-latest
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
