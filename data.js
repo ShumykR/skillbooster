@@ -1703,7 +1703,22 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Повнотекстовий пошук",
      "desc": "Postgres FTS (`tsvector`, GIN) vs Elasticsearch/OpenSearch",
-     "check": "релевантність на еталонному наборі"
+     "check": "релевантність на еталонному наборі",
+     "steps": [
+      "поставити Postgres у Docker і завантажити 100–200 текстів (README своїх проєктів, статті, нотатки) у таблицю `docs(title, body)`",
+      "скласти 15 запитів і для кожного записати, які документи мають бути знайдені (еталон)",
+      "додати `tsvector` як generated-колонку (title з вагою A, body з вагою B) і GIN-індекс, шукати через `websearch_to_tsquery` та `ts_rank_cd`",
+      "порівняти конфігурації `simple` та `english` (для українського тексту `simple` + `unaccent`)",
+      "порахувати precision@3 для кожної конфігурації",
+      "`EXPLAIN ANALYZE` до і після GIN: Seq Scan проти Bitmap Index Scan"
+     ],
+     "done": [
+      "для 15 запитів порахована precision@3 для двох конфігурацій і видно, яка краща та чому",
+      "запит із синонімом або помилкою в слові показує межу FTS (там потрібен trigram, векторний пошук або гібрид)",
+      "`EXPLAIN ANALYZE` підтверджує використання GIN",
+      "є 3–5 рядків висновку: коли досить Postgres FTS, а коли потрібен Elasticsearch/OpenSearch"
+     ],
+     "kind": "практика"
     },
     {
      "id": "t39",
@@ -1712,7 +1727,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Векторний пошук",
      "desc": "pgvector, індекси HNSW/IVFFlat, компроміс швидкість/точність",
-     "check": "recall@k"
+     "check": "recall@k",
+     "auto": "t39_ivf_index"
     }
    ],
    "practice": [

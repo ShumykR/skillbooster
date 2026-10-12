@@ -70,6 +70,7 @@ python -m pytest t02_async_dashboard   # або напряму pytest
 | 35 | Redis-кеш: cache-aside | 🟡 |
 | 36 | Cache stampede | 🔴 |
 | 37 | Rate limiter (token bucket) | 🟡 |
+| 39 | Векторний пошук: IVF-індекс і компроміс швидкість/точність | 🔴 |
 | 41 | Перевірка підпису вебхука | 🟡 |
 | 43 | Retry з backoff і circuit breaker | 🟡 |
 | 51 | Перевірка JWT | 🟡 |
