@@ -5559,8 +5559,9 @@ window.SKILLBOOSTER = {
      "level": 2,
      "ai": false,
      "title": "URL shortener",
-     "desc": "з кешем, лічильниками кліків і шардуванням ключів",
-     "check": ""
+     "desc": "з кешем, лічильниками кліків і шардуванням ключів (base62, аліаси, TTL, консистентне хешування)",
+     "check": "автотести",
+     "auto": "t111_url_shortener"
     },
     {
      "id": "t112",
@@ -5568,8 +5569,9 @@ window.SKILLBOOSTER = {
      "level": 2,
      "ai": false,
      "title": "Rate limiter як сервіс",
-     "desc": "на Redis",
-     "check": ""
+     "desc": "на Redis (token bucket, вікна, заголовки, fail-open, визначення клієнта)",
+     "check": "автотести",
+     "auto": "t112_rate_limiter_service"
     },
     {
      "id": "t113",
@@ -5577,8 +5579,9 @@ window.SKILLBOOSTER = {
      "level": 3,
      "ai": false,
      "title": "Черга завдань із гарантіями",
-     "desc": "at-least-once, ідемпотентність, dead-letter",
-     "check": ""
+     "desc": "at-least-once, ідемпотентність, dead-letter (visibility timeout, ретраї, redrive)",
+     "check": "автотести",
+     "auto": "t113_task_queue"
     },
     {
      "id": "t114",
@@ -5586,8 +5589,9 @@ window.SKILLBOOSTER = {
      "level": 3,
      "ai": false,
      "title": "Notification service",
-     "desc": "черги, пріоритети, дедуплікація, ретраї",
-     "check": ""
+     "desc": "черги, пріоритети, дедуплікація, ретраї (тихі години, fallback між каналами)",
+     "check": "автотести",
+     "auto": "t114_notification_service"
     },
     {
      "id": "t115",
@@ -5595,8 +5599,9 @@ window.SKILLBOOSTER = {
      "level": 3,
      "ai": false,
      "title": "Тайм-лайн / стрічка",
-     "desc": "fan-out on write vs read",
-     "check": ""
+     "desc": "fan-out on write vs read (push, pull, гібрид із «зірками», курсорна пагінація)",
+     "check": "автотести",
+     "auto": "t115_timeline_fanout"
     },
     {
      "id": "t116",
@@ -5604,8 +5609,9 @@ window.SKILLBOOSTER = {
      "level": 3,
      "ai": false,
      "title": "Event-driven з Kafka/RabbitMQ",
-     "desc": "consumer groups, порядок, offset, replay",
-     "check": ""
+     "desc": "consumer groups, порядок, offset, replay (модель партицій, rebalance, commit, lag)",
+     "check": "автотести",
+     "auto": "t116_event_streaming"
     },
     {
      "id": "t117",
@@ -5613,11 +5619,12 @@ window.SKILLBOOSTER = {
      "level": 3,
      "ai": false,
      "title": "Saga / розподілені транзакції",
-     "desc": "для замовлення з оплатою та складом",
-     "check": "",
+     "desc": "для замовлення з оплатою та складом (оркестратор, компенсації, відновлення після падіння)",
+     "check": "автотести",
      "pattern": [
       "Saga"
-     ]
+     ],
+     "auto": "t117_saga_orchestrator"
     },
     {
      "id": "t118",
@@ -5626,7 +5633,22 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Gossip Glomers",
      "desc": "challenges з розподілених систем",
-     "check": ""
+     "check": "",
+     "steps": [
+      "поставити Go і Maelstrom (за інструкцією fly.io/dist-sys), перевірити, що тестовий `echo` проходить",
+      "виконати challenge #1 Echo і #2 Unique ID Generation",
+      "виконати #3 Broadcast (кроки a-e: однонодовий, багатонодовий, відмовостійкий, ефективніший)",
+      "виконати #4 Grow-Only Counter і #5 Kafka-Style Log",
+      "виконати #6 Totally-Available Transactions"
+     ],
+     "done": [
+      "challenges #1–#3a проходять перевірку Maelstrom без помилок",
+      "#3b–#3e проходять із вимкненою мережею (partitions)",
+      "#4 і #5 проходять",
+      "для #3 записано, як змінюються кількість повідомлень і затримка між кроками c, d, e",
+      "коротко описано, які гарантії (consistency, availability) дає кожне рішення"
+     ],
+     "kind": "практика"
     }
    ],
    "practice": [
