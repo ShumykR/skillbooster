@@ -4715,6 +4715,21 @@ window.SKILLBOOSTER = {
       "770",
       "~16"
      ],
+     "steps": [
+      "підняти локальний кластер (kind або Killercoda)",
+      "написати Deployment: образ із тегом (не `latest`), 2 репліки, `resources.requests/limits`, readiness і liveness проби",
+      "додати Service (ClusterIP) і Ingress, який веде на нього за хостом",
+      "винести нечутливі налаштування в ConfigMap, а паролі й токени в Secret, підключити через `envFrom`/`secretKeyRef`",
+      "застосувати все через `kubectl apply -f` і перевірити доступ через Ingress",
+      "додати `securityContext`: `runAsNonRoot`, `allowPrivilegeEscalation: false`, `readOnlyRootFilesystem`"
+     ],
+     "done": [
+      "`kubectl get pods` показує всі репліки Ready",
+      "запит через Ingress повертає відповідь застосунку",
+      "змінна з ConfigMap і змінна з Secret видимі в контейнері (`kubectl exec ... env`)",
+      "у маніфестах немає паролів у відкритому вигляді (Secret створений командою або через зовнішнє сховище)",
+      "у Deployment є requests/limits, проби і `securityContext`"
+     ],
      "auto": "t93_k8s_manifest_audit"
     },
     {
@@ -4756,8 +4771,9 @@ window.SKILLBOOSTER = {
      "level": 2,
      "ai": false,
      "title": "HPA та KEDA",
-     "desc": "автомасштабування за CPU й довжиною черги",
-     "check": "навантаження"
+     "desc": "автомасштабування за CPU й довжиною черги (формула HPA, вікно стабілізації, scale-to-zero)",
+     "check": "автотести",
+     "auto": "t96_autoscaling_hpa_keda"
     },
     {
      "id": "t97",
@@ -4765,8 +4781,9 @@ window.SKILLBOOSTER = {
      "level": 2,
      "ai": false,
      "title": "Налагодження",
-     "desc": "CrashLoopBackOff, ImagePullBackOff, Pending, OOMKilled",
-     "check": "набір зламаних маніфестів"
+     "desc": "CrashLoopBackOff, ImagePullBackOff, Pending, OOMKilled (діагностика pod'а за status і events)",
+     "check": "автотести",
+     "auto": "t97_pod_triage"
     },
     {
      "id": "t98",
@@ -4774,12 +4791,13 @@ window.SKILLBOOSTER = {
      "level": 3,
      "ai": false,
      "title": "NetworkPolicy, RBAC, PodSecurity",
-     "desc": "принцип мінімальних прав",
-     "check": "тести доступу",
+     "desc": "принцип мінімальних прав (оцінка мережевих політик, `can-i`, аудит binding'ів, рівні baseline/restricted)",
+     "check": "автотести",
      "cwe": [
       "?269",
       "?668"
-     ]
+     ],
+     "auto": "t98_k8s_access_control"
     },
     {
      "id": "t99",
@@ -4788,7 +4806,22 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "GitOps",
      "desc": "ArgoCD, синхронізація з git",
-     "check": "Killercoda"
+     "check": "Killercoda",
+     "steps": [
+      "створити git-репозиторій із маніфестами застосунку (каталог `apps/myapp`)",
+      "встановити ArgoCD у кластер (kind або Killercoda) і зайти в UI",
+      "створити `Application`, що вказує на репозиторій і шлях, з `syncPolicy.automated` (prune + selfHeal)",
+      "змінити кількість реплік у git і дочекатися синхронізації без `kubectl apply`",
+      "вручну змінити ресурс у кластері (`kubectl scale`) і побачити, як ArgoCD повертає стан із git",
+      "зробити rollback через `git revert`"
+     ],
+     "done": [
+      "Application у статусі Synced і Healthy",
+      "зміна реплік у git потрапила в кластер без ручного `kubectl apply`",
+      "ручна зміна в кластері відкотилась самостійно (selfHeal)",
+      "rollback виконано через коміт у git, а не командою в кластері"
+     ],
+     "kind": "практика"
     },
     {
      "id": "t100",
@@ -4796,8 +4829,9 @@ window.SKILLBOOSTER = {
      "level": 3,
      "ai": false,
      "title": "Rolling update без втрат",
-     "desc": "PDB, preStop, graceful shutdown",
-     "check": "запити під час релізу"
+     "desc": "PDB, preStop, graceful shutdown (модель rolling update, PDB і завершення pod'а)",
+     "check": "автотести",
+     "auto": "t100_zero_downtime_rollout"
     }
    ],
    "practice": [

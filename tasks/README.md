@@ -118,6 +118,10 @@ python -m pytest t02_async_dashboard   # або напряму pytest
 | 92 | Multi-account і Landing Zone: як працюють SCP | 🔴 |
 | 93 | Аудит Kubernetes-маніфестів | 🟡 |
 | 94 | Probes: симулятор kubelet | 🔴 |
+| 96 | HPA і KEDA: автомасштабування за метрикою та чергою | 🟡 |
+| 97 | Налагодження pod'ів: що саме зламалось | 🟡 |
+| 98 | NetworkPolicy, RBAC, Pod Security: мінімальні права | 🔴 |
+| 100 | Rolling update без втрат: PDB, preStop, graceful shutdown | 🔴 |
 | 127 | Structured output з повторною спробою 🤖 | 🟡 |
 | 135 | Цикл агента з запобіжниками 🤖 | 🔴 |
 | 137 | Авторизація викликів інструментів агентом 🤖 | 🔴 |

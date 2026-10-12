@@ -146,14 +146,14 @@
 
 ## H. Kubernetes
 
-93. 🟡 **Deployment, Service, Ingress, ConfigMap, Secret** для свого застосунку. *Перевірка:* Killercoda. *CWE:* 269, 770, ~16
+93. 🟡 **Deployment, Service, Ingress, ConfigMap, Secret** для свого застосунку. *Тип:* практика *Кроки:* підняти локальний кластер (kind або Killercoda) | написати Deployment: образ із тегом (не `latest`), 2 репліки, `resources.requests/limits`, readiness і liveness проби | додати Service (ClusterIP) і Ingress, який веде на нього за хостом | винести нечутливі налаштування в ConfigMap, а паролі й токени в Secret, підключити через `envFrom`/`secretKeyRef` | застосувати все через `kubectl apply -f` і перевірити доступ через Ingress | додати `securityContext`: `runAsNonRoot`, `allowPrivilegeEscalation: false`, `readOnlyRootFilesystem` *Готово:* `kubectl get pods` показує всі репліки Ready | запит через Ingress повертає відповідь застосунку | змінна з ConfigMap і змінна з Secret видимі в контейнері (`kubectl exec ... env`) | у маніфестах немає паролів у відкритому вигляді (Secret створений командою або через зовнішнє сховище) | у Deployment є requests/limits, проби і `securityContext` *Перевірка:* Killercoda. *CWE:* 269, 770, ~16
 94. 🟡 **Probes і ресурси:** readiness/liveness/startup, requests/limits, чому pod «перезапускається» (симулятор kubelet, startupProbe). *Перевірка:* автотести.
 95. 🟡 **Helm-чарт** для застосунку з values для dev/prod. *Тип:* практика *Кроки:* поставити Helm 3 і `helm create myapp` | залишити Deployment, Service, Ingress, прибрати зайве | винести образ, репліки, ресурси, змінні оточення у `values.yaml` | додати `values-dev.yaml` (1 репліка, малі ліміти) і `values-prod.yaml` (3 репліки, ліміти, probes) | секрети не класти у values: посилання на існуючий Secret *Готово:* `helm lint myapp` без помилок | `helm template myapp -f values-prod.yaml` показує 3 репліки, `resources.limits` і probes | `helm template myapp -f values-dev.yaml` показує 1 репліку | у `values*.yaml` і шаблонах немає паролів і токенів *Перевірка:* `helm lint` + `template`.
-96. 🟡 **HPA та KEDA:** автомасштабування за CPU й довжиною черги. *Перевірка:* навантаження.
-97. 🟡 **Налагодження:** CrashLoopBackOff, ImagePullBackOff, Pending, OOMKilled. *Перевірка:* набір зламаних маніфестів.
-98. 🔴 **NetworkPolicy, RBAC, PodSecurity:** принцип мінімальних прав. *Перевірка:* тести доступу. *CWE:* ?269, ?668
-99. 🟡 **GitOps:** ArgoCD, синхронізація з git. *Перевірка:* Killercoda.
-100. 🔴 **Rolling update без втрат:** PDB, preStop, graceful shutdown. *Перевірка:* запити під час релізу.
+96. 🟡 **HPA та KEDA:** автомасштабування за CPU й довжиною черги (формула HPA, вікно стабілізації, scale-to-zero). *Перевірка:* автотести.
+97. 🟡 **Налагодження:** CrashLoopBackOff, ImagePullBackOff, Pending, OOMKilled (діагностика pod'а за status і events). *Перевірка:* автотести.
+98. 🔴 **NetworkPolicy, RBAC, PodSecurity:** принцип мінімальних прав (оцінка мережевих політик, `can-i`, аудит binding'ів, рівні baseline/restricted). *Перевірка:* автотести. *CWE:* ?269, ?668
+99. 🟡 **GitOps:** ArgoCD, синхронізація з git. *Тип:* практика *Кроки:* створити git-репозиторій із маніфестами застосунку (каталог `apps/myapp`) | встановити ArgoCD у кластер (kind або Killercoda) і зайти в UI | створити `Application`, що вказує на репозиторій і шлях, з `syncPolicy.automated` (prune + selfHeal) | змінити кількість реплік у git і дочекатися синхронізації без `kubectl apply` | вручну змінити ресурс у кластері (`kubectl scale`) і побачити, як ArgoCD повертає стан із git | зробити rollback через `git revert` *Готово:* Application у статусі Synced і Healthy | зміна реплік у git потрапила в кластер без ручного `kubectl apply` | ручна зміна в кластері відкотилась самостійно (selfHeal) | rollback виконано через коміт у git, а не командою в кластері *Перевірка:* Killercoda.
+100. 🔴 **Rolling update без втрат:** PDB, preStop, graceful shutdown (модель rolling update, PDB і завершення pod'а). *Перевірка:* автотести.
 
 ## I. Observability та надійність
 
