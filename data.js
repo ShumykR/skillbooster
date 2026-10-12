@@ -4298,7 +4298,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "VPC з нуля",
      "desc": "публічні/приватні підмережі, NAT, security groups, route tables",
-     "check": "terraform plan + тест з'єднання"
+     "check": "terraform plan + тест з'єднання",
+     "auto": "t83_vpc_model"
     },
     {
      "id": "t84",
@@ -4322,7 +4323,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "ECS Fargate або EKS",
      "desc": "розгорнути застосунок за ALB із автомасштабуванням",
-     "check": "e2e"
+     "check": "e2e",
+     "auto": "t85_autoscaling"
     },
     {
      "id": "t86",
@@ -4361,7 +4363,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Lambda + API Gateway + SQS",
      "desc": "подієва обробка, DLQ, ідемпотентність",
-     "check": "тест із повторами"
+     "check": "тест із повторами",
+     "auto": "t88_sqs_lambda"
     },
     {
      "id": "t89",
@@ -4374,7 +4377,8 @@ window.SKILLBOOSTER = {
      "cwe": [
       "?798",
       "?321"
-     ]
+     ],
+     "auto": "t89_secrets_client"
     },
     {
      "id": "t90",
@@ -4383,7 +4387,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Керування витратами",
      "desc": "budget alerts, теги, розбір «чому рахунок виріс»",
-     "check": "розбір сценарію Cost Explorer"
+     "check": "розбір сценарію Cost Explorer",
+     "auto": "t90_cost_analysis"
     },
     {
      "id": "t91",
@@ -4392,7 +4397,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Disaster recovery",
      "desc": "RTO/RPO, відновлення регіону/БД",
-     "check": "навчання із зупинкою"
+     "check": "навчання із зупинкою",
+     "auto": "t91_disaster_recovery"
     },
     {
      "id": "t92",
@@ -4401,7 +4407,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Multi-account і Landing Zone",
      "desc": "Organizations, SCP",
-     "check": "політики"
+     "check": "політики",
+     "auto": "t92_scp_evaluation"
     }
    ],
    "practice": [

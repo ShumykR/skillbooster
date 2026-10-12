@@ -106,9 +106,16 @@ python -m pytest t02_async_dashboard   # або напряму pytest
 | 79 | Preview-середовище на кожен PR | 🟡 |
 | 80 | Semantic versioning і автоматичний changelog | 🟡 |
 | 81 | Monorepo: запускати лише змінені сервіси | 🔴 |
+| 83 | VPC з нуля: підмережі, NAT, security groups, route tables | 🟡 |
 | 84 | Політики для Terraform plan | 🟡 |
+| 85 | ECS Fargate або EKS за ALB із автомасштабуванням | 🟡 |
 | 86 | RDS: ревʼю конфігурації і бюджет зʼєднань | 🟡 |
 | 87 | Аудит політики S3 | 🟡 |
+| 88 | Lambda + SQS: подієва обробка, DLQ, ідемпотентність | 🟡 |
+| 89 | Secrets Manager / Parameter Store замість змінних у коді | 🟡 |
+| 90 | Керування витратами: budget alerts, теги, «чому рахунок виріс» | 🟡 |
+| 91 | Disaster recovery: RTO/RPO і відновлення регіону/БД | 🔴 |
+| 92 | Multi-account і Landing Zone: як працюють SCP | 🔴 |
 | 93 | Аудит Kubernetes-маніфестів | 🟡 |
 | 94 | Probes: симулятор kubelet | 🔴 |
 | 127 | Structured output з повторною спробою 🤖 | 🟡 |
