@@ -10,7 +10,7 @@
 
   // ---------- сховище -------------------------------------------------------
   function emptyState() {
-    return { tasks: {}, verified: {}, concepts: {}, capstone: {}, days: [], settings: { baseUrl: "", model: "" } };
+    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], settings: { baseUrl: "", model: "" } };
   }
   var state = load();
 
@@ -23,6 +23,7 @@
       return {
         tasks: s.tasks || e.tasks,
         verified: s.verified || e.verified,
+        checks: s.checks || e.checks,
         concepts: s.concepts || e.concepts,
         capstone: s.capstone || e.capstone,
         days: s.days || e.days,
@@ -65,6 +66,7 @@
   }
   function md(s) { return esc(s).replace(/`([^`]+)`/g, "<code>$1</code>"); }
   function stageById(id) { return DATA.stages.filter(function (s) { return s.id === id; })[0]; }
+  function checkDone(id, i) { return !!(state.checks[id] && state.checks[id][i]); }
   function taskState(id) { return state.tasks[id] || "todo"; }
   function conceptDone(stageId, i) { return !!(state.concepts[stageId] && state.concepts[stageId][i]); }
 
@@ -350,6 +352,41 @@
     return out ? '<div class="tags">' + out + "</div>" : "";
   }
 
+  // завдання без автотесту: кроки і чекліст «Готово, коли»; усі пункти відмічені = завдання зроблене
+  function manualHtml(t) {
+    if (t.auto || !t.done) return "";
+    var marked = t.done.filter(function (_, i) { return checkDone(t.id, i); }).length;
+    var open = marked > 0 || taskState(t.id) === "doing";
+    return '<details class="manual"' + (open ? " open" : "") + "><summary>" +
+      (t.kind === "документ" ? "Що підготувати" : "Як виконати") + " · готово " + marked + "/" + t.done.length + "</summary>" +
+      (t.steps ? '<ol class="steps">' + t.steps.map(function (x) { return "<li>" + md(x) + "</li>"; }).join("") + "</ol>" : "") +
+      '<div class="chk"><b>Готово, коли:</b></div><ul class="checklist">' +
+      t.done.map(function (x, i) {
+        return '<li><label><input type="checkbox" data-check="' + t.id + ":" + i + '"' + (checkDone(t.id, i) ? " checked" : "") +
+          "><span>" + md(x) + "</span></label></li>";
+      }).join("") + "</ul></details>";
+  }
+
+  function rerenderTask(id) {
+    var card = document.getElementById("task-" + id);
+    var t = TASKS[id];
+    if (!card || !t) return;
+    var tmp = document.createElement("div");
+    tmp.innerHTML = taskHtml(t);
+    card.replaceWith(tmp.firstElementChild);
+    applyFilter();
+    // чипи й «довів» у понять цього етапу залежать від статусу завдання
+    (TASK_CONCEPTS[id] || []).forEach(function (c) {
+      var li = document.getElementById("c-" + c.stage.id + "-" + c.i);
+      if (li) {
+        var wrap = document.createElement("div");
+        wrap.innerHTML = conceptHtml(c.stage, c.i);
+        li.replaceWith(wrap.firstElementChild);
+      }
+    });
+    refreshProgress(location.hash.replace(/^#\/stage\//, ""));
+  }
+
   function taskHtml(t) {
     var s = taskState(t.id);
     var icon = s === "done" ? "✓" : s === "doing" ? "…" : "";
@@ -360,6 +397,8 @@
       "<div><h3>" + (t.n ? '<span class="num">№' + t.n + "</span>" : "") + esc(t.title) + " " + lvlBadge(t.level) +
       (t.ai ? ' <span class="badge ai">🤖 LLM</span>' : "") +
       (t.auto ? ' <span class="badge free">🧪 автоперевірка</span>' : "") +
+      (!t.auto && t.kind === "документ" ? ' <span class="badge part" title="Документ або розрахунок: оцінюєш себе за чеклістом">📝 документ</span>' : "") +
+      (!t.auto && t.kind !== "документ" && t.done ? ' <span class="badge part" title="Практика в реальному інструменті: перевіряєш себе за чеклістом">🛠 практика</span>' : "") +
       (state.verified[t.id] ? ' <span class="badge ok" title="Тести пройдено ' + esc(state.verified[t.id]) +
         '">✅ перевірено тестами</span>' : "") + "</h3>" +
       "<p>" + md(t.desc) + ".</p>" +
@@ -368,7 +407,7 @@
         return '<a href="#/stage/' + c.stage.id + '" data-focus="c-' + c.stage.id + "-" + c.i + '">' +
           esc(c.stage.concepts[c.i].replace(/`/g, "")) + "</a>";
       }).join(" · ") + "</div>" : "") +
-      tagsHtml(t) +
+      tagsHtml(t) + manualHtml(t) +
       (t.auto ? '<div class="chk">Папка <code>tasks/' + esc(t.auto) + "</code> · запуск: <code>python check.py " +
         esc(t.auto.split("_")[0]) + "</code></div>" : "") + "</div></div>";
   }
@@ -565,23 +604,7 @@
       if (next === "todo") delete state.tasks[id]; else state.tasks[id] = next;
       delete state.verified[id];  // ручна зміна статусу знімає позначку тестів
       touch();
-      var card = document.getElementById("task-" + id);
-      var t = null;
-      DATA.stages.forEach(function (st) { st.tasks.forEach(function (x) { if (x.id === id) t = x; }); });
-      var tmp = document.createElement("div");
-      tmp.innerHTML = taskHtml(t);
-      card.replaceWith(tmp.firstElementChild);
-      applyFilter();
-      // чипи й «довів» у понять цього етапу залежать від статусу завдання
-      (TASK_CONCEPTS[id] || []).forEach(function (c) {
-        var li = document.getElementById("c-" + c.stage.id + "-" + c.i);
-        if (li) {
-          var wrap = document.createElement("div");
-          wrap.innerHTML = conceptHtml(c.stage, c.i);
-          li.replaceWith(wrap.firstElementChild);
-        }
-      });
-      refreshProgress(location.hash.replace(/^#\/stage\//, ""));
+      rerenderTask(id);
       return;
     }
 
@@ -629,6 +652,21 @@
       refreshProgress(p[0]);
       return;
     }
+    var chk = e.target.closest("[data-check]");
+    if (chk) {
+      var c = chk.getAttribute("data-check").split(":");
+      var tk = TASKS[c[0]];
+      state.checks[c[0]] = state.checks[c[0]] || {};
+      if (chk.checked) state.checks[c[0]][c[1]] = true; else delete state.checks[c[0]][c[1]];
+      var all = tk.done.every(function (_, i) { return checkDone(c[0], i); });
+      var any = tk.done.some(function (_, i) { return checkDone(c[0], i); });
+      if (all) { state.tasks[c[0]] = "done"; }
+      else if (taskState(c[0]) === "done") { state.tasks[c[0]] = any ? "doing" : "todo"; if (!any) delete state.tasks[c[0]]; }
+      else if (any && taskState(c[0]) === "todo") { state.tasks[c[0]] = "doing"; }
+      touch();
+      rerenderTask(c[0]);
+      return;
+    }
     var cap = e.target.closest("[data-cap]");
     if (cap) {
       var q = cap.getAttribute("data-cap").split(":");
@@ -651,7 +689,7 @@
           }
           var e0 = emptyState();
           state = {
-            tasks: s.tasks, verified: s.verified || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [],
+            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [],
             settings: Object.assign(e0.settings, s.settings || {}),
           };
           save();

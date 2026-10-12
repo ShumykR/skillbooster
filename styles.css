@@ -330,3 +330,9 @@ pre.env {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; scroll-behavior: auto !important; }
 }
+
+.task details.manual { margin-top: 8px; font-size: .88rem; }
+.task details.manual summary { cursor: pointer; color: var(--accent); }
+.task details.manual .steps { margin: 6px 0 0; padding-left: 1.3rem; color: var(--muted); }
+.task details.manual .steps li { margin: 2px 0; }
+.task details.manual .checklist { margin: 4px 0 0; }

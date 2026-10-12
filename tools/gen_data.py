@@ -16,7 +16,12 @@ tasks_by_section = {}
 section = None
 group = None
 item_re = re.compile(r"^(\d+)\.\s+(🟢|🟡|🔴)\s+(🤖\s+)?\*\*(.+?)\*\*\s*(.*)$")
-marker_re = re.compile(r"\*(Перевірка|CWE|Патерн):\*")
+marker_re = re.compile(r"\*(Перевірка|CWE|Патерн|Кроки|Готово|Тип):\*")
+
+
+def split_items(text):
+    """Пункти списку в одному рядку каталогу розділені « | »."""
+    return [x.strip() for x in text.split(" | ") if x.strip()]
 
 
 def split_tags(text):
@@ -58,6 +63,12 @@ for line in open(CATALOG, encoding="utf-8"):
             task["cwe"] = split_tags(fields["CWE"])
         if "Патерн" in fields:
             task["pattern"] = split_tags(fields["Патерн"])
+        if "Кроки" in fields:
+            task["steps"] = split_items(fields["Кроки"])
+        if "Готово" in fields:
+            task["done"] = split_items(fields["Готово"])
+        if "Тип" in fields:
+            task["kind"] = fields["Тип"].strip().rstrip(".")
         if group:
             task["group"] = group
         tasks_by_section[section].append(task)
@@ -510,11 +521,17 @@ for st in STAGES:
     for t in tasks:
         if t["id"] in AUTO:
             t["auto"] = AUTO[t["id"]]
+            t.pop("kind", None)
+        elif t.get("kind") not in (None, "практика", "документ"):
+            raise SystemExit(f"{t['id']}: *Тип:* має бути «практика» або «документ», а не «{t['kind']}»")
     stage = {k: v for k, v in st.items() if k not in ("sections", "extra_tasks")}
     stage["tasks"] = tasks
     stages.append(stage)
 
 total = sum(len(s["tasks"]) for s in stages)
+_manual = [t for s in stages for t in s["tasks"] if "auto" not in t and not t["id"].startswith("j")]
+_bare = [t["id"] for t in _manual if not t.get("done")]
+print(f"завдання без автоперевірки: {len(_manual)}, з чеклістом «Готово»: {len(_manual) - len(_bare)}")
 all_tasks = [t for s in stages for t in s["tasks"]]
 sys.path.insert(0, HERE)
 import quiz_data  # noqa: E402
