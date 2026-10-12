@@ -134,6 +134,8 @@ python -m pytest t02_async_dashboard   # або напряму pytest
 | 115 | Тайм-лайн: fan-out on write проти fan-out on read | 🔴 |
 | 116 | Event streaming у стилі Kafka: партиції, offset, consumer groups | 🔴 |
 | 117 | Saga: розподілена транзакція замовлення | 🔴 |
+| 121 | Contract testing: чи не зламає зміна API споживачів | 🟡 |
+| 123 | Mutation testing: чи справді тести щось перевіряють | 🟡 |
 | 127 | Structured output з повторною спробою 🤖 | 🟡 |
 | 135 | Цикл агента з запобіжниками 🤖 | 🔴 |
 | 137 | Авторизація викликів інструментів агентом 🤖 | 🔴 |
