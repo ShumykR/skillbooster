@@ -71,8 +71,13 @@ python -m pytest t02_async_dashboard   # або напряму pytest
 | 36 | Cache stampede | 🔴 |
 | 37 | Rate limiter (token bucket) | 🟡 |
 | 39 | Векторний пошук: IVF-індекс і компроміс швидкість/точність | 🔴 |
+| 40 | REST-рев'ю: лінтер OpenAPI | 🟢 |
 | 41 | Перевірка підпису вебхука | 🟡 |
+| 42 | Вебхуки, що ми відправляємо | 🟡 |
 | 43 | Retry з backoff і circuit breaker | 🟡 |
+| 45 | OAuth2 «Увійти через Google/GitHub»: authorization code + PKCE | 🟡 |
+| 46 | N+1 у GraphQL/REST і DataLoader | 🟡 |
+| 49 | Листи й сповіщення: шаблони, черга, відписка, bounce | 🟡 |
 | 51 | Перевірка JWT | 🟡 |
 | 52 | RBAC → ABAC | 🟡 |
 | 53 | Throttling входу | 🟡 |
