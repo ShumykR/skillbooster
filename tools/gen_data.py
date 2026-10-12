@@ -79,18 +79,48 @@ JENKINS_TASKS = [
         "title": "Jenkins у Docker",
         "desc": "підняти Jenkins через docker compose, створити перший job, підключити агент",
         "check": "Jenkins відкривається локально, job проходить",
+        "kind": "практика",
+        "steps": ["написати docker-compose.yml з образом jenkins/jenkins:lts (порт 8080, том для jenkins_home)",
+                  "пройти початкове налаштування (пароль із логів контейнера, рекомендовані плагіни)",
+                  "створити freestyle job, що клонує твій репозиторій і запускає pytest",
+                  "підключити агент: або вбудований вузол, або окремий контейнер-агент за SSH/inbound",
+                  "перезапустити контейнер і перевірити, що job і налаштування збереглись"],
+        "done": ["Jenkins відкривається на localhost:8080 після docker compose up",
+                 "job клонує репозиторій і проходить зеленим",
+                 "налаштування переживають перезапуск контейнера (том jenkins_home)",
+                 "пароль адміністратора й токени не лежать у репозиторії"],
     },
     {
         "id": "j2", "n": 0, "level": 2, "ai": False,
         "title": "Jenkinsfile (declarative)",
         "desc": "перенести пайплайн із завдань 73–75 (lint, test, build образу) на Jenkinsfile і вебхук з Git",
         "check": "зелений пайплайн за пушем у репозиторій",
+        "kind": "практика",
+        "steps": ["створити Jenkinsfile (declarative) із stages: lint, test, build образу",
+                  "створити Multibranch Pipeline job на свій репозиторій",
+                  "налаштувати webhook із GitHub (або Poll SCM, якщо Jenkins недоступний ззовні) на push",
+                  "додати post-блок: архівувати звіт тестів і повідомляти про падіння",
+                  "порівняти з workflow GitHub Actions із завдань 73-75: що простіше, що складніше"],
+        "done": ["push у гілку автоматично запускає пайплайн",
+                 "stages lint, test, build виконуються в Docker-агенті, а не на самому контролері",
+                 "падіння тесту робить білд червоним і видно в post-блоці",
+                 "є 5-6 рядків порівняння з Actions (час, зручність, підтримка)"],
     },
     {
         "id": "j3", "n": 0, "level": 3, "ai": False,
         "title": "Shared Library і credentials",
         "desc": "винести спільні кроки в Shared Library, секрети тримати в Jenkins Credentials",
         "check": "два пайплайни використовують одну бібліотеку, секретів у коді немає",
+        "kind": "практика",
+        "steps": ["створити окремий репозиторій із Shared Library (каталог vars/, функція buildAndTest)",
+                  "підключити бібліотеку в Jenkins (Manage Jenkins, Global Pipeline Libraries) і викликати її у двох Jenkinsfile",
+                  "створити секрет у Jenkins Credentials (токен реєстру образів) і використати його через withCredentials",
+                  "переконатись, що значення секрету маскується в логах білду",
+                  "додати версіювання бібліотеки (тег) і підключати конкретну версію"],
+        "done": ["два різні пайплайни використовують одну бібліотеку",
+                 "у жодному Jenkinsfile чи репозиторії немає пароля або токена",
+                 "у логах білду секрет показано як ****",
+                 "бібліотека підключається за тегом, а не за гілкою main"],
     },
 ]
 
@@ -529,7 +559,7 @@ for st in STAGES:
     stages.append(stage)
 
 total = sum(len(s["tasks"]) for s in stages)
-_manual = [t for s in stages for t in s["tasks"] if "auto" not in t and not t["id"].startswith("j")]
+_manual = [t for s in stages for t in s["tasks"] if "auto" not in t]
 _bare = [t["id"] for t in _manual if not t.get("done")]
 print(f"завдання без автоперевірки: {len(_manual)}, з чеклістом «Готово»: {len(_manual) - len(_bare)}")
 all_tasks = [t for s in stages for t in s["tasks"]]
