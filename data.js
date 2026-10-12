@@ -2992,7 +2992,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Матриця версій Python, кеш залежностей, паралельні джоби.",
      "desc": "",
-     "check": "час пайплайна"
+     "check": "час пайплайна",
+     "auto": "t74_ci_speed"
     },
     {
      "id": "t75",
@@ -3001,7 +3002,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Збірка та публікація образу",
      "desc": "у GHCR/ECR з тегами за версією й sha",
-     "check": "образ у реєстрі"
+     "check": "образ у реєстрі",
+     "auto": "t75_image_tags"
     },
     {
      "id": "t76",
@@ -3010,7 +3012,23 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Деплой на сервер/ECS",
      "desc": "автоматичний на merge в main, з manual approval на prod",
-     "check": "environments"
+     "check": "environments",
+     "steps": [
+      "створити в репозиторії GitHub Environments `staging` і `production`",
+      "у `production` увімкнути Required reviewers (ти сам або напарник) і обмежити гілки до `main`",
+      "зробити workflow: на merge у `main` автоматично деплоїти на `staging`, а деплой на `production` має чекати схвалення (job з `environment: production` і `needs: deploy-staging`)",
+      "секрети зберігати як environment secrets (різні для staging і production), а не загальні",
+      "в кінці деплою запускати health-check і провалювати job, якщо сервіс не відповідає",
+      "додати у workflow `concurrency`, щоб два деплої одного середовища не йшли одночасно"
+     ],
+     "done": [
+      "merge у `main` сам деплоїть на staging без участі людини",
+      "деплой на production зупиняється на кнопці «Review deployments» і не йде без схвалення",
+      "environment secrets для production недоступні job-ам, що не мають `environment: production`",
+      "зламаний health-check провалює деплой і лишає попередню версію",
+      "вкладка Deployments в репозиторії показує історію деплоїв по середовищах"
+     ],
+     "kind": "практика"
     },
     {
      "id": "t77",
@@ -3019,7 +3037,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Стратегії релізів",
      "desc": "rolling, blue-green, canary; відкат за помилок",
-     "check": "симуляція зламаного релізу"
+     "check": "симуляція зламаного релізу",
+     "auto": "t77_release_strategies"
     },
     {
      "id": "t78",
@@ -3031,7 +3050,8 @@ window.SKILLBOOSTER = {
      "check": "відсутність секретів у репозиторії",
      "cwe": [
       "?798"
-     ]
+     ],
+     "auto": "t78_oidc_trust"
     },
     {
      "id": "t79",
@@ -3040,7 +3060,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Preview-середовище",
      "desc": "на кожен PR",
-     "check": "тимчасовий URL"
+     "check": "тимчасовий URL",
+     "auto": "t79_preview_envs"
     },
     {
      "id": "t80",
@@ -3049,7 +3070,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Semantic versioning і автоматичний changelog",
      "desc": "(release-please)",
-     "check": "релізний PR"
+     "check": "релізний PR",
+     "auto": "t80_semver_changelog"
     },
     {
      "id": "t81",
@@ -3058,7 +3080,8 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Monorepo",
      "desc": "запускати лише змінені сервіси",
-     "check": "фільтри шляхів"
+     "check": "фільтри шляхів",
+     "auto": "t81_monorepo_affected"
     },
     {
      "id": "t82",
@@ -3067,7 +3090,21 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "GitLab CI",
      "desc": "той самий пайплайн на іншій системі",
-     "check": "порівняння концепцій"
+     "check": "порівняння концепцій",
+     "steps": [
+      "взяти робочий GitHub Actions workflow (lint, test, build образу)",
+      "створити безкоштовний проєкт на GitLab.com і зробити `.gitlab-ci.yml`, що робить те саме: `stages`, `rules`, `cache`, `artifacts`, `needs`",
+      "зіставити поняття в таблиці: workflow/pipeline, job, step/script, runner, `uses`/`include`, secrets/CI variables (masked, protected), environments, matrix/`parallel:matrix`",
+      "запустити пайплайн і порівняти час, вигляд логів, зручність кешу й артефактів",
+      "записати 5 відмінностей, які тебе здивували"
+     ],
+     "done": [
+      "пайплайн у GitLab проходить зеленим на тих самих кроках, що й GitHub Actions",
+      "є таблиця відповідності понять не менше ніж з 8 рядків",
+      "секрет оголошено як masked і protected variable, а не записано у файл",
+      "записано 5 відмінностей (синтаксис, runners, кеш/артефакти, environments, marketplace проти `include`) і висновок, коли що обирати"
+     ],
+     "kind": "практика"
     },
     {
      "id": "j1",
