@@ -12,6 +12,7 @@
   function emptyState() {
     return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], settings: { baseUrl: "", model: "" } };
   }
+  var OLD_AI = ["ai-api:1", "ai-llm:4", "ai-rag:2", "ai-evals:0", "ai-agents:1", "ai-agents:8", "ai-security:1", "ai-api:6", "ai-ops:8"];
   var state = load();
 
   function load() {
@@ -20,7 +21,7 @@
       if (!raw) return emptyState();
       var s = JSON.parse(raw);
       var e = emptyState();
-      return {
+      var out = {
         tasks: s.tasks || e.tasks,
         verified: s.verified || e.verified,
         checks: s.checks || e.checks,
@@ -29,9 +30,24 @@
         days: s.days || e.days,
         settings: Object.assign(e.settings, s.settings || {}),
       };
+      migrateOldAi(out);
+      return out;
     } catch (err) {
       return emptyState();
     }
+  }
+  // Старий етап `ai` розбито на 8 етапів: переносимо галочки за таблицею старий індекс → етап:індекс
+  function migrateOldAi(s) {
+    var old = s.concepts.ai;
+    if (!old) return;
+    Object.keys(old).forEach(function (i) {
+      var to = OLD_AI[+i];
+      if (!old[i] || !to) return;
+      var p = to.split(":");
+      s.concepts[p[0]] = s.concepts[p[0]] || {};
+      s.concepts[p[0]][p[1]] = true;
+    });
+    delete s.concepts.ai;
   }
   function save() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (err) { /* приватний режим */ }
@@ -783,6 +799,7 @@
             tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [],
             settings: Object.assign(e0.settings, s.settings || {}),
           };
+          migrateOldAi(state);
           save();
           route();
           toast("Прогрес імпортовано");
