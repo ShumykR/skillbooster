@@ -2,7 +2,7 @@
 
 > Файл **генерується** командою `python tools/gen_data.py` з тегів `*CWE:*` у `docs/tasks-catalog.md` і довідника `tools/cwe_data.py`. Руками не правити.
 
-Стан: 195 завдань з автоперевіркою, 266 завдань у каталозі, capstone M0–M12.
+Стан: 200 завдань з автоперевіркою, 266 завдань у каталозі, capstone M0–M12.
 
 ## Джерела й обмеження
 
@@ -51,11 +51,11 @@
 | CWE-359 | Exposure of Private Personal Information | 🟡 | ~t61, №62 |
 | CWE-377 | Insecure Temporary File | 🟡 | ~t56 |
 | CWE-601 | Open Redirect | ✅ | t158, t233 |
-| CWE-639 | Authorization Bypass Through User-Controlled Key (IDOR) | ✅ | t16, t226, №50, t52, ~t162, №59, t235, №256, №182, ~t211, t137 |
+| CWE-639 | Authorization Bypass Through User-Controlled Key (IDOR) | ✅ | t16, t226, №50, t52, ~t162, №59, t235, №256, ~t182, ~t211, t137 |
 | CWE-668 | Exposure of Resource to Wrong Sphere | ✅ | t71, t84, t86, t87, №98 |
 | CWE-732 | Incorrect Permission Assignment for Critical Resource | ✅ | t84, t87, №60, t258, №263 |
 | CWE-862 | Missing Authorization | ✅ | t16, №50, t52, ~t163, t137 |
-| CWE-863 | Incorrect Authorization | ✅ | t52, t235, №182, t211, №217, t137, t197, №198, t213 |
+| CWE-863 | Incorrect Authorization | ✅ | t52, t235, t182, t211, №217, t137, t197, №198, t213 |
 | CWE-918 | Server-Side Request Forgery | ✅ | №50, t58, №256, №263 |
 | CWE-1275 | Sensitive Cookie with Improper SameSite Attribute | ✅ | t143, ~t167 |
 
@@ -147,8 +147,8 @@
 | CWE | Назва | Статус | Де |
 |---|---|---|---|
 | CWE-345 | Insufficient Verification of Data Authenticity | ✅ | t41, t51, t232, t234, t249, ~t199 |
-| CWE-494 | Download of Code Without Integrity Check | ✅ | ~t73, ~t55, t246, t249, №250, ~t199, №201 |
-| CWE-502 | Deserialization of Untrusted Data | ✅ | ~t56, t240, t255, №201 |
+| CWE-494 | Download of Code Without Integrity Check | ✅ | ~t73, ~t55, t246, t249, №250, ~t199, ~t201 |
+| CWE-502 | Deserialization of Untrusted Data | ✅ | ~t56, t240, t255, t201 |
 | CWE-829 | Inclusion of Functionality from Untrusted Control Sphere | ✅ | ~t73, t245, t246, ~t249, ~t212 |
 | CWE-915 | Mass Assignment | ✅ | ~t156, t162 |
 
@@ -191,16 +191,16 @@
 | 12 | CWE-434 | Unrestricted Upload | ✅ | №13, t145 |
 | 13 | CWE-476 | NULL Pointer Dereference | ➖ | — |
 | 14 | CWE-121 | Stack-based Buffer Overflow | ➖ | — |
-| 15 | CWE-502 | Deserialization of Untrusted Data | ✅ | ~t56, t240, t255, №201 |
+| 15 | CWE-502 | Deserialization of Untrusted Data | ✅ | ~t56, t240, t255, t201 |
 | 16 | CWE-122 | Heap-based Buffer Overflow | ➖ | — |
-| 17 | CWE-863 | Incorrect Authorization | ✅ | t52, t235, №182, t211, №217, t137, t197, №198, t213 |
+| 17 | CWE-863 | Incorrect Authorization | ✅ | t52, t235, t182, t211, №217, t137, t197, №198, t213 |
 | 18 | CWE-20 | Improper Input Validation | ✅ | №5, ~t7, ~t153, t156, ~t146, ~t145, ~t127, ~t196 |
 | 19 | CWE-284 | Improper Access Control | ✅ | t226, t52, ~t258, №263 |
 | 20 | CWE-200 | Exposure of Sensitive Information | 🟡 | ~t7, ~t57, ~t61, №62, ~t245, ~t196 |
 | 21 | CWE-306 | Missing Authentication | ✅ | t163, №189, №217 |
 | 22 | CWE-918 | SSRF | ✅ | №50, t58, №256, №263 |
 | 23 | CWE-77 | Command Injection | ✅ | ~t56, t254 |
-| 24 | CWE-639 | Authorization Bypass via User-Controlled Key | ✅ | t16, t226, №50, t52, ~t162, №59, t235, №256, №182, ~t211, t137 |
+| 24 | CWE-639 | Authorization Bypass via User-Controlled Key | ✅ | t16, t226, №50, t52, ~t162, №59, t235, №256, ~t182, ~t211, t137 |
 | 25 | CWE-770 | Allocation of Resources Without Limits | ✅ | t31, t37, №67, t93, ~t135 |
 
 З 25 слабкостей 7 стосуються пам'яті C/C++ (➖, для Python не актуальні). З решти 18: ✅ 17, 🟡 1, 📝 0, 🔗 0, ❌ 0.
