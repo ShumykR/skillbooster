@@ -10,7 +10,7 @@
 
   // ---------- сховище -------------------------------------------------------
   function emptyState() {
-    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], hints: {}, played: {}, settings: { baseUrl: "", model: "" } };
+    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], hints: {}, played: {}, failed: {}, settings: { baseUrl: "", model: "" } };
   }
   var OLD_AI = ["ai-api:1", "ai-llm:4", "ai-rag:2", "ai-evals:0", "ai-agents:1", "ai-agents:8", "ai-security:1", "ai-api:6", "ai-ops:8"];
   var state = load();
@@ -30,6 +30,7 @@
         days: s.days || e.days,
         hints: s.hints || e.hints,
         played: s.played || e.played,
+        failed: s.failed || e.failed,
         settings: Object.assign(e.settings, s.settings || {}),
       };
       migrateOldAi(out);
@@ -646,6 +647,8 @@
       (!t.auto && t.kind === "автотест" ? ' <span class="badge part" title="Умова готова, автоперевірка ще пишеться: поки можна розв\'язувати й перевіряти себе за умовою">⏳ автотест готується</span>' : "") +
       (!t.auto && t.kind === "документ" ?' <span class="badge part" title="Документ або розрахунок: оцінюєш себе за чеклістом">📝 документ</span>' : "") +
       (!t.auto && t.kind !== "документ" && t.done ? ' <span class="badge part" title="Практика в реальному інструменті: перевіряєш себе за чеклістом">🛠 практика</span>' : "") +
+      (state.failed[t.id] ? ' <span class="badge bad" title="Останній запуск check.py ' + esc(state.failed[t.id]) +
+        ' не пройшов; позначка зникне після успішного прогону">❌ тести падають (' + esc(state.failed[t.id]) + ")</span>" : "") +
       (state.verified[t.id] ? ' <span class="badge ok" title="Тести пройдено ' + esc(state.verified[t.id]) +
         '">✅ перевірено тестами</span>' : "") + "</h3>" +
       "<p>" + md(t.desc) + ".</p>" +
@@ -708,33 +711,42 @@
       if (!TASKS[id]) return;
       state.tasks[id] = "done";
       state.verified[id] = d;
+      delete state.failed[id];
       n++;
     });
     touch();
     return n;
   }
-  function syncIds(h) {
+  // #/sync/t2,t6?fail=t7,t9: пройдені й впалі завдання
+  function syncIds(h, key) {
     var seen = {};
     var raw = h.replace(/^#\/sync\/?/, "");
     try { raw = decodeURIComponent(raw); } catch (err) { /* лишаємо як є */ }
-    return raw.split(",").map(function (id) { return id.trim(); }).filter(function (id) {
+    var cut = raw.indexOf("?fail=");
+    var part = key === "fail" ? (cut === -1 ? "" : raw.slice(cut + 6)) : (cut === -1 ? raw : raw.slice(0, cut));
+    return part.split(",").map(function (id) { return id.trim(); }).filter(function (id) {
       if (!TASKS[id] || seen[id]) return false;
       seen[id] = true;
       return true;
     });
   }
-  function renderSync(ids) {
-    if (!ids.length) return "<h1>Синхронізація</h1><p class=\"lead\">У посиланні немає відомих завдань.</p>";
+  function renderSync(ids, fails) {
+    fails = fails || [];
+    if (!ids.length && !fails.length) return "<h1>Синхронізація</h1><p class=\"lead\">У посиланні немає відомих завдань.</p>";
     var fresh = ids.filter(function (id) { return !state.verified[id]; });
-    return "<h1>Результати check.py</h1>" +
-      '<p class="lead">Тести пройдено для ' + ids.length + " завдань" +
-      (fresh.length < ids.length ? " (нових: " + fresh.length + ")" : "") +
-      ". Позначити їх як «зроблено · перевірено тестами»? Решта прогресу не зміниться.</p>" +
-      '<div class="card"><ul class="sync-list">' + ids.map(function (id) {
+    function items(list) {
+      return '<ul class="sync-list">' + list.map(function (id) {
         return "<li>" + taskChip(id) + " " + esc(TASKS[id].title) + "</li>";
-      }).join("") + "</ul>" +
+      }).join("") + "</ul>";
+    }
+    return "<h1>Результати check.py</h1>" +
+      (ids.length ? '<p class="lead">Тести пройдено для ' + ids.length + " завдань" +
+        (fresh.length < ids.length ? " (нових: " + fresh.length + ")" : "") +
+        ". Позначити їх як «зроблено · перевірено тестами»? Решта прогресу не зміниться.</p>" : "") +
+      '<div class="card">' + (ids.length ? items(ids) : "") +
+      (fails.length ? '<p class="lead">❌ Тести падають для ' + fails.length + " завдань: вони отримають статус «у процесі» і позначку «тести падають», яка зникне після наступного успішного прогону.</p>" + items(fails) : "") +
       '<div class="row" style="margin-top:14px"><button class="btn" id="syncOk" data-ids="' + esc(ids.join(",")) +
-      '">Позначити</button><a class="btn ghost" href="#/">Скасувати</a></div></div>';
+      '" data-fail="' + esc(fails.join(",")) + '">Позначити</button><a class="btn ghost" href="#/">Скасувати</a></div></div>';
   }
 
   function envText() {
@@ -809,7 +821,7 @@
       html = renderPlayList();
       title = "Пісочниці · SkillBooster";
     } else if (h.indexOf("#/sync") === 0) {
-      html = renderSync(syncIds(h));
+      html = renderSync(syncIds(h), syncIds(h, "fail"));
       title = "Синхронізація · SkillBooster";
     } else if (h.indexOf("#/capstone") === 0) {
       html = renderCapstone();
@@ -896,8 +908,15 @@
     if (opt) { answerQuiz(opt); return; }
 
     if (e.target.id === "syncOk") {
-      var n = markVerified(e.target.getAttribute("data-ids").split(","));
-      toast("Перевірено тестами: " + n);
+      var n = markVerified(e.target.getAttribute("data-ids").split(",").filter(Boolean));
+      var bad = (e.target.getAttribute("data-fail") || "").split(",").filter(function (id) { return TASKS[id]; });
+      bad.forEach(function (id) {
+        state.failed[id] = today();
+        delete state.verified[id];
+        state.tasks[id] = "doing";
+      });
+      if (bad.length) touch();
+      toast("Перевірено тестами: " + n + (bad.length ? ", падає: " + bad.length : ""));
       location.hash = "#/";
       return;
     }
@@ -1018,7 +1037,7 @@
           }
           var e0 = emptyState();
           state = {
-            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [], hints: s.hints || {}, played: s.played || {},
+            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [], hints: s.hints || {}, played: s.played || {}, failed: s.failed || {},
             settings: Object.assign(e0.settings, s.settings || {}),
           };
           migrateOldAi(state);

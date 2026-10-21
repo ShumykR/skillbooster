@@ -244,6 +244,7 @@ a.tag:hover { text-decoration: underline; }
 .sync-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .92rem; }
 .sync-list .tchip { font-size: .78rem; }
 .badge.ok { background: var(--ok); color: #fff; }
+.badge.bad { background: var(--bad-soft); color: var(--bad); }
 .task .chk a { color: var(--accent); }
 .flash { animation: flash 1.6s ease; }
 @keyframes flash { 0%, 40% { box-shadow: 0 0 0 3px var(--accent); } 100% { box-shadow: 0 0 0 3px transparent; } }
