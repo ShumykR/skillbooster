@@ -280,6 +280,10 @@
       '<button class="chip" aria-pressed="false" data-f="open">Лише незавершені</button>' +
       (st.tasks.some(function (t) { return t.cwe && t.cwe.length; })
         ? '<button class="chip" aria-pressed="false" data-f="cwe" title="Завдання, що тренують конкретні слабкості CWE">🛡 CWE</button>' : "") +
+      [["ai", "🤖 LLM", "Потребують LLM"], ["auto", "🧪 автотест", "З автоперевіркою"],
+        ["manual", "🛠 практика / 📝 документ", "Без автотесту: кроки й чекліст"], ["pending", "⏳ готується", "Автотест ще пишеться"]]
+        .filter(function (x) { return st.tasks.some(function (t) { return taskKinds(t).indexOf(x[0]) !== -1; }); })
+        .map(function (x) { return '<button class="chip" aria-pressed="false" data-f="' + x[0] + '" title="' + x[2] + '">' + x[1] + "</button>"; }).join("") +
       "</div>" +
       '<div id="taskList">' + st.tasks.map(function (t, i) {
         var head = "";
@@ -399,6 +403,15 @@
     return out ? '<div class="tags">' + out + "</div>" : "";
   }
 
+  function taskKinds(t) {
+    var k = [];
+    if (t.ai) k.push("ai");
+    if (t.auto) k.push("auto");
+    else if (t.kind === "автотест") k.push("pending");
+    else k.push("manual");
+    return k;
+  }
+
   // завдання без автотесту: кроки і чекліст «Готово, коли»; усі пункти відмічені = завдання зроблене
   function manualHtml(t) {
     if (t.auto || !t.done) return "";
@@ -439,7 +452,7 @@
     var icon = s === "done" ? "✓" : s === "doing" ? "…" : "";
     var label = s === "done" ? "Зроблено" : s === "doing" ? "У процесі" : "Не розпочато";
     return '<div class="card task ' + (s === "done" ? "done" : "") + '" data-s="' + s + '" data-lvl="' + t.level +
-      '" data-tag="' + ((t.cwe && t.cwe.length) ? "cwe" : "") + '" id="task-' + t.id + '">' +
+      '" data-tag="' + ((t.cwe && t.cwe.length) ? "cwe" : "") + '" data-kinds=" ' + taskKinds(t).join(" ") + ' " id="task-' + t.id + '">' +
       '<button class="st" data-task="' + t.id + '" aria-label="' + label + ': ' + esc(t.title) + '. Змінити статус">' + icon + "</button>" +
       '<button class="linkbtn" data-copylink="task/' + t.id + '" title="Скопіювати посилання на завдання" aria-label="Скопіювати посилання на завдання">🔗</button>' +
       "<div><h3>" + (t.n ? '<span class="num">№' + t.n + "</span>" : "") + esc(t.title) + " " + lvlBadge(t.level) +
@@ -826,6 +839,7 @@
       var show = true;
       if (f === "open") show = el.getAttribute("data-s") !== "done";
       else if (f === "cwe") show = el.getAttribute("data-tag") === "cwe";
+      else if (f === "ai" || f === "auto" || f === "manual" || f === "pending") show = el.getAttribute("data-kinds").indexOf(" " + f + " ") !== -1;
       else if (f !== "all") show = el.getAttribute("data-lvl") === f;
       el.style.display = show ? "" : "none";
     });
