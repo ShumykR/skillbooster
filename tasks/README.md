@@ -189,14 +189,18 @@ python -m pytest t02_async_dashboard   # або напряму pytest
 | 182 | Інкрементальна індексація з правами доступу | 🟡 |
 | 183 | Harness: evaluator-optimizer  🤖 | 🔴 |
 | 184 | Агент як скінченний автомат | 🟡 |
+| 185 | Памʼять агента | 🟡 |
 | 186 | Політика sandbox для агента | 🔴 |
 | 187 | Durable execution агента | 🔴 |
 | 188 | Multi-agent оркестратор  🤖 | 🔴 |
+| 189 | Маршрутизація між агентами в стилі A2A | 🟡 |
 | 191 | Evals траєкторій агента | 🔴 |
 | 192 | Статистика evals | 🟡 |
+| 193 | Калібрування LLM-судді | 🟡 |
 | 194 | Монітор behavioral drift | 🟡 |
 | 196 | Guardrails-пайплайн | 🟡 |
 | 197 | Taint tracking у стилі CaMeL | 🔴 |
+| 198 | Аналізатор lethal trifecta | 🟡 |
 | 199 | MCP: tool poisoning і rug pull | 🟡 |
 | 200 | Red-team харнес  🤖 | 🔴 |
 | 201 | Безпечне завантаження моделей | 🟡 |

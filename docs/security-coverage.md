@@ -2,7 +2,7 @@
 
 > Файл **генерується** командою `python tools/gen_data.py` з тегів `*CWE:*` у `docs/tasks-catalog.md` і довідника `tools/cwe_data.py`. Руками не правити.
 
-Стан: 200 завдань з автоперевіркою, 266 завдань у каталозі, capstone M0–M12.
+Стан: 204 завдань з автоперевіркою, 266 завдань у каталозі, capstone M0–M12.
 
 ## Джерела й обмеження
 
@@ -55,7 +55,7 @@
 | CWE-668 | Exposure of Resource to Wrong Sphere | ✅ | t71, t84, t86, t87, №98 |
 | CWE-732 | Incorrect Permission Assignment for Critical Resource | ✅ | t84, t87, №60, t258, №263 |
 | CWE-862 | Missing Authorization | ✅ | t16, №50, t52, ~t163, t137 |
-| CWE-863 | Incorrect Authorization | ✅ | t52, t235, t182, t211, №217, t137, t197, №198, t213 |
+| CWE-863 | Incorrect Authorization | ✅ | t52, t235, t182, t211, №217, t137, t197, ~t198, t213 |
 | CWE-918 | Server-Side Request Forgery | ✅ | №50, t58, №256, №263 |
 | CWE-1275 | Sensitive Cookie with Improper SameSite Attribute | ✅ | t143, ~t167 |
 
@@ -132,7 +132,7 @@
 | CWE-287 | Improper Authentication | ✅ | №45, ~t51, t233, t236 |
 | CWE-294 | Authentication Bypass by Capture-replay | ✅ | t41, t233, t234, t236 |
 | CWE-295 | Improper Certificate Validation | ✅ | №68, ~t56, №238, t255 |
-| CWE-306 | Missing Authentication for Critical Function | ✅ | t163, №189, №217 |
+| CWE-306 | Missing Authentication for Critical Function | ✅ | t163, ~t189, №217 |
 | CWE-307 | Excessive Authentication Attempts | ✅ | t53, ~t259 |
 | CWE-308 | Use of Single-factor Authentication (MFA) | 📝 | №53 |
 | CWE-346 | Origin Validation Error | ✅ | №45, t236 |
@@ -193,11 +193,11 @@
 | 14 | CWE-121 | Stack-based Buffer Overflow | ➖ | — |
 | 15 | CWE-502 | Deserialization of Untrusted Data | ✅ | ~t56, t240, t255, t201 |
 | 16 | CWE-122 | Heap-based Buffer Overflow | ➖ | — |
-| 17 | CWE-863 | Incorrect Authorization | ✅ | t52, t235, t182, t211, №217, t137, t197, №198, t213 |
+| 17 | CWE-863 | Incorrect Authorization | ✅ | t52, t235, t182, t211, №217, t137, t197, ~t198, t213 |
 | 18 | CWE-20 | Improper Input Validation | ✅ | №5, ~t7, ~t153, t156, ~t146, ~t145, ~t127, ~t196 |
 | 19 | CWE-284 | Improper Access Control | ✅ | t226, t52, ~t258, №263 |
 | 20 | CWE-200 | Exposure of Sensitive Information | 🟡 | ~t7, ~t57, ~t61, №62, ~t245, ~t196 |
-| 21 | CWE-306 | Missing Authentication | ✅ | t163, №189, №217 |
+| 21 | CWE-306 | Missing Authentication | ✅ | t163, ~t189, №217 |
 | 22 | CWE-918 | SSRF | ✅ | №50, t58, №256, №263 |
 | 23 | CWE-77 | Command Injection | ✅ | ~t56, t254 |
 | 24 | CWE-639 | Authorization Bypass via User-Controlled Key | ✅ | t16, t226, №50, t52, ~t162, №59, t235, №256, ~t182, ~t211, t137 |
