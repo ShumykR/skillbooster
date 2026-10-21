@@ -187,6 +187,8 @@ python -m pytest t02_async_dashboard   # або напряму pytest
 | 177 | Constrained decoding | 🔴 |
 | 178 | Структурний чанкер | 🟡 |
 | 179 | Grounding checker  🤖 | 🔴 |
+| 180 | GraphRAG з нуля | 🔴 |
+| 181 | Agentic RAG  🤖 | 🔴 |
 | 182 | Інкрементальна індексація з правами доступу | 🟡 |
 | 183 | Harness: evaluator-optimizer  🤖 | 🔴 |
 | 184 | Агент як скінченний автомат | 🟡 |
