@@ -59,4 +59,6 @@ for _stage in PRACTICE:
 SANDBOX = {
     "llm-cost": {"title": "Калькулятор вартості LLM", "icon": "💸",
                  "concepts": [("ai-api", 6), ("ai-llm", 1)], "tasks": [133, 132]},
+    "trifecta": {"title": "Lethal trifecta: де розірвати ланцюг", "icon": "🔱",
+                 "concepts": [("ai-security", 3)], "tasks": [197, 198, 196]},
 }

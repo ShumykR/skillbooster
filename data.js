@@ -21,6 +21,23 @@ window.SKILLBOOSTER = {
     "t133",
     "t132"
    ]
+  },
+  {
+   "id": "trifecta",
+   "title": "Lethal trifecta: де розірвати ланцюг",
+   "icon": "🔱",
+   "track": "ai",
+   "concepts": [
+    [
+     "ai-security",
+     3
+    ]
+   ],
+   "tasks": [
+    "t197",
+    "t198",
+    "t196"
+   ]
   }
  ],
  "tracks": [
@@ -11921,6 +11938,11 @@ window.SKILLBOOSTER = {
       "answer": 0,
       "why": "Аномалії в розподілі інструментів і відмов ловить той самий монітор drift (завдання №194)."
      }
+    ]
+   },
+   "sandboxes": {
+    "3": [
+     "trifecta"
     ]
    }
   },

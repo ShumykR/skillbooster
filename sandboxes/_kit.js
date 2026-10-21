@@ -58,6 +58,15 @@
     return { get: function () { return +sel.value; } };
   }
 
+  function textarea(parent, o) {
+    var id = "sbk" + (++uid);
+    var ta = el("textarea", { id: id, rows: o.rows || 4 });
+    ta.value = o.value || "";
+    ta.addEventListener("input", function () { o.onInput(ta.value); });
+    parent.appendChild(el("div", { class: "sb-ctl" }, [el("label", { for: id, text: o.label }), ta]));
+    return { get: function () { return ta.value; } };
+  }
+
   // горизонтальна смуга: сегменти [{label, value, cls}] у пропорції до max (або до суми)
   function bars(parent, rows, max) {
     var top = max || Math.max.apply(null, rows.map(function (r) { return r.value; }).concat([1e-9]));
@@ -94,5 +103,5 @@
     return "$" + Number(n).toLocaleString("uk-UA", { maximumFractionDigits: d, minimumFractionDigits: d });
   }
 
-  window.SB_KIT = { el: el, slider: slider, check: check, num: num, select: select, bars: bars, rng: rng, fmtNum: fmtNum, fmtUsd: fmtUsd };
+  window.SB_KIT = { el: el, slider: slider, check: check, num: num, select: select, textarea: textarea, bars: bars, rng: rng, fmtNum: fmtNum, fmtUsd: fmtUsd };
 })();

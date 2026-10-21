@@ -424,3 +424,16 @@ details.readme > summary { cursor: pointer; padding: 8px 12px; font-weight: 600;
   .search { flex: 1 1 120px; }
   #qres { position: fixed; left: 8px; right: 8px; top: 62px; width: auto; }
 }
+.sb-ctl textarea { grid-column: 1 / -1; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface);
+  color: var(--text); font: inherit; font-size: .85rem; resize: vertical; }
+.sb-badge { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: .85rem; font-weight: 600; }
+.sb-badge.ok { background: var(--surface-2); color: var(--text); }
+.sb-badge.bad { background: var(--bad-soft); color: var(--bad); }
+.sb-flow { list-style: none; margin: 12px 0; padding: 0; }
+.sb-flow li { display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; margin: 0 0 8px; border-left: 4px solid var(--ok);
+  background: var(--surface-2); border-radius: 6px; font-size: .88rem; overflow-wrap: anywhere; }
+.sb-flow li.stop { border-left-color: var(--bad); }
+.sb-flow li span { color: var(--muted); }
+.sb-verdict { padding: 10px 14px; border-radius: 8px; font-weight: 600; }
+.sb-verdict.leak { background: var(--bad-soft); color: var(--bad); }
+.sb-verdict.blocked, .sb-verdict.safe { background: var(--surface-2); color: var(--ok); }
