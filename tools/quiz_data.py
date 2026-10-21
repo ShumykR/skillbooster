@@ -65,4 +65,6 @@ SANDBOX = {
                   "concepts": [("ai-llm", 6)], "tasks": [173, 196]},
     "rrf": {"title": "RRF: злиття рейтингів BM25 і вектора", "icon": "🔀",
             "concepts": [("ai-rag", 2), ("ai-rag", 9)], "tasks": [130]},
+    "context-budget": {"title": "Бюджет контексту: що влізе у вікно", "icon": "🪟",
+                       "concepts": [("ai-api", 4)], "tasks": [175]},
 }

@@ -73,6 +73,21 @@ window.SKILLBOOSTER = {
    "tasks": [
     "t130"
    ]
+  },
+  {
+   "id": "context-budget",
+   "title": "Бюджет контексту: що влізе у вікно",
+   "icon": "🪟",
+   "track": "ai",
+   "concepts": [
+    [
+     "ai-api",
+     4
+    ]
+   ],
+   "tasks": [
+    "t175"
+   ]
   }
  ],
  "tracks": [
@@ -9946,6 +9961,9 @@ window.SKILLBOOSTER = {
    "sandboxes": {
     "6": [
      "llm-cost"
+    ],
+    "4": [
+     "context-budget"
     ]
    }
   },
