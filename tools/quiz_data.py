@@ -81,4 +81,6 @@ SANDBOX = {
                   "concepts": [("ai-agents", 3)], "tasks": [184]},
     "rollout": {"title": "Rollout: rolling, blue-green, canary і ціна багу", "icon": "🚀",
                 "concepts": [("cicd", 4), ("k8s", 7)], "tasks": [77, 100]},
+    "hnsw": {"title": "HNSW: пошук у графі «малого світу»", "icon": "🕸",
+             "concepts": [("ai-llm", 5)], "tasks": [171, 39]},
 }

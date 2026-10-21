@@ -208,6 +208,22 @@ window.SKILLBOOSTER = {
     "t77",
     "t100"
    ]
+  },
+  {
+   "id": "hnsw",
+   "title": "HNSW: пошук у графі «малого світу»",
+   "icon": "🕸",
+   "track": "ai",
+   "concepts": [
+    [
+     "ai-llm",
+     5
+    ]
+   ],
+   "tasks": [
+    "t171",
+    "t39"
+   ]
   }
  ],
  "tracks": [
@@ -9683,6 +9699,9 @@ window.SKILLBOOSTER = {
     ],
     "6": [
      "base-rate"
+    ],
+    "5": [
+     "hnsw"
     ]
    }
   },

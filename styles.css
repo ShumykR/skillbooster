@@ -487,3 +487,5 @@ details.readme > summary { cursor: pointer; padding: 8px 12px; font-weight: 600;
 .sb-pod.new { background: #d9822b; }
 .sb-pod.start { border: 2px dashed #d9822b; }
 .sb-rs { color: var(--muted); white-space: nowrap; }
+.sb-svg { display: block; width: 100%; max-width: 520px; aspect-ratio: 1; border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+  color: var(--text); cursor: crosshair; }
