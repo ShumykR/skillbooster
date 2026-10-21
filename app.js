@@ -256,7 +256,8 @@
       '<small class="note">' + s.pct + "% · розумію " + s.conceptsUnderstood + "/" + s.conceptsTotal +
       " · довів практикою " + s.conceptsProven + "/" + s.conceptsPractice +
       " · завдання " + s.tasksDone + "/" + s.tasksTotal + "</small></div></div>" +
-      '<div class="why"><strong>Навіщо це на роботі.</strong> ' + esc(st.why) + "</div>";
+      '<div class="why"><strong>Навіщо це на роботі.</strong> ' + esc(st.why) + "</div>" +
+      '<p><a class="chip" href="#/notes/' + st.id + '">📄 Шпаргалка етапу</a></p>';
 
     html += "<h2>Що треба знати</h2>" +
       '<p class="note">Галочка означає «розумію» (її ставить і пройдений тест 🧠). ' +
@@ -291,6 +292,25 @@
         if (t.group && (i === 0 || st.tasks[i - 1].group !== t.group)) head = '<h3 class="grp">' + esc(t.group) + "</h3>";
         return head + taskHtml(t);
       }).join("") + "</div>";
+    return html;
+  }
+
+  // шпаргалка етапу: поняття з поясненнями з питань самоперевірки, практика й ресурси (друкується як PDF)
+  function renderNotes(st) {
+    var tr = trackById(trackOf(st));
+    var html = '<div class="crumbs"><a href="#/stage/' + st.id + '">← ' + esc(st.title) + "</a> / Шпаргалка</div>" +
+      '<div class="notes"><div class="notes-actions"><button class="chip" data-print>🖨 Друк / PDF</button></div>' +
+      "<h1>" + st.icon + " " + esc(st.title) + "</h1>" +
+      '<p class="note">' + esc(tr.title) + ", етап " + stageNo(st) + ". " + esc(st.why) + "</p>";
+    st.concepts.forEach(function (c, i) {
+      var qs = (st.quiz && st.quiz[i]) || [], ids = practiceOf(st, i);
+      html += '<section class="nc"><h3>' + md(c) + "</h3>" +
+        qs.map(function (q) { return "<p>" + md(q.why) + "</p>"; }).join("") +
+        (ids.length ? '<p class="note">Практика: ' + ids.map(taskChip).join(" ") + "</p>" : "") + "</section>";
+    });
+    html += "<h2>Ресурси</h2><ul>" + st.resources.map(function (r) {
+      return '<li><a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer">' + esc(r.name) + "</a> — " + esc(r.note) + "</li>";
+    }).join("") + "</ul></div>";
     return html;
   }
 
@@ -700,6 +720,12 @@
       setTrack(trackOf(st));
       html = renderStage(st);
       title = st.title + " · SkillBooster";
+    } else if (/^#\/notes\/[\w-]+/.test(h) && stageById(h.match(/^#\/notes\/([\w-]+)/)[1])) {
+      var ns = stageById(h.match(/^#\/notes\/([\w-]+)/)[1]);
+      activeId = ns.id;
+      setTrack(trackOf(ns));
+      html = renderNotes(ns);
+      title = "Шпаргалка: " + ns.title + " · SkillBooster";
     } else if (h.indexOf("#/sync") === 0) {
       html = renderSync(syncIds(h));
       title = "Синхронізація · SkillBooster";
@@ -813,6 +839,8 @@
       applyFilter();
       return;
     }
+
+    if (e.target.closest("[data-print]")) { window.print(); return; }
 
     var hb = e.target.closest("[data-hint]");
     if (hb) {
