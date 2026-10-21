@@ -45,7 +45,7 @@ def main():
     if not dirs:
         print("Завдань не знайдено.")
         return 1
-    passed, failed = {}, []
+    passed = {}
     for d in dirs:
         code, out = run_task(d)
         task_id = "t" + re.match(r"t(\d+)_", d.name).group(1).lstrip("0")
@@ -54,25 +54,24 @@ def main():
         if ok:
             passed[task_id] = "done"
         else:
-            failed.append(task_id)
             tail = "\n".join(out.strip().splitlines()[-12:])
             print("   " + tail.replace("\n", "\n   "))
     (ROOT / "skillbooster-progress.json").write_text(
         json.dumps({"mode": "merge", "tasks": passed}, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     print(f"\nПройдено {len(passed)} з {len(dirs)}.")
-    if passed or failed:
-        sync = write_sync_page(list(passed), failed)
+    if passed:
+        sync = write_sync_page(list(passed))
         print(f"Відмітити на сайті: відкрий tasks/{sync.name} (або запусти з --open)")
         if "--open" in sys.argv:
             webbrowser.open(sync.as_uri())
     return 0
 
 
-def write_sync_page(ids, failed=()):
+def write_sync_page(ids):
     """HTML-перехідник: Windows губить #фрагмент у file://-посиланнях, а JS-редирект ні."""
     site = os.environ.get("SKILLBOOSTER_URL") or (ROOT.parent / "index.html").as_uri()
-    target = site.split("#")[0] + "#/sync/" + ",".join(ids) + ("?fail=" + ",".join(failed) if failed else "")
+    target = site.split("#")[0] + "#/sync/" + ",".join(ids)
     page = ROOT / "skillbooster-sync.html"
     js_target = json.dumps(target).replace("<", "\\u003c")
     page.write_text(
