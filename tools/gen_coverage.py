@@ -71,7 +71,7 @@ def build(tasks, auto_count, catalog_count):
     w("# Покриття OWASP Top 10:2025 і CWE (зіставлення з навчальним шляхом)\n")
     w("> Файл **генерується** командою `python tools/gen_data.py` з тегів `*CWE:*` у `docs/tasks-catalog.md` "
       "і довідника `tools/cwe_data.py`. Руками не правити.\n")
-    w(f"Стан: {auto_count} завдань з автоперевіркою, {catalog_count} завдань у каталозі, capstone M0–M10.\n")
+    w(f"Стан: {auto_count} завдань з автоперевіркою, {catalog_count} завдань у каталозі, capstone M0–M11.\n")
     w("## Джерела й обмеження\n")
     w("- **OWASP Top 10:2025** (восьма редакція, листопад 2025): сторінки категорій на https://top10.owasp.org/2025, розділ «List of Mapped CWEs». "
       "Усього змаплено 249 записів (інші джерела пишуть 248; розбіжність не досліджувалась).")

@@ -86,6 +86,25 @@
 
 ---
 
+## 9. Інтерактивні візуалізації (інтуїція за 5 хвилин)
+
+Не замінюють практику, а дають «відчути механізм» перед завданням. На сайті позначені типом «Інтерактив».
+
+| Тема | Ресурс |
+|---|---|
+| Виконання Python | [Python Tutor](https://pythontutor.com) |
+| Плани запитів PostgreSQL | [explain.dalibo.com](https://explain.dalibo.com), уроки SQL: [SQLBolt](https://sqlbolt.com) |
+| Мережа | [The Illustrated TLS 1.3](https://tls13.xargs.org), [How DNS works](https://howdns.works), [explainshell](https://explainshell.com), [Play with Docker](https://labs.play-with-docker.com) |
+| Git | [Learn Git Branching](https://learngitbranching.js.org) |
+| Безпека | [jwt.io](https://www.jwt.io), [CSP Evaluator](https://csp-evaluator.withgoogle.com) |
+| Kubernetes | [Network Policy Editor](https://editor.networkpolicy.io) |
+| Observability | [PromLens](https://demo.promlens.com) |
+| Розподілені системи | [The Secret Lives of Data: Raft](https://thesecretlivesofdata.com/raft/), [raft.github.io](https://raft.github.io) |
+| Як працюють LLM | [AI Fundamentals Sandbox](https://ai-fundamentals-sandbox.vercel.app) (українською), [Transformer Explainer](https://poloclub.github.io/transformer-explainer/), [LLM Visualization](https://bbycroft.net/llm), [Tiktokenizer](https://tiktokenizer.vercel.app), [Embedding Projector](https://projector.tensorflow.org), [TensorFlow Playground](https://playground.tensorflow.org), [Seeing Theory](https://seeing-theory.brown.edu) |
+| RAG | [ChunkViz](https://chunkviz.up.railway.app) |
+| AI security (ігри й CTF) | [Gandalf](https://gandalf.lakera.ai), [Tensor Trust](https://tensortrust.ai), [Prompt Airlines](https://promptairlines.com), [GitHub Secure Code Game](https://github.com/skills/secure-code-game), [HackAPrompt](https://www.hackaprompt.com), [CyberChef](https://gchq.github.io/CyberChef/) |
+| Вибір моделі й inference | [Model Memory Calculator](https://huggingface.co/spaces/hf-accelerate/model-memory-usage), [LMArena](https://lmarena.ai), [Artificial Analysis](https://artificialanalysis.ai) |
+
 ## Висновок: де є і глибина, і автоперевірка безкоштовно
 
 1. **PortSwigger Academy**: безпека.

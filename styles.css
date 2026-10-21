@@ -336,3 +336,17 @@ pre.env {
 .task details.manual .steps { margin: 6px 0 0; padding-left: 1.3rem; color: var(--muted); }
 .task details.manual .steps li { margin: 2px 0; }
 .task details.manual .checklist { margin: 4px 0 0; }
+
+/* перемикач треків */
+.track-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.track-tabs.side { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.track-tabs.big { margin: 4px 0 12px; }
+.track-tab {
+  flex: 1 1 auto; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 7px 10px; border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); font-size: .88rem; text-decoration: none; white-space: nowrap;
+}
+.track-tabs.big .track-tab { font-size: 1rem; padding: 10px 14px; }
+.track-tab:hover { border-color: var(--accent); text-decoration: none; }
+.track-tab.active { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; }
+.track-tab .np { font-size: .75rem; color: var(--muted); font-variant-numeric: tabular-nums; }

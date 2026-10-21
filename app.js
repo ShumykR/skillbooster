@@ -66,6 +66,20 @@
   }
   function md(s) { return esc(s).replace(/`([^`]+)`/g, "<code>$1</code>"); }
   function stageById(id) { return DATA.stages.filter(function (s) { return s.id === id; })[0]; }
+
+  // треки: окремі шляхи (Backend + DevOps, AI Engineering) зі своєю нумерацією етапів
+  var TRACKS = DATA.tracks || [{ id: "core", icon: "", title: "Етапи", intro: "", order: "" }];
+  var TRACK_KEY = "skillbooster.track";
+  function trackById(id) { return TRACKS.filter(function (t) { return t.id === id; })[0]; }
+  function trackOf(st) { return st.track || TRACKS[0].id; }
+  function stagesOf(tid) { return DATA.stages.filter(function (s) { return trackOf(s) === tid; }); }
+  function stageNo(st) { return stagesOf(trackOf(st)).indexOf(st) + 1; }
+  var curTrack = TRACKS[0].id;
+  try { if (trackById(localStorage.getItem(TRACK_KEY))) curTrack = localStorage.getItem(TRACK_KEY); } catch (err) { /* приватний режим */ }
+  function setTrack(id) {
+    curTrack = id;
+    try { localStorage.setItem(TRACK_KEY, id); } catch (err) { /* приватний режим */ }
+  }
   function checkDone(id, i) { return !!(state.checks[id] && state.checks[id][i]); }
   function taskState(id) { return state.tasks[id] || "todo"; }
   function conceptDone(stageId, i) { return !!(state.concepts[stageId] && state.concepts[stageId][i]); }
@@ -106,9 +120,9 @@
       pct: total ? Math.round(((td + cs) / total) * 100) : 0,
     };
   }
-  function overall() {
+  function overall(tid) {
     var done = 0, total = 0, tasksDone = 0, tasksTotal = 0;
-    DATA.stages.forEach(function (st) {
+    (tid ? stagesOf(tid) : DATA.stages).forEach(function (st) {
       var s = stageStats(st);
       done += s.tasksDone + s.conceptsDone;
       total += s.tasksTotal + s.conceptsTotal;
@@ -132,8 +146,16 @@
   }
 
   // ---------- навігація / верхня панель -------------------------------------
+  function trackTabs(cls) {
+    if (TRACKS.length < 2) return "";
+    return '<div class="' + cls + '">' + TRACKS.map(function (t) {
+      return '<a class="track-tab' + (t.id === curTrack ? " active" : "") + '" href="#/track/' + t.id + '"' +
+        (t.id === curTrack ? ' aria-current="page"' : "") + ">" + t.icon + " " + esc(t.title) +
+        ' <span class="np">' + overall(t.id).pct + "%</span></a>";
+    }).join("") + "</div>";
+  }
   function renderNav(activeId) {
-    var html = DATA.stages.map(function (st, i) {
+    var html = trackTabs("track-tabs side") + stagesOf(curTrack).map(function (st, i) {
       var s = stageStats(st);
       var cls = "nav-item" + (st.id === activeId ? " active" : "") + (s.pct === 100 ? " complete" : "");
       return '<a class="' + cls + '" href="#/stage/' + st.id + '">' +
@@ -151,13 +173,14 @@
 
   // ---------- сторінки ------------------------------------------------------
   function nextTask() {
-    for (var i = 0; i < DATA.stages.length; i++) {
-      var st = DATA.stages[i];
+    var list = stagesOf(curTrack);
+    for (var i = 0; i < list.length; i++) {
+      var st = list[i];
       var doing = st.tasks.filter(function (t) { return taskState(t.id) === "doing"; })[0];
       if (doing) return { stage: st, task: doing, doing: true };
     }
-    for (var j = 0; j < DATA.stages.length; j++) {
-      var s2 = DATA.stages[j];
+    for (var j = 0; j < list.length; j++) {
+      var s2 = list[j];
       var todo = s2.tasks.filter(function (t) { return taskState(t.id) === "todo"; })[0];
       if (todo) return { stage: s2, task: todo, doing: false };
     }
@@ -165,26 +188,29 @@
   }
 
   function renderHome() {
-    var o = overall();
+    var tr = trackById(curTrack), list = stagesOf(curTrack);
+    var o = overall(curTrack);
     var nt = nextTask();
     var html = "<h1>Шлях Python-бекендера: від FastAPI до DevOps та AI</h1>" +
-      '<p class="lead">Тут зібрано етапи, безкоштовні ресурси та ' + o.tasksTotal +
+      '<p class="lead">Тут зібрано етапи, безкоштовні ресурси та ' + overall().tasksTotal +
       " практичних завдань із реальних production-проєктів. Відмічай прогрес, він зберігається в твоєму браузері.</p>" +
+      trackTabs("track-tabs big") +
+      (tr.intro ? '<p class="note">' + esc(tr.intro) + "</p>" : "") +
       '<div class="stat-row">' +
       '<div class="stat"><b>' + o.pct + '%</b><span>загальний прогрес</span></div>' +
       '<div class="stat"><b>' + o.tasksDone + "/" + o.tasksTotal + '</b><span>завдань виконано</span></div>' +
       '<div class="stat"><b>' + streak() + '</b><span>днів поспіль</span></div>' +
-      '<div class="stat"><b>' + DATA.stages.length + '</b><span>етапів</span></div></div>';
+      '<div class="stat"><b>' + list.length + '</b><span>етапів</span></div></div>';
 
     if (nt) {
       html += '<div class="card next-card"><div><small>' + (nt.doing ? "Продовжити" : "Наступне завдання") + " · " +
         nt.stage.icon + " " + esc(nt.stage.title) + "</small><strong>" + esc(nt.task.title) + "</strong></div>" +
         '<a class="btn" href="#/stage/' + nt.stage.id + '" data-focus="task-' + nt.task.id + '">Відкрити</a></div>';
     } else {
-      html += '<div class="card next-card"><strong>🎉 Усі завдання виконано. Час робити портфоліо й шукати роботу!</strong></div>';
+      html += '<div class="card next-card"><strong>🎉 Усі завдання цього треку виконано. Час робити портфоліо й шукати роботу!</strong></div>';
     }
 
-    html += "<h2>Етапи</h2><div class=\"grid\">" + DATA.stages.map(function (st, i) {
+    html += "<h2>Етапи</h2><div class=\"grid\">" + list.map(function (st, i) {
       var s = stageStats(st);
       return '<a class="card stage-card" href="#/stage/' + st.id + '">' +
         '<div class="head"><span class="ico">' + st.icon + "</span><span>" + (i + 1) + ". " + esc(st.title) + "</span></div>" +
@@ -193,16 +219,14 @@
         '<div class="meta"><span>' + s.tasksDone + "/" + s.tasksTotal + " завдань</span><span>" + s.pct + "%</span></div></a>";
     }).join("") + "</div>";
 
-    html += "<h2>Рекомендований порядок</h2>" +
-      '<p class="note">Етапи 1–3 дають базу. Після них можна йти паралельно: DevOps-гілка (4, 5, 7, 8, 9) і AI-гілка (12). ' +
-      "Безпека (6) краще йде разом із API й хмарою. Системний дизайн (11) корисно відкласти на момент, коли вже є досвід з БД і чергами.</p>";
+    if (tr.order) html += "<h2>Рекомендований порядок</h2>" + '<p class="note">' + esc(tr.order) + "</p>";
     return html;
   }
 
   function renderStage(st) {
-    var idx = DATA.stages.indexOf(st);
+    var tr = trackById(trackOf(st));
     var s = stageStats(st);
-    var html = '<div class="crumbs"><a href="#/">Усі етапи</a> / Етап ' + (idx + 1) + "</div>" +
+    var html = '<div class="crumbs"><a href="#/track/' + tr.id + '">' + esc(tr.title) + "</a> / Етап " + stageNo(st) + "</div>" +
       '<div class="stage-head"><div class="big">' + st.icon + "</div><div><h1>" + esc(st.title) + "</h1>" +
       '<div class="bar" style="width:260px;max-width:100%"><span style="width:' + s.pct + '%"></span></div>' +
       '<small class="note">' + s.pct + "% · розумію " + s.conceptsUnderstood + "/" + s.conceptsTotal +
@@ -397,7 +421,8 @@
       "<div><h3>" + (t.n ? '<span class="num">№' + t.n + "</span>" : "") + esc(t.title) + " " + lvlBadge(t.level) +
       (t.ai ? ' <span class="badge ai">🤖 LLM</span>' : "") +
       (t.auto ? ' <span class="badge free">🧪 автоперевірка</span>' : "") +
-      (!t.auto && t.kind === "документ" ? ' <span class="badge part" title="Документ або розрахунок: оцінюєш себе за чеклістом">📝 документ</span>' : "") +
+      (!t.auto && t.kind === "автотест" ? ' <span class="badge part" title="Умова готова, автоперевірка ще пишеться: поки можна розв\'язувати й перевіряти себе за умовою">⏳ автотест готується</span>' : "") +
+      (!t.auto && t.kind === "документ" ?' <span class="badge part" title="Документ або розрахунок: оцінюєш себе за чеклістом">📝 документ</span>' : "") +
       (!t.auto && t.kind !== "документ" && t.done ? ' <span class="badge part" title="Практика в реальному інструменті: перевіряєш себе за чеклістом">🛠 практика</span>' : "") +
       (state.verified[t.id] ? ' <span class="badge ok" title="Тести пройдено ' + esc(state.verified[t.id]) +
         '">✅ перевірено тестами</span>' : "") + "</h3>" +
@@ -517,9 +542,11 @@
     var activeId = null;
     var html;
     var title = "SkillBooster";
+    var tm = h.match(/^#\/track\/([\w-]+)/);
     if (m && stageById(m[1])) {
       var st = stageById(m[1]);
       activeId = st.id;
+      setTrack(trackOf(st));
       html = renderStage(st);
       title = st.title + " · SkillBooster";
     } else if (h.indexOf("#/sync") === 0) {
@@ -535,6 +562,7 @@
       html = renderSettings();
       title = "Налаштування · SkillBooster";
     } else {
+      if (tm && trackById(tm[1])) setTrack(tm[1]);
       html = renderHome();
     }
     view.innerHTML = html;

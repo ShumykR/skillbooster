@@ -129,6 +129,15 @@ R = lambda name, url, kind, level, free, note: {
     "name": name, "url": url, "kind": kind, "level": level, "free": free, "note": note,
 }
 
+TRACKS = [
+    {"id": "core", "icon": "⚙️", "title": "Backend + DevOps",
+     "intro": "Python і FastAPI у production, бази даних, API, безпека, Linux, CI/CD, хмара, Kubernetes, observability і системний дизайн.",
+     "order": "Етапи 1–4 дають базу. Після них можна йти паралельно: API і безпека (5, 8) та DevOps-гілка (6, 7, 9, 10, 11). Системний дизайн (12) корисно відкласти на момент, коли вже є досвід з БД і чергами. AI-трек можна починати одразу після етапів 1, 2 і 4."},
+    {"id": "ai", "icon": "🤖", "title": "AI Engineering",
+     "intro": "Окремий трек рівня middle: як працюють LLM, API і context engineering, advanced RAG і grounding, агенти й harness, evals, AI security, LLMOps і governance. Спирається на етапи Python, тестування й БД Backend-треку.",
+     "order": "Етапи 1 і 2 це основа. RAG (3) і агенти (4) будуються на них. Evals (5) і безпеку (6) починай разом із першим RAG, а не наприкінці: саме вони відрізняють middle від демо. LLMOps (7) і governance (8) знадобляться, коли є що викочувати. Наскрізний проєкт (віхи M3–M6 і M11) веде через увесь трек."},
+]
+
 STAGES = [
     {
         "id": "python",
@@ -153,6 +162,7 @@ STAGES = [
             R("Fluent Python (репозиторій прикладів)", "https://www.fluentpython.com", "Книга", "🟡–🔴", "Частково", "Репозиторій безкоштовний, книга платна"),
             R("FastAPI: офіційна документація", "https://fastapi.tiangolo.com", "Документація", "🟢–🟡", "Безкоштовно", "Розділи Advanced User Guide й Deployment"),
             R("CodeCrafters: Build your own HTTP server / Redis", "https://codecrafters.io", "Практика", "🔴", "Частково", "Відправка рішень платна, один челендж місяця безкоштовний"),
+            R("Python Tutor", "https://pythontutor.com", "Інтерактив", "🟢", "Безкоштовно", "Покрокова візуалізація виконання: стек, об'єкти, посилання"),
         ],
     },
     {
@@ -227,6 +237,8 @@ STAGES = [
             R("PostgreSQL Internals (Egor Rogov)", "https://postgrespro.com/community/books/internals", "Книга", "🔴", "Безкоштовно", "MVCC, WAL, блокування, планувальник"),
             R("CMU 15-445 Database Systems", "https://15445.courses.cs.cmu.edu", "Курс", "🔴", "Безкоштовно", "Лекції та проєкти, проєкти на C++"),
             R("DataLemur", "https://datalemur.com", "Практика", "🟡", "Частково", "SQL-задачі рівня співбесід"),
+            R("explain.dalibo.com", "https://explain.dalibo.com", "Інтерактив", "🟡", "Безкоштовно", "Візуалізація плану EXPLAIN (ANALYZE) PostgreSQL: де час і рядки"),
+            R("SQLBolt", "https://sqlbolt.com", "Інтерактив", "🟢", "Безкоштовно", "Інтерактивні уроки SQL прямо в браузері"),
         ],
     },
     {
@@ -272,6 +284,10 @@ STAGES = [
             R("OverTheWire: Bandit", "https://overthewire.org/wargames/bandit/", "Гра", "🟢", "Безкоштовно", "Linux і SSH через рівні"),
             R("iximiuz Labs", "https://labs.iximiuz.com", "Лаби", "🔴", "Частково", "Free: 1 playground, 1 година на день. 150+ челенджів у платному плані ($10/міс)"),
             R("KodeKloud 100 Days of DevOps", "https://kodekloud.com/100-days-of-devops", "Лаби", "🟡", "Безкоштовно", "Одна реальна задача на день з автоперевіркою"),
+            R("The Illustrated TLS 1.3 Connection", "https://tls13.xargs.org", "Інтерактив", "🟡", "Безкоштовно", "Кожен байт TLS-рукостискання з поясненням"),
+            R("How DNS works", "https://howdns.works", "Інтерактив", "🟢", "Безкоштовно", "Комікс про шлях DNS-запиту від резолвера до authoritative"),
+            R("explainshell", "https://explainshell.com", "Інтерактив", "🟢", "Безкоштовно", "Вставляєш команду, бачиш пояснення кожного прапорця"),
+            R("Play with Docker", "https://labs.play-with-docker.com", "Інтерактив", "🟢", "Безкоштовно", "Docker у браузері, сесія 4 години, потрібен акаунт Docker Hub"),
         ],
     },
     {
@@ -295,6 +311,7 @@ STAGES = [
             R("GitHub Skills", "https://skills.github.com", "Курси", "🟢–🟡", "Безкоштовно", "Інтерактивні курси з Actions прямо в репозиторії"),
             R("GitHub Actions: документація", "https://docs.github.com/actions", "Документація", "🟡", "Безкоштовно", "Workflows, OIDC, reusable workflows"),
             R("Jenkins: Pipeline документація", "https://www.jenkins.io/doc/book/pipeline/", "Документація", "🟡", "Безкоштовно", "Для необов'язкового модуля Jenkins"),
+            R("Learn Git Branching", "https://learngitbranching.js.org", "Інтерактив", "🟢–🟡", "Безкоштовно", "Візуальна гра: rebase, cherry-pick, remote, є українська"),
         ],
     },
     {
@@ -319,6 +336,8 @@ STAGES = [
             R("PortSwigger Web Security Academy", "https://portswigger.net/web-security", "Лаби", "🟢–🔴", "Безкоштовно", "250+ лаб: SQLi, SSRF, JWT, OAuth, API testing"),
             R("OWASP Juice Shop", "https://owasp.org/www-project-juice-shop/", "Лаби", "🟡", "Безкоштовно", "Вразливий застосунок з 100+ челенджами, запускається в Docker"),
             R("OWASP crAPI", "https://github.com/OWASP/crAPI", "Лаби", "🟡–🔴", "Безкоштовно", "Вразливий API за OWASP API Top 10"),
+            R("jwt.io", "https://www.jwt.io", "Інтерактив", "🟢", "Безкоштовно", "Декодування й перевірка JWT: заголовок, claims, підпис"),
+            R("CSP Evaluator", "https://csp-evaluator.withgoogle.com", "Інтерактив", "🟡", "Безкоштовно", "Аналіз Content-Security-Policy від Google: де обхід"),
         ],
     },
     {
@@ -365,6 +384,7 @@ STAGES = [
             R("Killercoda", "https://killercoda.com", "Лаби", "🟡–🔴", "Безкоштовно", "Справжні VM у браузері: сценарії CKA/CKAD/CKS, Helm, ArgoCD"),
             R("Kubernetes The Hard Way", "https://github.com/kelseyhightower/kubernetes-the-hard-way", "Лаби", "🔴", "Безкоштовно", "Кластер вручну, потрібні власні VM"),
             R("Kubernetes: офіційні tutorials", "https://kubernetes.io/docs/tutorials/", "Документація", "🟢–🟡", "Безкоштовно", "Інтерактивні модулі для початку"),
+            R("Network Policy Editor", "https://editor.networkpolicy.io", "Інтерактив", "🟡", "Безкоштовно", "Будуєш NetworkPolicy візуально й бачиш, який трафік дозволено"),
         ],
     },
     {
@@ -387,6 +407,7 @@ STAGES = [
             R("Grafana Play", "https://play.grafana.org", "Пісочниця", "🟡", "Безкоштовно", "Живі дашборди для практики"),
             R("OpenTelemetry Demo", "https://opentelemetry.io/docs/demo/", "Лаби", "🟡–🔴", "Безкоштовно", "Повний мікросервісний стенд для трейсингу"),
             R("Google SRE Book", "https://sre.google/sre-book/table-of-contents/", "Книга", "🟡–🔴", "Безкоштовно", "SLO, моніторинг, incident response"),
+            R("PromLens", "https://demo.promlens.com", "Інтерактив", "🟡", "Безкоштовно", "Розбір PromQL-запиту на дерево з поясненням кожного кроку"),
         ],
     },
     {
@@ -409,33 +430,240 @@ STAGES = [
             R("Gossip Glomers (Fly.io)", "https://fly.io/dist-sys/", "Челенджі", "🔴", "Безкоштовно", "Розподілені системи з тестером Maelstrom, на Python теж можна"),
             R("System Design Primer", "https://github.com/donnemartin/system-design-primer", "Гайд", "🟡–🔴", "Безкоштовно", "Теорія, картки Anki, задачі"),
             R("MIT 6.5840 Distributed Systems", "https://pdos.csail.mit.edu/6.824/", "Курс", "🔴", "Безкоштовно", "Лаби Raft і KV-сховище, мова Go"),
+            R("The Secret Lives of Data: Raft", "https://thesecretlivesofdata.com/raft/", "Інтерактив", "🟢", "Безкоштовно", "Анімоване пояснення консенсусу Raft"),
+            R("Raft: візуалізація", "https://raft.github.io", "Інтерактив", "🟡–🔴", "Безкоштовно", "Інтерактивний кластер: вимикай вузли й дивись вибори лідера"),
+        ],
+    },
+    # ---- трек AI Engineering ----------------------------------------------------
+    {
+        "id": "ai-llm",
+        "track": "ai",
+        "icon": "🧮",
+        "title": "Як працюють LLM: основи й математика",
+        "sections": ["N"],
+        "why": "Без моделі в голові LLM поводиться «магічно»: дивні збої, раптові рахунки, поганий пошук. Токени, sampling, геометрія векторів, ймовірності й автомати пояснюють, чому система поводиться саме так, і це мова решти треку.",
+        "concepts": [
+            "Transformer на рівні інженера: attention, KV-cache, MoE, чому довгий контекст дорогий",
+            "Токени й ціна: токенізація, контекстне вікно, input/output/cached/reasoning токени",
+            "Sampling: temperature, top-p, logprobs, seed; чому temperature 0 не гарантує детермінізм",
+            "Reasoning-моделі: thinking budget, interleaved thinking, коли міркування не варте ціни",
+            "Векторна геометрія: dot, cosine, нормалізація, розмірність; вибір embedding-моделі (MTEB)",
+            "ANN-індекси: HNSW, IVF, PQ, DiskANN; recall проти латентності й пам'яті",
+            "Ймовірності: Bayes, base rate, калібрування впевненості моделей і класифікаторів",
+            "Графи й скінченні автомати як мова агентних систем; MDP на рівні ідеї",
+            "Мультимодальність: зображення, PDF, аудіо й голос; vision-моделі для документів",
+        ],
+        "resources": [
+            R("3Blue1Brown: Neural Networks (включно з Transformers)", "https://www.3blue1brown.com/topics/neural-networks", "Відео", "🟢–🟡", "Безкоштовно", "Найкраща візуальна інтуїція attention і embeddings"),
+            R("Andrej Karpathy: Neural Networks: Zero to Hero", "https://karpathy.ai/zero-to-hero.html", "Курс", "🟡–🔴", "Безкоштовно", "GPT і токенізатор з нуля в коді"),
+            R("Hugging Face: LLM Course", "https://huggingface.co/learn/llm-course", "Курс", "🟡", "Безкоштовно", "Transformers, токенізатори, fine-tuning"),
+            R("Pinecone: Faiss і векторний пошук", "https://www.pinecone.io/learn/series/faiss/", "Гайд", "🟡", "Безкоштовно", "HNSW, IVF, PQ з ілюстраціями"),
+            R("Mathematics for Machine Learning", "https://mml-book.github.io", "Книга", "🟡–🔴", "Безкоштовно", "Лінійна алгебра й ймовірності, PDF безкоштовно"),
+            R("AI Fundamentals Sandbox", "https://ai-fundamentals-sandbox.vercel.app", "Інтерактив", "🟢", "Безкоштовно", "Українською: 22 пісочниці від контекстного вікна до attention і генерації"),
+            R("Transformer Explainer", "https://poloclub.github.io/transformer-explainer/", "Інтерактив", "🟢–🟡", "Безкоштовно", "Живий GPT-2 у браузері: attention, temperature, top-k"),
+            R("LLM Visualization (bbycroft)", "https://bbycroft.net/llm", "Інтерактив", "🟡–🔴", "Безкоштовно", "3D-прохід токена крізь усі шари трансформера"),
+            R("Tiktokenizer", "https://tiktokenizer.vercel.app", "Інтерактив", "🟢", "Безкоштовно", "Як різні токенізатори ріжуть твій текст; порівняй українську й англійську"),
+            R("Embedding Projector", "https://projector.tensorflow.org", "Інтерактив", "🟡", "Безкоштовно", "Embeddings у 3D: сусіди слів, PCA, t-SNE"),
+            R("TensorFlow Playground", "https://playground.tensorflow.org", "Інтерактив", "🟢", "Безкоштовно", "Нейромережа в браузері: шари, активації, навчання наживо"),
+            R("Seeing Theory", "https://seeing-theory.brown.edu", "Інтерактив", "🟢", "Безкоштовно", "Візуальні ймовірності й статистика: Bayes, розподіли, довірчі інтервали"),
         ],
     },
     {
-        "id": "ai",
-        "icon": "🤖",
-        "title": "AI-інженерія для бекенду",
+        "id": "ai-api",
+        "track": "ai",
+        "icon": "🔌",
+        "title": "LLM API, structured output і context engineering",
         "sections": ["L"],
-        "why": "Нова обов'язкова навичка 2025–2026: вбудовувати LLM у бекенд, будувати RAG, агентів і MCP-сервери, контролювати витрати та безпеку, і ефективно працювати з AI-асистентами для коду.",
+        "why": "Це щоденна робота AI-бекендера: надійні виклики моделей, відповіді у валідованій структурі, інструменти, контроль витрат і правильний контекст. Якість системи у 2026 визначає не промпт, а те, що і в якому порядку потрапляє у вікно.",
         "concepts": [
-            "LLM API: повідомлення, streaming, tool calling, structured output",
-            "Embeddings і векторний пошук (pgvector)",
-            "RAG: чанкінг, hybrid search, reranking, цитування",
-            "Evals: еталонні набори, LLM-as-judge, регресії промптів у CI",
-            "Агенти: цикл план → інструмент → спостереження, ліміти кроків",
-            "MCP: сервери, tools, resources",
-            "Безпека LLM: prompt injection, небезпечні tool-виклики, PII",
-            "Витрати: облік токенів, кешування, fallback на дешевшу модель",
-            "Робота з AI-асистентами: AGENTS.md / CLAUDE.md, малі кроки, тести як запобіжник",
+            "LLM API: ролі повідомлень, streaming SSE, помилки, ретраї, 429",
+            "Structured output: JSON Schema, strict mode, constrained decoding, валідація й повтор",
+            "Tool calling: схеми, паралельні виклики, валідація аргументів, tool choice",
+            "Prompt engineering як інженерія: шаблони, few-shot, версіонування, оптимізація (DSPy)",
+            "Context engineering: що класти у вікно, порядок, компактизація, lost in the middle, long context проти RAG",
+            "Кешування: prompt caching у провайдера, семантичний кеш, інвалідація",
+            "Вартість: облік токенів, бюджети, batch API, routing за складністю, fallback",
+            "LLM gateway: кілька провайдерів, ретраї, circuit breaker, deadline (LiteLLM, OpenRouter)",
+            "Довгі генерації й UX: черги, SSE-прогрес, відновлення після розриву, скасування",
         ],
         "resources": [
-            R("DataTalksClub: AI Dev Tools Zoomcamp 2026", "https://github.com/DataTalksClub", "Курс", "🟡", "Безкоштовно", "AI-асистенти, FastAPI, Docker, AWS, OpenTelemetry, MCP. Self-paced доступний завжди"),
+            R("Claude Academy", "https://academy.claude.com", "Курс", "🟢–🟡", "Безкоштовно", "Building with the Claude API, prompt engineering, tool use"),
+            R("Anthropic: Effective context engineering for AI agents", "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents", "Стаття", "🟡", "Безкоштовно", "Компактизація, нотатки, субагенти, бюджет контексту"),
+            R("OpenAI Cookbook", "https://cookbook.openai.com", "Приклади", "🟡", "Безкоштовно", "Structured outputs, function calling, batch"),
+            R("LiteLLM: документація", "https://docs.litellm.ai", "Документація", "🟡", "Безкоштовно", "Gateway до 100+ провайдерів, бюджети, fallback"),
+            R("DSPy", "https://dspy.ai", "Документація", "🟡–🔴", "Безкоштовно", "Програмування замість ручних промптів, оптимізатори"),
+        ],
+    },
+    {
+        "id": "ai-rag",
+        "track": "ai",
+        "icon": "📚",
+        "title": "Advanced RAG і grounding",
+        "sections": ["O"],
+        "why": "Більшість корпоративних AI-продуктів це пошук по власних даних. Наївний RAG ламається на таблицях, multi-hop питаннях і правах доступу, а відповідь без grounding виглядає переконливо навіть тоді, коли вигадана.",
+        "concepts": [
+            "Інгест: парсинг PDF/HTML/таблиць, OCR, метадані, дедуплікація",
+            "Чанкінг: за структурою, parent-child, contextual retrieval, late chunking",
+            "Пошук: hybrid (BM25 + dense), sparse (SPLADE), late interaction (ColBERT), RRF, фільтри",
+            "Reranking (cross-encoder), query rewriting, HyDE, multi-query",
+            "Grounding: відповідь лише з джерел, цитати на рівні тверджень, відмова «не знаю»",
+            "Faithfulness і галюцинації: перевірка тверджень проти контексту, метрики RAGAS",
+            "GraphRAG: сутності, спільноти, local і global search; коли граф виграє у вектора",
+            "Agentic RAG: агент вирішує, що й скільки шукати, multi-hop, self-RAG",
+            "Структуровані дані: text-to-SQL і API як джерела, безпечне виконання",
+            "Метрики retrieval: recall@k, MRR, nDCG, context precision і recall",
+            "Продакшн-індекс: права доступу в запиті, інкрементальне оновлення, зміна embedding-моделі, pgvector чи Qdrant",
+        ],
+        "resources": [
             R("DataTalksClub: LLM Zoomcamp", "https://datatalks.club/docs/courses/llm-zoomcamp/", "Курс", "🟡–🔴", "Безкоштовно", "Agentic RAG, pgvector, evals, моніторинг. API коштуватиме $1–5"),
-            R("Claude Academy", "https://academy.claude.com", "Курс", "🟢–🟡", "Безкоштовно", "Building with the Claude API, Intro to MCP, Claude Code in Action"),
+            R("Anthropic: Contextual Retrieval", "https://www.anthropic.com/news/contextual-retrieval", "Стаття", "🟡", "Безкоштовно", "Контекстні префікси чанків, BM25 + embeddings + rerank"),
+            R("Microsoft GraphRAG", "https://microsoft.github.io/graphrag/", "Документація", "🔴", "Безкоштовно", "Спільноти, local і global search"),
+            R("RAGAS: метрики RAG", "https://docs.ragas.io", "Документація", "🟡", "Безкоштовно", "Faithfulness, context precision/recall"),
+            R("Jason Liu: Systematically improving RAG", "https://jxnl.co/writing/category/rag/", "Блог", "🟡–🔴", "Безкоштовно", "Як покращувати RAG через дані й метрики, а не інтуїцію"),
+            R("ChunkViz", "https://chunkviz.up.railway.app", "Інтерактив", "🟢", "Безкоштовно", "Розмір чанка, overlap і сплітер на твоєму тексті наочно"),
+        ],
+    },
+    {
+        "id": "ai-agents",
+        "track": "ai",
+        "icon": "🦾",
+        "title": "Агенти й harness engineering",
+        "sections": ["P"],
+        "why": "Агент це модель у циклі з інструментами, а надійним його робить harness: обмеження, верифікатори, пам'ять, пісочниця, чекпоінти й людина в потрібних точках. Саме harness, а не вибір моделі, відрізняє демо від продакшну.",
+        "concepts": [
+            "Workflows проти агентів: prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer",
+            "Агентний цикл: план → інструмент → спостереження, ліміти кроків і зациклення",
+            "Harness: оболонка навколо моделі (інструменти, контекст, верифікатори, ліміти, журнал); довгі задачі з прогрес-файлами",
+            "Control patterns: FSM, бюджети, circuit breaker, human-in-the-loop гейти",
+            "Пам'ять агента: короткострокова, довгострокова, епізодична; забування й конфлікти",
+            "Sandbox і дозволи: ізоляція коду (контейнер, gVisor, Firecracker, E2B), allow/ask/deny для дій",
+            "Durable execution: чекпоінти, replay, ідемпотентні інструменти (Temporal, LangGraph checkpointer)",
+            "Multi-agent: ієрархія, peer-to-peer, swarm, handoffs; ізоляція контексту субагентів і коли одного агента досить",
+            "MCP: tools, resources, prompts, Streamable HTTP, OAuth 2.1, elicitation",
+            "A2A і AG-UI: agent cards, життєвий цикл задач, протокол агент ↔ інтерфейс",
+            "Computer use, browser-агенти і голосові realtime-агенти",
+            "Фреймворки: Claude Agent SDK, OpenAI Agents SDK, LangGraph, Pydantic AI, Google ADK; коли без них",
+        ],
+        "resources": [
+            R("Anthropic: Building effective agents", "https://www.anthropic.com/engineering/building-effective-agents", "Стаття", "🟡", "Безкоштовно", "Workflows проти агентів, п'ять базових патернів"),
+            R("Hugging Face: Agents Course", "https://huggingface.co/learn/agents-course", "Курс", "🟡", "Безкоштовно", "Агенти з нуля і на фреймворках"),
             R("Hugging Face: MCP Course", "https://huggingface.co/learn/mcp-course", "Курс", "🟡", "Безкоштовно", "Будуєш MCP-сервери, є сертифікат"),
-            R("Hugging Face: Agents Course", "https://huggingface.co/learn/agents-course", "Курс", "🟡", "Безкоштовно", "Агенти з нуля"),
+            R("Model Context Protocol: специфікація", "https://modelcontextprotocol.io", "Документація", "🟡–🔴", "Безкоштовно", "Транспорти, авторизація, security best practices"),
+            R("A2A Protocol", "https://a2a-protocol.org", "Документація", "🟡", "Безкоштовно", "Agent cards і життєвий цикл задач (Linux Foundation)"),
             R("LangChain Academy", "https://academy.langchain.com", "Курс", "🟡", "Безкоштовно", "LangGraph: стан, пам'ять, human-in-the-loop"),
+            R("12-Factor Agents", "https://github.com/humanlayer/12-factor-agents", "Гайд", "🟡", "Безкоштовно", "Принципи надійних агентів у продакшні"),
+        ],
+    },
+    {
+        "id": "ai-evals",
+        "track": "ai",
+        "icon": "📊",
+        "title": "Evals і AI observability",
+        "sections": ["Q"],
+        "why": "Ймовірнісну систему неможливо покрити звичайними unit-тестами. Evals тут замінюють тести, а трейси замінюють логи: без них кожна зміна промпту чи моделі стає лотереєю, яку видно лише зі скарг.",
+        "concepts": [
+            "Eval-driven development: аналіз помилок, датасет, базова лінія; capability проти regression evals",
+            "Оцінювачі: код, LLM-as-judge, людина; калібрування судді та його упередження",
+            "Evals агентів: outcome і trajectory, pass@k і pass^k, середовища й бенчмарки (SWE-bench, τ-bench)",
+            "Статистика: довірчі інтервали, парне порівняння, розмір вибірки; гейти в CI",
+            "Датасети: реальні збої з продакшну, синтетичні дані, стратифікація",
+            "Трасування: OpenTelemetry GenAI semantic conventions, Langfuse, Phoenix; trace-based debugging",
+            "Онлайн-моніторинг: зворотний зв'язок, behavioral drift, алерти на якість і вартість",
+            "Оптимізація за метрикою: DSPy, A/B промптів, як не перенавчитись на eval",
+        ],
+        "resources": [
+            R("Hamel Husain: Your AI product needs evals", "https://hamel.dev/blog/posts/evals/", "Стаття", "🟡", "Безкоштовно", "Аналіз помилок і eval-driven development на практиці"),
+            R("Anthropic Engineering", "https://www.anthropic.com/engineering", "Блог", "🟡–🔴", "Безкоштовно", "Demystifying evals for AI agents, harness для довгих задач"),
+            R("Langfuse: документація", "https://langfuse.com/docs", "Документація", "🟡", "Безкоштовно", "Self-hosted трасування, evals, датасети"),
+            R("Arize Phoenix", "https://phoenix.arize.com", "Інструмент", "🟡", "Безкоштовно", "Open-source трасування і evals на OpenTelemetry"),
+            R("OpenTelemetry: GenAI semantic conventions", "https://opentelemetry.io/docs/specs/semconv/gen-ai/", "Специфікація", "🟡", "Безкоштовно", "Стандартні атрибути для LLM-спанів"),
+        ],
+    },
+    {
+        "id": "ai-security",
+        "track": "ai",
+        "icon": "🛡️",
+        "title": "AI Security і red teaming",
+        "sections": ["R"],
+        "why": "LLM виконує інструкції з будь-якого тексту, який читає, тому кожен документ, сторінка чи опис інструмента стає вектором атаки. Агент з доступом до даних і мережі без архітектурних захистів це вже готовий канал витоку.",
+        "concepts": [
+            "OWASP Top 10 for LLM Applications 2025 і OWASP Top 10 for Agentic Applications (ASI01–ASI10)",
+            "Prompt injection: пряма й непряма, jailbreak, agent goal hijack; чому повного захисту немає",
+            "Guardrails: input/output rails, класифікатори (Llama Guard, Prompt Guard), NeMo Guardrails, fail closed",
+            "Архітектурні захисти: lethal trifecta, dual LLM, CaMeL (taint і capabilities), spotlighting",
+            "Інструменти й MCP: tool poisoning, rug pull, confused deputy, token passthrough",
+            "Ідентичність агента: делеговані права, короткоживучі токени, мінімальні права, excessive agency",
+            "Витоки даних: system prompt leakage, PII, ізоляція tenants у RAG, ексфільтрація через Markdown",
+            "Supply chain AI: pickle проти safetensors, отруєння даних і індексу, slopsquatting",
+            "Red teaming: garak, PyRIT, promptfoo, MITRE ATLAS, attack success rate",
+            "Моніторинг атак у проді: unbounded consumption, аномалії інструментів, rogue agents",
+        ],
+        "resources": [
+            R("OWASP GenAI Security Project", "https://genai.owasp.org", "Гайд", "🟡", "Безкоштовно", "LLM Top 10 2025, Agentic Top 10, гайди з red teaming"),
+            R("Simon Willison: The lethal trifecta", "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/", "Стаття", "🟡", "Безкоштовно", "Приватні дані + недовірений контент + канал назовні"),
+            R("CaMeL: Defeating Prompt Injections by Design", "https://arxiv.org/abs/2503.18813", "Стаття", "🔴", "Безкоштовно", "Taint tracking і capabilities замість фільтрів"),
+            R("PortSwigger: Web LLM attacks", "https://portswigger.net/web-security/llm-attacks", "Лаби", "🟡", "Безкоштовно", "Лаби з indirect prompt injection і небезпечних tools"),
             R("Gandalf by Lakera", "https://gandalf.lakera.ai", "Гра", "🟢", "Безкоштовно", "Практика prompt injection"),
+            R("promptfoo", "https://www.promptfoo.dev", "Інструмент", "🟡", "Безкоштовно", "Red teaming і evals у CI, плагіни OWASP"),
+            R("MITRE ATLAS", "https://atlas.mitre.org", "Довідник", "🟡–🔴", "Безкоштовно", "Тактики й техніки атак на AI-системи"),
+            R("Tensor Trust", "https://tensortrust.ai", "Інтерактив", "🟡", "Безкоштовно", "Атакуєш чужі промпти й захищаєш свій"),
+            R("Prompt Airlines (Wiz)", "https://promptairlines.com", "Інтерактив", "🟡", "Безкоштовно", "CTF: змусити чат-бота авіакомпанії порушити правила"),
+            R("GitHub Secure Code Game", "https://github.com/skills/secure-code-game", "Інтерактив", "🟡", "Безкоштовно", "Сезон 3: шість вразливих AI-асистентів, працює в Codespaces"),
+            R("HackAPrompt", "https://www.hackaprompt.com", "Інтерактив", "🟡–🔴", "Безкоштовно", "Великі red-teaming челенджі, включно з агентами"),
+            R("CyberChef", "https://gchq.github.io/CyberChef/", "Інтерактив", "🟢", "Безкоштовно", "Base64, hex, Unicode: як атаки обходять фільтри кодуванням"),
+        ],
+    },
+    {
+        "id": "ai-ops",
+        "track": "ai",
+        "icon": "🏭",
+        "title": "LLMOps, inference і моделі",
+        "sections": ["S"],
+        "why": "Рано чи пізно постане питання: яку модель брати, чи хостити свою, чи донавчати і як безпечно викотити нову версію промпту. Тут же робота з AI-асистентами для коду, яка у 2026 стала частиною щоденного процесу.",
+        "concepts": [
+            "Вибір моделі: власні evals проти бенчмарків, ціна/якість/латентність, frontier проти малих моделей",
+            "Self-hosting: vLLM, SGLang, Ollama, llama.cpp; OpenAI-сумісний API",
+            "Inference-оптимізація: continuous batching, PagedAttention, prefix caching, квантизація, speculative decoding",
+            "Метрики й capacity: TTFT, TPOT, throughput, GPU-пам'ять під KV-cache, беззбитковість проти API",
+            "Адаптація моделей: коли fine-tuning (а коли промпт чи RAG), LoRA/QLoRA, дистиляція",
+            "Як навчають моделі: pretraining, SFT, RLHF, DPO, RLVR і GRPO на рівні розуміння",
+            "Agentic CI/CD: evals як гейт, canary для промптів і моделей, rollback, версіонування артефактів",
+            "Хмарні AI-платформи: Bedrock, Azure AI Foundry, Vertex AI; квоти, регіони, дані не для навчання",
+            "AI-асистенти в розробці: AGENTS.md/CLAUDE.md, skills, subagents, hooks, spec-driven development, агенти в CI",
+        ],
+        "resources": [
+            R("vLLM: документація", "https://docs.vllm.ai", "Документація", "🟡–🔴", "Безкоштовно", "PagedAttention, batching, квантизація, OpenAI-сумісний сервер"),
+            R("Ollama", "https://ollama.com", "Інструмент", "🟢", "Безкоштовно", "Локальні моделі на CPU/GPU одною командою"),
+            R("Unsloth: документація", "https://docs.unsloth.ai", "Документація", "🟡", "Безкоштовно", "LoRA/QLoRA і RL у безкоштовному Colab"),
+            R("Hugging Face: smol course", "https://github.com/huggingface/smol-course", "Курс", "🟡", "Безкоштовно", "SFT, DPO, evals на малих моделях"),
+            R("DataTalksClub: AI Dev Tools Zoomcamp", "https://github.com/DataTalksClub", "Курс", "🟡", "Безкоштовно", "AI-асистенти, FastAPI, Docker, AWS, OpenTelemetry, MCP"),
+            R("Claude Code: документація", "https://code.claude.com/docs", "Документація", "🟡", "Безкоштовно", "Skills, subagents, hooks, GitHub Actions"),
+            R("Model Memory Calculator", "https://huggingface.co/spaces/hf-accelerate/model-memory-usage", "Інтерактив", "🟡", "Безкоштовно", "Скільки пам'яті GPU потрібно моделі для inference і навчання"),
+            R("LMArena", "https://lmarena.ai", "Інтерактив", "🟢", "Безкоштовно", "Сліпе порівняння моделей і рейтинг за голосами людей"),
+            R("Artificial Analysis", "https://artificialanalysis.ai", "Інтерактив", "🟢", "Безкоштовно", "Ціна, швидкість, TTFT і якість моделей та провайдерів"),
+        ],
+    },
+    {
+        "id": "ai-gov",
+        "track": "ai",
+        "icon": "⚖️",
+        "title": "AI Governance і відповідальний AI",
+        "sections": ["T"],
+        "why": "З 2 серпня 2026 у ЄС діють обов'язки прозорості та вимоги до GPAI, а обов'язки для high-risk систем Digital Omnibus переніс на 2027–2028. Інженер перекладає ці вимоги в журнали, маркування, документацію й тести, і саме цього очікують від middle у продуктах для ЄС.",
+        "concepts": [
+            "EU AI Act: рівні ризику, заборонені практики, GPAI, провайдер і деплоєр, строки після Digital Omnibus (2026/1744)",
+            "Прозорість: маркування AI-взаємодії й контенту (ст. 50), C2PA, system і model cards",
+            "Privacy-by-Design: мінімізація даних, строки зберігання, zero data retention, GDPR і DPA з провайдером",
+            "Audit trail: незмінний журнал рішень і дій агента: хто, що, від чийого імені",
+            "Fairness: контрфактичні тести, різниця рішень між групами, людський нагляд",
+            "Управління ризиками: NIST AI RMF, ISO/IEC 42001, AI-політика компанії",
+            "Документація системи: PRD, System Design Document, V&V-звіт",
+        ],
+        "resources": [
+            R("EU AI Act Explorer", "https://artificialintelligenceact.eu", "Довідник", "🟡", "Безкоштовно", "Текст акту, Digital Omnibus, compliance checker"),
+            R("NIST AI Risk Management Framework", "https://www.nist.gov/itl/ai-risk-management-framework", "Стандарт", "🟡", "Безкоштовно", "Govern, Map, Measure, Manage; профіль для GenAI"),
+            R("University of Helsinki: Ethics of AI", "https://ethics-of-ai.mooc.fi", "Курс", "🟢", "Безкоштовно", "Відповідальність, прозорість, fairness"),
+            R("C2PA", "https://c2pa.org", "Специфікація", "🟡", "Безкоштовно", "Походження контенту і маркування згенерованого"),
         ],
     },
 ]
@@ -465,7 +693,7 @@ LEGACY = [
     ["AWS, Azure, GCP", "keep", "AWS вже знаєш; Terraform додатково; Azure/GCP за потреби"],
     ["Jenkins, GitLab, Bitbucket, GitHub", "replace", "Основа GitHub Actions та GitLab CI; Jenkins як опційний модуль"],
     ["Логи, телеметрія, моніторинг", "keep", "Підсилюємо: OpenTelemetry, Prometheus, Grafana, SLO"],
-    ["(немає в оригіналі)", "new", "LLM API, RAG, агенти, MCP, evals, безпека LLM, AI-асистенти для коду"],
+    ["(немає в оригіналі)", "new", "Окремий трек AI Engineering: LLM і математика, context engineering, advanced RAG і grounding, агенти й harness, evals, AI security, LLMOps, governance"],
 ]
 
 
@@ -487,26 +715,34 @@ CAPSTONE = {
             "Маскування PII у логах, секрети лише з env/Secrets Manager, pip-audit у CI",
             "Паролі через scrypt/argon2 з перехешуванням (№157), сесії або refresh-токени з ротацією, відкликанням і абсолютним терміном (№160, №51); якщо є cookie, то CSRF-захист і прапорці (№143)",
             "Окремі pydantic-моделі запиту й відповіді з extra=forbid (№162); тест у CI, що ВСІ маршрути або захищені, або в явному списку публічних (№163)"]},
-        {"id": "m3", "stage": "ai", "title": "Інгест документів", "items": [
+        {"id": "m3", "stage": "ai-rag", "title": "Інгест документів", "items": [
             "Завантаження файлу (потоково, ліміти розміру, presigned URL до S3)",
             "Тип за вмістом (magic bytes), безпечне ім'я файлу, шлях лише під контрольованою текою (№145, №144); якщо додаси завантаження за URL, то із захистом від SSRF (№58)",
             "Чанкінг, embeddings, запис у pgvector фоновим воркером (ARQ/Celery) з retry і DLQ",
-            "Outbox для події document.indexed"]},
-        {"id": "m4", "stage": "ai", "title": "RAG-відповіді", "items": [
+            "Outbox для події document.indexed",
+            "Структурний чанкінг із contextual prefix (№178), інкрементальна переіндексація за content hash і при зміні embedding-моделі (№182)"]},
+        {"id": "m4", "stage": "ai-rag", "title": "RAG-відповіді", "items": [
             "POST /ask: hybrid search (BM25 + вектор), reranking, відповідь із цитатами",
             "Streaming через SSE, structured output із валідацією та повтором",
             "LLM підключається через LLM_BASE_URL / LLM_API_KEY / LLM_MODEL (твій проксі)",
             "Відповідь моделі екранується перед показом у вебі (№142), а все витягнуте з документів вважається недовіреним вмістом (prompt injection)",
-            "OWASP LLM Top 10: системний промпт не містить секретів і його витік нічого не дає; відповіді й цитати показують лише документи, до яких користувач має доступ (фільтр за власником ще в пошуку, не після); ліміти токенів, розміру контексту й запитів (unbounded consumption); завантажений документ не може отруїти індекс інших користувачів"]},
-        {"id": "m5", "stage": "ai", "title": "Якість і витрати", "items": [
+            "OWASP LLM Top 10: системний промпт не містить секретів і його витік нічого не дає; відповіді й цитати показують лише документи, до яких користувач має доступ (фільтр за власником ще в пошуку, не після); ліміти токенів, розміру контексту й запитів (unbounded consumption); завантажений документ не може отруїти індекс інших користувачів",
+            "Grounding: кожне твердження відповіді має цитату на знайдений чанк, без підтримки сервіс відповідає «не знаю» (№179); input/output guardrails з fail closed (№196)",
+            "Менеджер контексту з бюджетом токенів і компактизацією історії чату (№175)"]},
+        {"id": "m5", "stage": "ai-evals", "title": "Якість і витрати", "items": [
             "Еталонний набір із 30 питань, метрики recall@k, LLM-as-judge; eval у CI проти мок-моделі",
             "Облік токенів і бюджет на користувача, fallback на дешевшу модель",
-            "Кешування однакових запитів та prompt caching там, де підтримується"]},
-        {"id": "m6", "stage": "ai", "title": "Агент і MCP", "items": [
+            "Кешування однакових запитів та prompt caching там, де підтримується",
+            "Синтетичний eval-набір зі стратифікацією (№216), довірчі інтервали в регресійному гейті (№192), суддя відкалібрований на людській розмітці (№193)",
+            "Трасування в Langfuse або Phoenix (№195), монітор drift (№194), версії промптів у реєстрі з canary і rollback (№176, №204)"]},
+        {"id": "m6", "stage": "ai-agents", "title": "Агент і MCP", "items": [
             "Агент з інструментами (пошук, статистика) і лімітами кроків",
             "Політика авторизації викликів інструментів і набір тестів на prompt injection",
             "MCP-сервер, що відкриває пошук по документах зовнішнім клієнтам",
-            "Надмірні повноваження агента (excessive agency): інструменти лише з мінімальними правами, дії зі змінами потребують підтвердження людини, журнал кожного виклику з користувачем і аргументами; тест: документ із інструкцією «видали все» не запускає жодного інструмента запису"]},
+            "Надмірні повноваження агента (excessive agency): інструменти лише з мінімальними правами, дії зі змінами потребують підтвердження людини, журнал кожного виклику з користувачем і аргументами; тест: документ із інструкцією «видали все» не запускає жодного інструмента запису",
+            "Harness: агент як скінченний автомат з HITL-гейтом (№184), durable execution з чекпоінтами (№187), політика sandbox для інструментів (№186)",
+            "Захист від lethal trifecta: жодна сесія не поєднує приватні дані, недовірений контент і канал назовні без підтвердження (№197, №198); агент діє з делегованими звуженими правами користувача (№213)",
+            "MCP-сервер віддалений: Streamable HTTP, OAuth 2.1 без token passthrough (№217), визначення інструментів закріплені хешами (№199)"]},
         {"id": "m7", "stage": "cicd", "title": "Контейнери й CI/CD", "items": [
             "Multi-stage Dockerfile (non-root, образ < 200 МБ), docker compose: app, worker, postgres, redis",
             "GitHub Actions: lint → test → build → Trivy → push у GHCR, теги за версією й sha",
@@ -529,6 +765,12 @@ CAPSTONE = {
             "Threat model за STRIDE (№165): межі довіри на діаграмі, 10 загроз з мітигаціями, перелік прийнятих ризиків",
             "Оцінка навантаження (RPS, обсяг даних, вартість), перелік режимів відмов і реакція на них",
             "README, за яким чужа людина запустить проєкт за 10 хвилин"]},
+        {"id": "m11", "stage": "ai-gov", "title": "V&V і governance", "items": [
+            "PRD (проблема, користувачі, метрики успіху) і System Design Document з рішеннями щодо моделі, RAG, агента й harness",
+            "Red teaming власної системи (№202): звіт з attack success rate за категоріями OWASP LLM і Agentic Top 10 до і після виправлень",
+            "V&V-звіт: що перевірено (evals, red team, навантаження), якими метриками, з якими довірчими інтервалами, і відомі обмеження",
+            "System card (№210), класифікація ризику за EU AI Act (№208), маркування AI-відповідей у UI (ст. 50), audit trail дій агента на хеш-ланцюжку (№207)",
+            "Захист проєкту: 20-хвилинна презентація рішень і відповіді на питання (рев'ю колеги або mock-інтерв'ю)"]},
     ],
 }
 
@@ -552,16 +794,20 @@ for st in STAGES:
         if t["id"] in AUTO:
             t["auto"] = AUTO[t["id"]]
             t.pop("kind", None)
-        elif t.get("kind") not in (None, "практика", "документ"):
-            raise SystemExit(f"{t['id']}: *Тип:* має бути «практика» або «документ», а не «{t['kind']}»")
+        elif t.get("kind") not in (None, "практика", "документ", "автотест"):
+            raise SystemExit(f"{t['id']}: *Тип:* має бути «практика», «документ» або «автотест», а не «{t['kind']}»")
     stage = {k: v for k, v in st.items() if k not in ("sections", "extra_tasks")}
+    stage.setdefault("track", "core")
     stage["tasks"] = tasks
     stages.append(stage)
 
 total = sum(len(s["tasks"]) for s in stages)
 _manual = [t for s in stages for t in s["tasks"] if "auto" not in t]
+_planned = [t["id"] for t in _manual if t.get("kind") == "автотест"]
+_manual = [t for t in _manual if t.get("kind") != "автотест"]
 _bare = [t["id"] for t in _manual if not t.get("done")]
 print(f"завдання без автоперевірки: {len(_manual)}, з чеклістом «Готово»: {len(_manual) - len(_bare)}")
+print(f"автотест готується: {len(_planned)}")
 all_tasks = [t for s in stages for t in s["tasks"]]
 sys.path.insert(0, HERE)
 import quiz_data  # noqa: E402
@@ -592,7 +838,7 @@ import cwe_data  # noqa: E402
 import gen_coverage  # noqa: E402
 _names = gen_coverage.cwe_names()
 _used = {re.sub(r"^[~?@]", "", tag) for t in all_tasks for tag in t.get("cwe", [])}
-data = {"stages": stages, "legacy": LEGACY, "capstone": CAPSTONE,
+data = {"tracks": TRACKS, "stages": stages, "legacy": LEGACY, "capstone": CAPSTONE,
         "cwe": {k: _names[k] for k in sorted(_used, key=int) if k in _names}}
 with open(OUT, "w", encoding="utf-8") as f:
     f.write("// Згенеровано з tasks-catalog.md. Редагуй каталог і перегенеруй, або правь тут вручну.\n")
