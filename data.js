@@ -1,6 +1,28 @@
 // Згенеровано з tasks-catalog.md. Редагуй каталог і перегенеруй, або правь тут вручну.
 window.SKILLBOOSTER = {
  "repo": "https://github.com/ShumykR/skillbooster",
+ "sandboxes": [
+  {
+   "id": "llm-cost",
+   "title": "Калькулятор вартості LLM",
+   "icon": "💸",
+   "track": "ai",
+   "concepts": [
+    [
+     "ai-api",
+     6
+    ],
+    [
+     "ai-llm",
+     1
+    ]
+   ],
+   "tasks": [
+    "t133",
+    "t132"
+   ]
+  }
+ ],
  "tracks": [
   {
    "id": "core",
@@ -9439,6 +9461,11 @@ window.SKILLBOOSTER = {
       "why": "Пауза понад секунду руйнує розмову. Тому міряють кожну ланку: розпізнавання, LLM, синтез (завдання №215)."
      }
     ]
+   },
+   "sandboxes": {
+    "1": [
+     "llm-cost"
+    ]
    }
   },
   {
@@ -9859,6 +9886,11 @@ window.SKILLBOOSTER = {
       "answer": 0,
       "why": "Якщо результат більше нікому не потрібен, скасування економить гроші. Для фонових задач навпаки: результат зберігають."
      }
+    ]
+   },
+   "sandboxes": {
+    "6": [
+     "llm-cost"
     ]
    }
   },

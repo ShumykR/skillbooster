@@ -52,3 +52,11 @@ for _stage in PRACTICE:
     except ModuleNotFoundError as e:
         if e.name != f"quizzes.{_stage.replace('-', '_')}":
             raise
+
+
+# Інтерактивні пісочниці (`sandboxes/<id>.js`): {id: {title, icon, concepts: [(етап, індекс поняття)], tasks: [номери]}}.
+# Генератор перевіряє, що файл і поняття існують, і додає в data.js список `sandboxes` та поле `sandboxes` у етапи.
+SANDBOX = {
+    "llm-cost": {"title": "Калькулятор вартості LLM", "icon": "💸",
+                 "concepts": [("ai-api", 6), ("ai-llm", 1)], "tasks": [133, 132]},
+}

@@ -1016,12 +1016,26 @@ for s in stages:
         if _longest > len(_qs) * 0.2:
             print(f"УВАГА: QUIZ[{s['id']}]: правильний варіант помітно довший у {_longest} з {len(_qs)} питань")
 
+# ---- пісочниці --------------------------------------------------------------
+_sb_list = []
+_stage_by_id = {s["id"]: s for s in stages}
+for _sid, _sb in quiz_data.SANDBOX.items():
+    assert os.path.isfile(os.path.join(HERE, "..", "sandboxes", _sid + ".js")), f"SANDBOX[{_sid}]: немає sandboxes/{_sid}.js"
+    for _st, _i in _sb["concepts"]:
+        assert _st in _stage_by_id and 0 <= _i < len(_stage_by_id[_st]["concepts"]), f"SANDBOX[{_sid}]: немає поняття {_st}:{_i}"
+        _stage_by_id[_st].setdefault("sandboxes", {}).setdefault(str(_i), []).append(_sid)
+    for _n in _sb["tasks"]:
+        assert f"t{_n}" in _ids, f"SANDBOX[{_sid}]: невідоме завдання {_n}"
+    _sb_list.append({"id": _sid, "title": _sb["title"], "icon": _sb["icon"],
+                     "track": _stage_by_id[_sb["concepts"][0][0]].get("track", "core"),
+                     "concepts": [list(c) for c in _sb["concepts"]], "tasks": [f"t{n}" for n in _sb["tasks"]]})
+
 import cwe_data  # noqa: E402
 import gen_coverage  # noqa: E402
 _names = gen_coverage.cwe_names()
 _used = {re.sub(r"^[~?@]", "", tag) for t in all_tasks for tag in t.get("cwe", [])}
 REPO = "https://github.com/ShumykR/skillbooster"
-data = {"repo": REPO, "tracks": TRACKS, "stages": stages, "legacy": LEGACY, "capstone": CAPSTONE,
+data = {"repo": REPO, "sandboxes": _sb_list, "tracks": TRACKS, "stages": stages, "legacy": LEGACY, "capstone": CAPSTONE,
         "cwe": {k: _names[k] for k in sorted(_used, key=int) if k in _names}}
 with open(OUT, "w", encoding="utf-8") as f:
     f.write("// Згенеровано з tasks-catalog.md. Редагуй каталог і перегенеруй, або правь тут вручну.\n")

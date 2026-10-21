@@ -380,3 +380,28 @@ details.readme > summary { cursor: pointer; padding: 8px 12px; font-weight: 600;
   .notes a { color: #000; text-decoration: none; }
   .tchip { border: 0 !important; padding: 0 !important; background: none !important; color: #000 !important; }
 }
+
+/* пісочниці */
+.sandbox { margin: 12px 0; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.sb-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; }
+@media (max-width: 760px) { .sb-layout { grid-template-columns: minmax(0, 1fr); } }
+.sb-ctl { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: center; margin: 8px 0; }
+.sb-ctl label { grid-column: 1 / -1; font-size: .88rem; color: var(--muted); }
+.sb-ctl input[type=range] { width: 100%; grid-column: 1; }
+.sb-ctl output { font-variant-numeric: tabular-nums; min-width: 5ch; text-align: right; font-weight: 600; color: var(--text); }
+.sb-ctl input[type=number], .sb-ctl select { grid-column: 1 / -1; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--surface); color: var(--text); font: inherit; }
+.sb-ctl.sb-check { display: flex; gap: 8px; align-items: center; }
+.sb-ctl.sb-check label { color: var(--text); font-size: .92rem; }
+.sb-big { font-size: 2rem; font-weight: 700; }
+.sb-big small { font-size: .9rem; font-weight: 400; color: var(--muted); }
+.sb-bars { margin: 10px 0; }
+.sb-row { display: grid; grid-template-columns: 7.5em 1fr auto; gap: 8px; align-items: center; margin: 5px 0; font-size: .88rem; }
+.sb-track { height: 14px; border-radius: 7px; background: var(--surface-2); overflow: hidden; }
+.sb-fill { display: block; height: 100%; border-radius: 7px; background: var(--accent); }
+.sb-fill.c2 { background: #2fa87a; } .sb-fill.c3 { background: #d9822b; } .sb-fill.c4 { background: #c2477f; }
+.sb-num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sb-levers li { margin: 3px 0; } .sb-levers li.top { font-weight: 600; }
+.sb-map { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.sb-map th, .sb-map td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; }
+.sb-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }

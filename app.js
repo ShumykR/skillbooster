@@ -10,7 +10,7 @@
 
   // ---------- сховище -------------------------------------------------------
   function emptyState() {
-    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], hints: {}, settings: { baseUrl: "", model: "" } };
+    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], hints: {}, played: {}, settings: { baseUrl: "", model: "" } };
   }
   var OLD_AI = ["ai-api:1", "ai-llm:4", "ai-rag:2", "ai-evals:0", "ai-agents:1", "ai-agents:8", "ai-security:1", "ai-api:6", "ai-ops:8"];
   var state = load();
@@ -29,6 +29,7 @@
         capstone: s.capstone || e.capstone,
         days: s.days || e.days,
         hints: s.hints || e.hints,
+        played: s.played || e.played,
         settings: Object.assign(e.settings, s.settings || {}),
       };
       migrateOldAi(out);
@@ -295,6 +296,77 @@
     return html;
   }
 
+  // ---------- пісочниці -----------------------------------------------------
+  var sbLoading = {};
+  function sbScript(src, cb) {
+    var sc = document.createElement("script");
+    sc.src = src;
+    sc.onload = function () { cb(true); };
+    sc.onerror = function () { cb(false); };
+    document.head.appendChild(sc);
+  }
+  function loadSandbox(id, cb) {
+    if (window.SB_SANDBOXES && window.SB_SANDBOXES[id]) { cb(window.SB_SANDBOXES[id]); return; }
+    function fetchOne() {
+      sbScript("sandboxes/" + id + ".js", function (ok) { cb(ok && window.SB_SANDBOXES[id] ? window.SB_SANDBOXES[id] : null); });
+    }
+    if (window.SB_KIT) fetchOne();
+    else sbScript("sandboxes/_kit.js", function (ok) { if (ok) fetchOne(); else cb(null); });
+  }
+  function sandboxMeta(id) { return (DATA.sandboxes || []).filter(function (x) { return x.id === id; })[0]; }
+
+  function renderPlayList() {
+    var list = DATA.sandboxes || [];
+    var html = "<h1>▶ Пісочниці</h1>" +
+      '<p class="note">Інтерактивні моделі до понять: покрути повзунки й побачиш, як змінюється результат. Це навчальний крок, на прогрес він не впливає.</p>';
+    if (!list.length) return html + "<p>Поки що пісочниць немає.</p>";
+    TRACKS.forEach(function (tr) {
+      var items = list.filter(function (x) { return x.track === tr.id; });
+      if (!items.length) return;
+      html += "<h2>" + esc(tr.title) + "</h2><div class=\"res-grid\">" + items.map(function (x) {
+        return '<a class="card res" href="#/play/' + x.id + '"><span class="rt">' + x.icon + " " + esc(x.title) +
+          (state.played[x.id] ? " ✓" : "") + "</span><span class=\"rn\">" +
+          x.concepts.map(function (c) { var st = stageById(c[0]); return esc(st.concepts[c[1]].replace(/`/g, "").split(":")[0]); }).join(" · ") +
+          "</span></a>";
+      }).join("") + "</div>";
+    });
+    return html;
+  }
+
+  function renderPlay(id) {
+    var meta = sandboxMeta(id);
+    var list = (DATA.sandboxes || []).filter(function (x) { return x.track === meta.track; });
+    var at = list.indexOf(meta);
+    var html = '<div class="crumbs"><a href="#/play">← Пісочниці</a></div>' +
+      "<h1>" + meta.icon + " " + esc(meta.title) + "</h1>" +
+      '<div id="sbMount" class="sandbox"><p class="note">Завантаження…</p></div><div id="sbInfo"></div>' +
+      '<h2>Перевір себе</h2><p>' + meta.concepts.map(function (c) {
+        var st = stageById(c[0]);
+        return '<a class="chip" href="#/concept/' + c[0] + "/" + c[1] + '">🧠 ' + md(st.concepts[c[1]].split(":")[0]) + "</a>";
+      }).join(" ") + "</p>" +
+      (meta.tasks.length ? "<h2>Реалізуй</h2><p>" + meta.tasks.map(taskChip).join(" ") + "</p>" : "") +
+      '<p class="sb-nav">' + (at > 0 ? '<a href="#/play/' + list[at - 1].id + '">← ' + esc(list[at - 1].title) + "</a>" : "<span></span>") +
+      (at < list.length - 1 ? '<a href="#/play/' + list[at + 1].id + '">' + esc(list[at + 1].title) + " →</a>" : "") + "</p>";
+    loadSandbox(id, function (sb) {
+      var box = document.getElementById("sbMount");
+      if (!box || location.hash.indexOf("#/play/" + id) !== 0) return;
+      if (!sb) { box.innerHTML = '<p class="note">Не вдалося завантажити пісочницю.</p>'; return; }
+      box.textContent = "";
+      var intro = document.createElement("div");
+      intro.innerHTML = "<p>" + esc(sb.analogy) + "</p>";
+      box.appendChild(intro);
+      var area = document.createElement("div");
+      box.appendChild(area);
+      sb.mount(area, {});
+      document.getElementById("sbInfo").innerHTML = '<div class="why"><strong>Формула.</strong> ' + md(sb.formula) + "</div>" +
+        "<h2>Що тут що</h2><table class=\"sb-map\"><thead><tr><th>У пісочниці</th><th>Аналогія</th><th>У реальності</th></tr></thead><tbody>" +
+        sb.mapping.map(function (r) { return "<tr>" + r.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") +
+        "</tbody></table>";
+      if (!state.played[id]) { state.played[id] = today(); touch(); }
+    });
+    return html;
+  }
+
   // шпаргалка етапу: поняття з поясненнями з питань самоперевірки, практика й ресурси (друкується як PDF)
   function renderNotes(st) {
     var tr = trackById(trackOf(st));
@@ -332,6 +404,9 @@
     if (qs.length) {
       meta += '<button class="qbtn" data-quiz="' + key + '" aria-expanded="false">🧠 Перевірити себе · ' + qs.length + "</button>";
     }
+    ((st.sandboxes && st.sandboxes[i]) || []).forEach(function (sid) {
+      meta += '<a class="qbtn" href="#/play/' + sid + '">▶ Спробувати</a>';
+    });
     return '<li id="c-' + st.id + "-" + i + '"><label><input type="checkbox" data-concept="' + key + '"' +
       (conceptDone(st.id, i) ? " checked" : "") + "><span>" + md(st.concepts[i]) + "</span></label>" +
       (meta ? '<div class="cmeta">' + meta + "</div>" : "") +
@@ -726,6 +801,13 @@
       setTrack(trackOf(ns));
       html = renderNotes(ns);
       title = "Шпаргалка: " + ns.title + " · SkillBooster";
+    } else if (/^#\/play\/[\w-]+/.test(h) && sandboxMeta(h.match(/^#\/play\/([\w-]+)/)[1])) {
+      var pm = sandboxMeta(h.match(/^#\/play\/([\w-]+)/)[1]);
+      html = renderPlay(pm.id);
+      title = pm.title + " · SkillBooster";
+    } else if (h.indexOf("#/play") === 0) {
+      html = renderPlayList();
+      title = "Пісочниці · SkillBooster";
     } else if (h.indexOf("#/sync") === 0) {
       html = renderSync(syncIds(h));
       title = "Синхронізація · SkillBooster";
@@ -936,7 +1018,7 @@
           }
           var e0 = emptyState();
           state = {
-            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [], hints: s.hints || {},
+            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [], hints: s.hints || {}, played: s.played || {},
             settings: Object.assign(e0.settings, s.settings || {}),
           };
           migrateOldAi(state);
