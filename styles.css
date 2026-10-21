@@ -468,3 +468,4 @@ details.readme > summary { cursor: pointer; padding: 8px 12px; font-weight: 600;
 .sb-st { flex: 1; height: 22px; background: var(--muted); }
 .sb-st.ok { background: var(--ok); } .sb-st.bad { background: var(--bad); } .sb-st.warn { background: var(--warn); }
 .sb-st.outage { box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .35); }
+.sb-verdict.warn { background: var(--warn-soft); color: var(--warn); }

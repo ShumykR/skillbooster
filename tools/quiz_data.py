@@ -75,4 +75,6 @@ SANDBOX = {
                      "concepts": [("api", 4)], "tasks": [112]},
     "error-budget": {"title": "Error budget і burn rate", "icon": "🔥",
                      "concepts": [("observability", 4)], "tasks": [104]},
+    "eval-noise": {"title": "Шум в evals: коли різниця справжня", "icon": "📊",
+                   "concepts": [("ai-evals", 3)], "tasks": [192]},
 }

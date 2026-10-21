@@ -158,6 +158,21 @@ window.SKILLBOOSTER = {
    "tasks": [
     "t104"
    ]
+  },
+  {
+   "id": "eval-noise",
+   "title": "Шум в evals: коли різниця справжня",
+   "icon": "📊",
+   "track": "ai",
+   "concepts": [
+    [
+     "ai-evals",
+     3
+    ]
+   ],
+   "tasks": [
+    "t192"
+   ]
   }
  ],
  "tracks": [
@@ -11531,6 +11546,11 @@ window.SKILLBOOSTER = {
       "answer": 0,
       "why": "Sticky-призначення дає чисте порівняння і не плутає користувача різною поведінкою (завдання №176)."
      }
+    ]
+   },
+   "sandboxes": {
+    "3": [
+     "eval-noise"
     ]
    }
   },
