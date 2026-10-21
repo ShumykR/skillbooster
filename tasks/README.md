@@ -180,6 +180,7 @@ python -m pytest t02_async_dashboard   # або напряму pytest
 | 169 | BPE-токенізатор з нуля | 🟡 |
 | 170 | Sampling: temperature, top-k, top-p, logprobs | 🟢 |
 | 171 | HNSW з нуля | 🔴 |
+| 172 | Квантизація embeddings | 🟡 |
 | 173 | Bayes для guardrail-класифікатора | 🟡 |
 | 175 | Менеджер контекстного вікна  🤖 | 🟡 |
 | 176 | Реєстр промптів | 🟡 |
@@ -204,6 +205,7 @@ python -m pytest t02_async_dashboard   # або напряму pytest
 | 199 | MCP: tool poisoning і rug pull | 🟡 |
 | 200 | Red-team харнес  🤖 | 🔴 |
 | 201 | Безпечне завантаження моделей | 🟡 |
+| 203 | Capacity planning для inference | 🟡 |
 | 204 | Canary для промптів і моделей | 🟡 |
 | 207 | Audit trail на хеш-ланцюжку | 🟡 |
 | 208 | Класифікатор ризику за EU AI Act | 🟡 |

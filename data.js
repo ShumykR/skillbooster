@@ -9156,7 +9156,7 @@ window.SKILLBOOSTER = {
      "title": "Квантизація embeddings",
      "desc": "int8 і бінарна квантизація з rescoring, Matryoshka-обрізання розмірності; таблиця «пам'ять ↔ recall@10»",
      "check": "автотести (бінарний пошук + rescoring тримає recall, пам'ять у 32 рази менша)",
-     "kind": "автотест"
+     "auto": "t172_embedding_quantization"
     },
     {
      "id": "t173",
@@ -12014,7 +12014,7 @@ window.SKILLBOOSTER = {
      "title": "Capacity planning для inference",
      "desc": "з TTFT, TPOT, довжин запитів і continuous batching порахувати кількість GPU під p95 SLO, порівняти з ціною API і знайти точку беззбитковості",
      "check": "автотести",
-     "kind": "автотест"
+     "auto": "t203_inference_capacity"
     },
     {
      "id": "t204",
