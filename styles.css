@@ -265,7 +265,11 @@ a.tag:hover { text-decoration: underline; }
 }
 .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-.task { display: grid; grid-template-columns: auto 1fr; gap: 12px; padding: 12px 14px; margin-bottom: 8px; }
+.task { display: grid; grid-template-columns: auto 1fr; gap: 12px; padding: 12px 14px; margin-bottom: 8px; position: relative; }
+.task .linkbtn { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; padding: 0; border: 1px solid transparent; border-radius: 6px;
+  background: transparent; color: var(--muted); cursor: pointer; font-size: .9rem; line-height: 1; opacity: .55; }
+.task .linkbtn:hover, .task .linkbtn:focus-visible { opacity: 1; border-color: var(--border); color: var(--accent); }
+.task h3 { padding-right: 30px; }
 .task.done { opacity: .62; }
 .task .st {
   width: 34px; height: 34px; border-radius: 50%;

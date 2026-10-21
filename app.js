@@ -64,7 +64,14 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-  function md(s) { return esc(s).replace(/`([^`]+)`/g, "<code>$1</code>"); }
+  // `код` і «№NNN»: номер існуючого завдання стає чипом-посиланням (поза <code>); plain вимикає чипи
+  function md(s, plain) {
+    var h = esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+    if (plain) return h;
+    return h.split(/(<code>[\s\S]*?<\/code>)/).map(function (part, i) {
+      return i % 2 ? part : part.replace(/№(\d+)/g, function (m, n) { return TASKS["t" + n] ? taskChip("t" + n) : m; });
+    }).join("");
+  }
   function stageById(id) { return DATA.stages.filter(function (s) { return s.id === id; })[0]; }
 
   // треки: окремі шляхи (Backend + DevOps, AI Engineering) зі своєю нумерацією етапів
@@ -305,7 +312,7 @@
     box.innerHTML = qs.map(function (q, qi) {
       return '<div class="qq" data-qi="' + qi + '"><p><b>' + (qi + 1) + ".</b> " + md(q.q) + "</p>" +
         shuffled(q.options.map(function (o, oi) { return { o: o, ok: oi === q.answer }; })).map(function (x) {
-          return '<button class="qopt" data-ok="' + (x.ok ? 1 : 0) + '">' + md(x.o) + "</button>";
+          return '<button class="qopt" data-ok="' + (x.ok ? 1 : 0) + '">' + md(x.o, true) + "</button>";
         }).join("") + '<p class="why-q" hidden>' + md(q.why) + "</p></div>";
     }).join("") + '<div class="qres" aria-live="polite"></div>';
     box.hidden = false;
@@ -418,6 +425,7 @@
     return '<div class="card task ' + (s === "done" ? "done" : "") + '" data-s="' + s + '" data-lvl="' + t.level +
       '" data-tag="' + ((t.cwe && t.cwe.length) ? "cwe" : "") + '" id="task-' + t.id + '">' +
       '<button class="st" data-task="' + t.id + '" aria-label="' + label + ': ' + esc(t.title) + '. Змінити статус">' + icon + "</button>" +
+      '<button class="linkbtn" data-copylink="task/' + t.id + '" title="Скопіювати посилання на завдання" aria-label="Скопіювати посилання на завдання">🔗</button>' +
       "<div><h3>" + (t.n ? '<span class="num">№' + t.n + "</span>" : "") + esc(t.title) + " " + lvlBadge(t.level) +
       (t.ai ? ' <span class="badge ai">🤖 LLM</span>' : "") +
       (t.auto ? ' <span class="badge free">🧪 автоперевірка</span>' : "") +
@@ -536,8 +544,28 @@
 
   // ---------- роутинг -------------------------------------------------------
   var pendingFocus = null;
+  // глибокі посилання: #/task/t129 і #/concept/ai-rag/4 (індекс 0-based, як у id картки) відкривають етап і підсвічують картку
+  function deepLink(h) {
+    var tk = h.match(/^#\/task\/(t\d+)\/?$/);
+    if (tk && TASK_STAGE[tk[1]]) return { stage: TASK_STAGE[tk[1]], focus: "task-" + tk[1] };
+    var cn = h.match(/^#\/concept\/([\w-]+)\/(\d+)\/?$/);
+    var st = cn && stageById(cn[1]);
+    if (st && +cn[2] < st.concepts.length) return { stage: st.id, focus: "c-" + st.id + "-" + cn[2] };
+    return null;
+  }
   function route() {
     var h = location.hash || "#/";
+    var dl = deepLink(h);
+    if (dl) {  // показуємо етап під канонічною адресою, посилання лишається в буфері
+      pendingFocus = dl.focus;
+      history.replaceState(null, "", "#/stage/" + dl.stage);
+      h = "#/stage/" + dl.stage;
+    }
+    var legacy = h.match(/^#\/stage\/([\w-]+)\/?$/);
+    if (legacy && !stageById(legacy[1]) && trackById(legacy[1])) {  // старий етап «ai» став треком
+      history.replaceState(null, "", "#/track/" + legacy[1]);
+      h = "#/track/" + legacy[1];
+    }
     var m = h.match(/^#\/stage\/([\w-]+)/);
     var activeId = null;
     var html;
@@ -575,6 +603,25 @@
       focusEl(pendingFocus);
       pendingFocus = null;
     }
+  }
+  function copyText(txt, okMsg) {
+    function fallback() {
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = txt;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        toast(ok ? okMsg : "Не вдалося скопіювати");
+      } catch (err) { toast("Не вдалося скопіювати"); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function () { toast(okMsg); }, fallback);
+    } else { fallback(); }
   }
   function focusEl(id) {
     var el = document.getElementById(id);
@@ -641,6 +688,12 @@
       document.querySelectorAll("#filters .chip").forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
       chip.setAttribute("aria-pressed", "true");
       applyFilter();
+      return;
+    }
+
+    var cl = e.target.closest("[data-copylink]");
+    if (cl) {
+      copyText(location.href.split("#")[0] + "#/" + cl.getAttribute("data-copylink"), "Посилання скопійовано");
       return;
     }
 
