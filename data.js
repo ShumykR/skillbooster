@@ -6780,7 +6780,7 @@ window.SKILLBOOSTER = {
       "~320",
       "~323"
      ],
-     "kind": "автотест"
+     "auto": "t231_envelope_encryption"
     },
     {
      "id": "t232",
@@ -6796,7 +6796,7 @@ window.SKILLBOOSTER = {
       "757",
       "~613"
      ],
-     "kind": "автотест"
+     "auto": "t232_jwt_verifier"
     },
     {
      "id": "t233",
@@ -6812,7 +6812,7 @@ window.SKILLBOOSTER = {
       "294",
       "~613"
      ],
-     "kind": "автотест"
+     "auto": "t233_oauth_server"
     },
     {
      "id": "t234",
@@ -6826,7 +6826,7 @@ window.SKILLBOOSTER = {
       "294",
       "345"
      ],
-     "kind": "автотест"
+     "auto": "t234_dpop"
     },
     {
      "id": "t235",
@@ -6844,7 +6844,7 @@ window.SKILLBOOSTER = {
      "pattern": [
       "Policy Decision Point"
      ],
-     "kind": "автотест"
+     "auto": "t235_rebac"
     },
     {
      "id": "t236",
@@ -6859,7 +6859,7 @@ window.SKILLBOOSTER = {
       "294",
       "346"
      ],
-     "kind": "автотест"
+     "auto": "t236_webauthn_server"
     },
     {
      "id": "t237",
@@ -7732,7 +7732,7 @@ window.SKILLBOOSTER = {
       "269",
       "~200"
      ],
-     "kind": "автотест"
+     "auto": "t245_actions_audit"
     },
     {
      "id": "t246",
@@ -7747,7 +7747,7 @@ window.SKILLBOOSTER = {
       "829",
       "~1357"
      ],
-     "kind": "автотест"
+     "auto": "t246_dependency_policy"
     },
     {
      "id": "t247",
@@ -7761,7 +7761,7 @@ window.SKILLBOOSTER = {
       "~1395",
       "~1104"
      ],
-     "kind": "автотест"
+     "auto": "t247_sbom_vex"
     },
     {
      "id": "t248",
@@ -7771,7 +7771,7 @@ window.SKILLBOOSTER = {
      "title": "Security gate на SARIF",
      "desc": "злиття SARIF від кількох сканерів, стабільні fingerprints, baseline (старі знахідки не блокують, нові блокують), винятки з власником і терміном, пороги за severity і рішення pass/fail з поясненням",
      "check": "автотести",
-     "kind": "автотест"
+     "auto": "t248_sarif_gate"
     },
     {
      "id": "t249",
@@ -7786,7 +7786,7 @@ window.SKILLBOOSTER = {
       "345",
       "~829"
      ],
-     "kind": "автотест"
+     "auto": "t249_provenance_verify"
     },
     {
      "id": "t250",
