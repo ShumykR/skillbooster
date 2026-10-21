@@ -69,4 +69,6 @@ SANDBOX = {
                        "concepts": [("ai-api", 4)], "tasks": [175]},
     "backoff": {"title": "Backoff і jitter: чому клієнти б'ють хвилями", "icon": "🌊",
                 "concepts": [("api", 3), ("ai-api", 7)], "tasks": [42, 134]},
+    "breaker": {"title": "Circuit breaker: стани й ціна захисту", "icon": "🔌",
+                "concepts": [("sysdesign", 7), ("ai-api", 7)], "tasks": [109, 134]},
 }

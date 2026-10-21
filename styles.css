@@ -464,3 +464,7 @@ details.readme > summary { cursor: pointer; padding: 8px 12px; font-weight: 600;
 .sb-map tr.sel th, .sb-map tr.sel td { background: var(--surface-2); font-weight: 600; }
 .sb-result, .sb-controls { min-width: 0; }
 .sb-result { overflow-x: auto; }
+.sb-states { display: flex; gap: 1px; margin: 8px 0; }
+.sb-st { flex: 1; height: 22px; background: var(--muted); }
+.sb-st.ok { background: var(--ok); } .sb-st.bad { background: var(--bad); } .sb-st.warn { background: var(--warn); }
+.sb-st.outage { box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .35); }

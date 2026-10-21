@@ -108,6 +108,26 @@ window.SKILLBOOSTER = {
     "t42",
     "t134"
    ]
+  },
+  {
+   "id": "breaker",
+   "title": "Circuit breaker: стани й ціна захисту",
+   "icon": "🔌",
+   "track": "core",
+   "concepts": [
+    [
+     "sysdesign",
+     7
+    ],
+    [
+     "ai-api",
+     7
+    ]
+   ],
+   "tasks": [
+    "t109",
+    "t134"
+   ]
   }
  ],
  "tracks": [
@@ -5933,6 +5953,11 @@ window.SKILLBOOSTER = {
       "why": "Обмежена черга дає backpressure: виробник уповільнюється або отримує відмову (завдання №15)."
      }
     ]
+   },
+   "sandboxes": {
+    "7": [
+     "breaker"
+    ]
    }
   },
   {
@@ -9991,7 +10016,8 @@ window.SKILLBOOSTER = {
      "context-budget"
     ],
     "7": [
-     "backoff"
+     "backoff",
+     "breaker"
     ]
    }
   },
