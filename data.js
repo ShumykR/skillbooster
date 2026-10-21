@@ -2711,7 +2711,7 @@ window.SKILLBOOSTER = {
       "Modular monolith",
       "Fitness function"
      ],
-     "kind": "автотест"
+     "auto": "t222_fitness_functions"
     },
     {
      "id": "t223",
@@ -2728,7 +2728,7 @@ window.SKILLBOOSTER = {
       "Aggregate",
       "Domain Event"
      ],
-     "kind": "автотест"
+     "auto": "t223_order_aggregate"
     },
     {
      "id": "t224",
@@ -2742,7 +2742,7 @@ window.SKILLBOOSTER = {
       "Schema Registry",
       "Upcaster"
      ],
-     "kind": "автотест"
+     "auto": "t224_schema_registry"
     },
     {
      "id": "t225",
@@ -2756,7 +2756,7 @@ window.SKILLBOOSTER = {
       "Event Sourcing",
       "CQRS"
      ],
-     "kind": "автотест"
+     "auto": "t225_event_sourcing"
     },
     {
      "id": "t226",
@@ -2774,7 +2774,7 @@ window.SKILLBOOSTER = {
      "pattern": [
       "Tenant isolation"
      ],
-     "kind": "автотест"
+     "auto": "t226_tenant_isolation"
     },
     {
      "id": "t227",
@@ -2788,7 +2788,7 @@ window.SKILLBOOSTER = {
       "Strangler Fig",
       "Dark launch"
      ],
-     "kind": "автотест"
+     "auto": "t227_strangler_fig"
     },
     {
      "id": "t228",
@@ -7325,7 +7325,7 @@ window.SKILLBOOSTER = {
      "title": "Дерево атак і вибір мітигацій",
      "desc": "дерево AND/OR з вартістю й імовірністю листків, найдешевший шлях атакувальника, вплив мітигації на дерево, мінімальний набір мітигацій, що перекриває всі шляхи до цілі в межах бюджету, пояснення результату",
      "check": "автотести",
-     "kind": "автотест"
+     "auto": "t242_attack_tree"
     },
     {
      "id": "t243",
@@ -8162,7 +8162,7 @@ window.SKILLBOOSTER = {
       "~1007",
       "~451"
      ],
-     "kind": "автотест"
+     "auto": "t252_hidden_instructions"
     },
     {
      "id": "t253",
@@ -8180,7 +8180,7 @@ window.SKILLBOOSTER = {
      "pattern": [
       "Policy Enforcement Point"
      ],
-     "kind": "автотест"
+     "auto": "t253_shell_policy"
     },
     {
      "id": "t254",
@@ -8195,7 +8195,7 @@ window.SKILLBOOSTER = {
       "77",
       "~269"
      ],
-     "kind": "автотест"
+     "auto": "t254_ci_triage_bot"
     },
     {
      "id": "t255",
@@ -8214,7 +8214,7 @@ window.SKILLBOOSTER = {
       "330",
       "942"
      ],
-     "kind": "автотест"
+     "auto": "t255_ai_diff_linter"
     },
     {
      "id": "t256",
@@ -8639,7 +8639,7 @@ window.SKILLBOOSTER = {
       "~311",
       "~778"
      ],
-     "kind": "автотест"
+     "auto": "t258_cloud_scanner"
     },
     {
      "id": "t259",
@@ -8654,7 +8654,7 @@ window.SKILLBOOSTER = {
       "~307",
       "~223"
      ],
-     "kind": "автотест"
+     "auto": "t259_auth_detections"
     },
     {
      "id": "t260",
@@ -8667,7 +8667,7 @@ window.SKILLBOOSTER = {
      "cwe": [
       "~1395"
      ],
-     "kind": "автотест"
+     "auto": "t260_vuln_prioritization"
     },
     {
      "id": "t261",
