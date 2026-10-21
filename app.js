@@ -523,20 +523,34 @@
   }
   function sandboxMeta(id) { return (DATA.sandboxes || []).filter(function (x) { return x.id === id; })[0]; }
 
+  var EXT_KINDS = ["Інтерактив", "Гра", "Пісочниця"];   // ресурси етапів, що працюють як інтерактив у браузері
   function renderPlayList() {
+    var extHtml = "";
     var list = DATA.sandboxes || [];
     var html = "<h1>▶ Пісочниці</h1>" +
-      '<p class="note">Інтерактивні моделі до понять: покрути повзунки й побачиш, як змінюється результат. Це навчальний крок, на прогрес він не впливає.</p>';
+      '<p class="note">Інтерактивні моделі до понять: покрути повзунки й побачиш, як змінюється результат. Нижче в кожному треку зібрано зовнішні інтерактиви з ресурсів етапів. Це навчальний крок, на прогрес він не впливає.</p>';
     if (!list.length) return html + "<p>Поки що пісочниць немає.</p>";
     TRACKS.forEach(function (tr) {
       var items = list.filter(function (x) { return x.track === tr.id; });
-      if (!items.length) return;
-      html += "<h2>" + esc(tr.title) + "</h2><div class=\"res-grid\">" + items.map(function (x) {
+      var ext = [];
+      stagesOf(tr.id).forEach(function (st) {
+        st.resources.forEach(function (r) { if (EXT_KINDS.indexOf(r.kind) !== -1) ext.push({ r: r, st: st }); });
+      });
+      if (!items.length && !ext.length) return;
+      html += "<h2>" + esc(tr.title) + "</h2>";
+      if (ext.length) extHtml = '<h3>Зовнішні інтерактиви</h3><div class="res-grid">' + ext.map(function (x) {
+        return '<a class="card res" href="' + esc(x.r.url) + '" target="_blank" rel="noopener noreferrer"><span class="rt">' + esc(x.r.name) + " ↗</span>" +
+          '<span class="rn">' + esc(x.r.note) + '</span><span class="rb"><span class="badge">' + esc(x.r.kind) + '</span><span class="badge">' + x.st.icon + " " + esc(x.st.title) + "</span>" +
+          freeBadge(x.r.free) + "</span></a>";
+      }).join("") + "</div>";
+      else extHtml = "";
+      if (items.length) html += '<h3>Наші пісочниці</h3>';
+      html += '<div class="res-grid">' + items.map(function (x) {
         return '<a class="card res" href="#/play/' + x.id + '"><span class="rt">' + x.icon + " " + esc(x.title) +
           (state.played[x.id] ? " ✓" : "") + "</span><span class=\"rn\">" +
           x.concepts.map(function (c) { var st = stageById(c[0]); return esc(st.concepts[c[1]].replace(/`/g, "").split(":")[0]); }).join(" · ") +
           "</span></a>";
-      }).join("") + "</div>";
+      }).join("") + "</div>" + extHtml;
     });
     return html;
   }
