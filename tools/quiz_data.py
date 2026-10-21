@@ -79,4 +79,6 @@ SANDBOX = {
                    "concepts": [("ai-evals", 3)], "tasks": [192]},
     "agent-fsm": {"title": "Агент як скінченний автомат", "icon": "🤖",
                   "concepts": [("ai-agents", 3)], "tasks": [184]},
+    "rollout": {"title": "Rollout: rolling, blue-green, canary і ціна багу", "icon": "🚀",
+                "concepts": [("cicd", 4), ("k8s", 7)], "tasks": [77, 100]},
 }

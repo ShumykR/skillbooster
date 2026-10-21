@@ -188,6 +188,26 @@ window.SKILLBOOSTER = {
    "tasks": [
     "t184"
    ]
+  },
+  {
+   "id": "rollout",
+   "title": "Rollout: rolling, blue-green, canary і ціна багу",
+   "icon": "🚀",
+   "track": "core",
+   "concepts": [
+    [
+     "cicd",
+     4
+    ],
+    [
+     "k8s",
+     7
+    ]
+   ],
+   "tasks": [
+    "t77",
+    "t100"
+   ]
   }
  ],
  "tracks": [
@@ -4344,6 +4364,11 @@ window.SKILLBOOSTER = {
       "why": "Credentials зберігаються зашифрованими, а `withCredentials` маскує значення в логах."
      }
     ]
+   },
+   "sandboxes": {
+    "4": [
+     "rollout"
+    ]
    }
   },
   {
@@ -5170,6 +5195,11 @@ window.SKILLBOOSTER = {
       "answer": 0,
       "why": "PDB діє на drain і оновлення вузлів, а не на аварії (завдання №100)."
      }
+    ]
+   },
+   "sandboxes": {
+    "7": [
+     "rollout"
     ]
    }
   },
