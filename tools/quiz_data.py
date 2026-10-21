@@ -71,4 +71,6 @@ SANDBOX = {
                 "concepts": [("api", 3), ("ai-api", 7)], "tasks": [42, 134]},
     "breaker": {"title": "Circuit breaker: стани й ціна захисту", "icon": "🔌",
                 "concepts": [("sysdesign", 7), ("ai-api", 7)], "tasks": [109, 134]},
+    "token-bucket": {"title": "Token bucket: сплеск, поповнення, Retry-After", "icon": "🪣",
+                     "concepts": [("api", 4)], "tasks": [112]},
 }

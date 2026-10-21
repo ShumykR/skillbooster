@@ -128,6 +128,21 @@ window.SKILLBOOSTER = {
     "t109",
     "t134"
    ]
+  },
+  {
+   "id": "token-bucket",
+   "title": "Token bucket: сплеск, поповнення, Retry-After",
+   "icon": "🪣",
+   "track": "core",
+   "concepts": [
+    [
+     "api",
+     4
+    ]
+   ],
+   "tasks": [
+    "t112"
+   ]
   }
  ],
  "tracks": [
@@ -2760,6 +2775,9 @@ window.SKILLBOOSTER = {
    "sandboxes": {
     "3": [
      "backoff"
+    ],
+    "4": [
+     "token-bucket"
     ]
    }
   },
