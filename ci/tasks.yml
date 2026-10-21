@@ -6,6 +6,7 @@ name: tasks
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -20,7 +21,7 @@ jobs:
       - name: data.js і звіти актуальні
         run: |
           python tools/gen_data.py
-          git diff --exit-code -- data.js docs tasks/README.md
+          git diff --exit-code -- data.js readmes.js docs tasks/README.md
       - name: у кожного завдання є README, solution.py і test_solution.py
         run: |
           missing=0
