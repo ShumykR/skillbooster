@@ -901,6 +901,7 @@
       title = "Шпаргалка: " + ns.title + " · SkillBooster";
     } else if (/^#\/play\/[\w-]+/.test(h) && sandboxMeta(h.match(/^#\/play\/([\w-]+)/)[1])) {
       var pm = sandboxMeta(h.match(/^#\/play\/([\w-]+)/)[1]);
+      setTrack(pm.track);
       html = renderPlay(pm.id);
       title = pm.title + " · SkillBooster";
     } else if (h.indexOf("#/play") === 0) {

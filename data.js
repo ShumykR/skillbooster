@@ -54,6 +54,25 @@ window.SKILLBOOSTER = {
     "t173",
     "t196"
    ]
+  },
+  {
+   "id": "rrf",
+   "title": "RRF: злиття рейтингів BM25 і вектора",
+   "icon": "🔀",
+   "track": "ai",
+   "concepts": [
+    [
+     "ai-rag",
+     2
+    ],
+    [
+     "ai-rag",
+     9
+    ]
+   ],
+   "tasks": [
+    "t130"
+   ]
   }
  ],
  "tracks": [
@@ -10392,6 +10411,14 @@ window.SKILLBOOSTER = {
       "answer": 0,
       "why": "Хеш вмісту показує, які чанки змінились. Це економить embeddings і не залишає застарілих фрагментів."
      }
+    ]
+   },
+   "sandboxes": {
+    "2": [
+     "rrf"
+    ],
+    "9": [
+     "rrf"
     ]
    }
   },

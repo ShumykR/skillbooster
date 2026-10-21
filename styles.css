@@ -439,3 +439,13 @@ details.readme > summary { cursor: pointer; padding: 8px 12px; font-weight: 600;
 .sb-verdict.blocked, .sb-verdict.safe { background: var(--surface-2); color: var(--ok); }
 .sb-cell-bad { background: var(--bad-soft); color: var(--bad); font-weight: 600; }
 .sb-cell-ok { background: var(--surface-2); color: var(--ok); font-weight: 600; }
+.sb-rank { list-style: decimal; margin: 6px 0 12px; padding-left: 24px; }
+.sb-rank li { display: grid; grid-template-columns: 1fr auto auto; gap: 6px; align-items: center; padding: 3px 6px; border-radius: 6px; font-size: .88rem; }
+.sb-rank li.target { background: var(--surface-2); font-weight: 600; }
+.sb-rank.fused li { grid-template-columns: minmax(0, 1fr) 90px 3.5em; }
+.sb-stack { display: flex; }
+.sb-stack .sb-fill { height: 100%; border-radius: 0; flex: none; }
+.sb-mv { width: 26px; height: 26px; padding: 0; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; }
+.sb-mv:hover, .sb-mv:focus-visible { border-color: var(--accent); }
+.sb-lists { margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 760px) { .sb-lists { grid-template-columns: minmax(0, 1fr); } }

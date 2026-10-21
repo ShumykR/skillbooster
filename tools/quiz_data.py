@@ -63,4 +63,6 @@ SANDBOX = {
                  "concepts": [("ai-security", 3)], "tasks": [197, 198, 196]},
     "base-rate": {"title": "Base rate: чому «99% точний» не означає «99% блокувань правильні»", "icon": "🎯",
                   "concepts": [("ai-llm", 6)], "tasks": [173, 196]},
+    "rrf": {"title": "RRF: злиття рейтингів BM25 і вектора", "icon": "🔀",
+            "concepts": [("ai-rag", 2), ("ai-rag", 9)], "tasks": [130]},
 }
