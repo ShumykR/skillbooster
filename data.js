@@ -9126,7 +9126,7 @@ window.SKILLBOOSTER = {
      "title": "BPE-токенізатор з нуля",
      "desc": "навчити merges на корпусі, `encode`/`decode` без втрат (включно з емодзі й кирилицею), порахувати, у скільки разів український текст «дорожчий» за англійський",
      "check": "автотести (roundtrip, детерміновані merges, кількість токенів)",
-     "kind": "автотест"
+     "auto": "t169_bpe_tokenizer"
     },
     {
      "id": "t170",
@@ -9136,7 +9136,7 @@ window.SKILLBOOSTER = {
      "title": "Sampling",
      "desc": "softmax із temperature, top-k, top-p (nucleus), seed і logprobs; temperature 0 як greedy, перевірка розподілу на 10 000 вибірках",
      "check": "автотести (статистичні межі з фіксованим seed)",
-     "kind": "автотест"
+     "auto": "t170_sampling"
     },
     {
      "id": "t171",
@@ -9166,7 +9166,7 @@ window.SKILLBOOSTER = {
      "title": "Bayes для guardrail-класифікатора",
      "desc": "precision при низькому base rate атак, вибір порогу за вартістю помилок, калібрування впевненості (ECE, Platt scaling)",
      "check": "автотести (обчислені метрики на фіксованих даних)",
-     "kind": "автотест"
+     "auto": "t173_guardrail_bayes"
     },
     {
      "id": "t174",
@@ -9541,7 +9541,7 @@ window.SKILLBOOSTER = {
      "title": "Менеджер контекстного вікна",
      "desc": "бюджет токенів за секціями (інструкції, пам'ять, документи, історія), пріоритети й обрізання, компактизація старої історії через мок-LLM, закріплені інструкції не обрізаються ніколи, важливе на початку й наприкінці (lost in the middle)",
      "check": "автотести (бюджет не перевищено, порядок секцій, компактизація викликається лише за порогом)",
-     "kind": "автотест"
+     "auto": "t175_context_window"
     },
     {
      "id": "t176",
@@ -9554,7 +9554,7 @@ window.SKILLBOOSTER = {
      "cwe": [
       "~1336"
      ],
-     "kind": "автотест"
+     "auto": "t176_prompt_registry"
     },
     {
      "id": "t177",
@@ -9567,7 +9567,7 @@ window.SKILLBOOSTER = {
      "pattern": [
       "State"
      ],
-     "kind": "автотест"
+     "auto": "t177_constrained_decoding"
     },
     {
      "id": "t132",
@@ -9959,7 +9959,7 @@ window.SKILLBOOSTER = {
      "title": "Структурний чанкер",
      "desc": "розбиття Markdown/HTML за заголовками, таблиці й код не розриваються, parent-child чанки, contextual prefix (назва документа й шлях заголовків), стабільні id для переіндексації",
      "check": "автотести",
-     "kind": "автотест"
+     "auto": "t178_structural_chunker"
     },
     {
      "id": "t179",
@@ -10018,7 +10018,7 @@ window.SKILLBOOSTER = {
       "863",
       "~639"
      ],
-     "kind": "автотест"
+     "auto": "t211_safe_text_to_sql"
     }
    ],
    "practice": [
@@ -10436,7 +10436,7 @@ window.SKILLBOOSTER = {
      "title": "Harness: evaluator-optimizer",
      "desc": "агент пропонує патч, верифікатор (тести) оцінює, агент виправляє; ліміт ітерацій і вартості, відкат при регресії, журнал траєкторії для відлагодження",
      "check": "автотести (на мок-LLM: зупинка на зелених тестах, відкат при регресії, ліміти)",
-     "kind": "автотест"
+     "auto": "t183_evaluator_optimizer"
     },
     {
      "id": "t184",
@@ -10452,7 +10452,7 @@ window.SKILLBOOSTER = {
      "pattern": [
       "State"
      ],
-     "kind": "автотест"
+     "auto": "t184_agent_fsm"
     },
     {
      "id": "t185",
@@ -10477,7 +10477,7 @@ window.SKILLBOOSTER = {
       "~78",
       "~250"
      ],
-     "kind": "автотест"
+     "auto": "t186_agent_sandbox_policy"
     },
     {
      "id": "t187",
@@ -10487,7 +10487,7 @@ window.SKILLBOOSTER = {
      "title": "Durable execution агента",
      "desc": "журнал подій, відновлення після падіння через replay без повторних побічних ефектів, ключі ідемпотентності інструментів, чекпоінти",
      "check": "автотести (падіння на кожному кроці, жодна дія не виконана двічі)",
-     "kind": "автотест"
+     "auto": "t187_durable_agent"
     },
     {
      "id": "t188",
@@ -10497,7 +10497,7 @@ window.SKILLBOOSTER = {
      "title": "Multi-agent оркестратор",
      "desc": "orchestrator-workers з паралельними підзадачами, handoff між агентами, окремий контекст і бюджет на воркера, злиття результатів, порівняння з одним агентом за вартістю",
      "check": "автотести (на мок-LLM)",
-     "kind": "автотест"
+     "auto": "t188_multi_agent_orchestrator"
     },
     {
      "id": "t189",
@@ -11021,7 +11021,7 @@ window.SKILLBOOSTER = {
      "title": "Evals траєкторій агента",
      "desc": "обов'язкові й заборонені інструменти, частковий порядок кроків, зайві виклики, успіх задачі; pass@k і pass^k на повторних запусках",
      "check": "автотести",
-     "kind": "автотест"
+     "auto": "t191_agent_trajectory_evals"
     },
     {
      "id": "t192",
@@ -11031,7 +11031,7 @@ window.SKILLBOOSTER = {
      "title": "Статистика evals",
      "desc": "bootstrap довірчі інтервали, парне порівняння двох версій промпту, мінімальний розмір набору; регресійний гейт не падає на шумі й ловить справжнє погіршення",
      "check": "автотести (фіксований seed)",
-     "kind": "автотест"
+     "auto": "t192_eval_statistics"
     },
     {
      "id": "t193",
@@ -11051,7 +11051,7 @@ window.SKILLBOOSTER = {
      "title": "Монітор behavioral drift",
      "desc": "PSI і дивергенція Дженсена-Шеннона для розподілів (довжина відповіді, частка відмов, теми, використання інструментів), ковзні вікна, алерт без шуму",
      "check": "автотести",
-     "kind": "автотест"
+     "auto": "t194_drift_monitor"
     },
     {
      "id": "t195",
@@ -11082,7 +11082,7 @@ window.SKILLBOOSTER = {
      "title": "Синтетичний eval-датасет",
      "desc": "генерація пар «питання → відповідь → чанк-джерело» з корпусу через мок-LLM, фільтр питань, на які не можна відповісти з джерела, дедуплікація перефразувань, стратифікація за типами (факт, порівняння, multi-hop, «немає відповіді»)",
      "check": "автотести",
-     "kind": "автотест"
+     "auto": "t216_synthetic_evalset"
     },
     {
      "id": "t218",
@@ -11490,7 +11490,7 @@ window.SKILLBOOSTER = {
      "pattern": [
       "Chain of Responsibility"
      ],
-     "kind": "автотест"
+     "auto": "t196_guardrails"
     },
     {
      "id": "t197",
@@ -11504,7 +11504,7 @@ window.SKILLBOOSTER = {
       "807",
       "863"
      ],
-     "kind": "автотест"
+     "auto": "t197_taint_tracking"
     },
     {
      "id": "t198",
@@ -11531,7 +11531,7 @@ window.SKILLBOOSTER = {
       "~494",
       "~345"
      ],
-     "kind": "автотест"
+     "auto": "t199_mcp_tool_poisoning"
     },
     {
      "id": "t200",
@@ -11541,7 +11541,7 @@ window.SKILLBOOSTER = {
      "title": "Red-team харнес",
      "desc": "корпус атак із мутаторами (base64, переклад, roleplay, розбиття на частини), прогін проти системи, attack success rate за категоріями OWASP LLM/Agentic, регресійний гейт",
      "check": "автотести (на мок-системі)",
-     "kind": "автотест"
+     "auto": "t200_red_team_harness"
     },
     {
      "id": "t201",
@@ -11590,7 +11590,7 @@ window.SKILLBOOSTER = {
       "~1357",
       "~829"
      ],
-     "kind": "автотест"
+     "auto": "t212_slopsquatting"
     },
     {
      "id": "t213",
@@ -11605,7 +11605,7 @@ window.SKILLBOOSTER = {
       "863",
       "~441"
      ],
-     "kind": "автотест"
+     "auto": "t213_agent_delegation"
     }
    ],
    "practice": [
@@ -12024,7 +12024,7 @@ window.SKILLBOOSTER = {
      "title": "Canary для промптів і моделей",
      "desc": "розподіл трафіку, порівняння якості, вартості й помилок між версіями, автоматичний rollback за порогами, sticky-призначення користувача",
      "check": "автотести",
-     "kind": "автотест"
+     "auto": "t204_prompt_canary"
     },
     {
      "id": "t205",
@@ -12445,7 +12445,7 @@ window.SKILLBOOSTER = {
       "~117",
       "~354"
      ],
-     "kind": "автотест"
+     "auto": "t207_audit_trail"
     },
     {
      "id": "t208",
@@ -12455,7 +12455,7 @@ window.SKILLBOOSTER = {
      "title": "Класифікатор ризику за EU AI Act",
      "desc": "опис системи → категорія (заборонена, high-risk за Annex III, прозорість за ст. 50, мінімальна), список обов'язків провайдера й деплоєра і строки з урахуванням Digital Omnibus 2026",
      "check": "автотести (навчальна спрощена модель, не юридична порада)",
-     "kind": "автотест"
+     "auto": "t208_eu_ai_act_classifier"
     },
     {
      "id": "t209",
