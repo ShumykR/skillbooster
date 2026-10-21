@@ -10,7 +10,7 @@
 
   // ---------- сховище -------------------------------------------------------
   function emptyState() {
-    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], hints: {}, played: {}, failed: {}, review: {}, settings: { baseUrl: "", model: "" } };
+    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], hints: {}, played: {}, failed: {}, review: {}, notes: {}, settings: { baseUrl: "", model: "" } };
   }
   var OLD_AI = ["ai-api:1", "ai-llm:4", "ai-rag:2", "ai-evals:0", "ai-agents:1", "ai-agents:8", "ai-security:1", "ai-api:6", "ai-ops:8"];
   var state = load();
@@ -32,6 +32,7 @@
         played: s.played || e.played,
         failed: s.failed || e.failed,
         review: s.review || e.review,
+        notes: s.notes || e.notes,
         settings: Object.assign(e.settings, s.settings || {}),
       };
       migrateOldAi(out);
@@ -688,6 +689,14 @@
     return out ? '<div class="tags">' + out + "</div>" : "";
   }
 
+  // власні нотатки до завдання (висновки, посилання на свій репозиторій), зберігаються з debounce
+  function noteHtml(id) {
+    var v = state.notes[id] || "";
+    return '<details class="notebox"' + (v ? " open" : "") + "><summary>📝 Мої нотатки" + (v ? " ·" : "") + (v ? " є" : "") +
+      '</summary><textarea data-note="' + id + '" rows="3" placeholder="Висновки, посилання на свій код, що було складно…" aria-label="Нотатки до завдання">' + esc(v) + "</textarea></details>";
+  }
+  var noteTimer = null;
+
   function taskKinds(t) {
     var k = [];
     if (t.ai) k.push("ai");
@@ -851,7 +860,7 @@
         '" title="Скопіювати команду">📋 Копіювати</button>' +
         (DATA.repo ? ' · <a href="' + DATA.repo + "/tree/main/tasks/" + esc(t.auto) + '" target="_blank" rel="noopener">Код на GitHub</a>' +
           ' · <a href="' + DATA.repo.replace("github.com", "github.dev") + "/tree/main/tasks/" + esc(t.auto) +
-          '" target="_blank" rel="noopener">Відкрити в github.dev</a>' : "") + "</div>" + readmeShell(t.id) : "") + "</div></div>";
+          '" target="_blank" rel="noopener">Відкрити в github.dev</a>' : "") + "</div>" + readmeShell(t.id) : "") + noteHtml(t.id) + "</div></div>";
   }
 
 
@@ -1253,7 +1262,7 @@
           }
           var e0 = emptyState();
           state = {
-            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [], hints: s.hints || {}, played: s.played || {}, failed: s.failed || {}, review: s.review || {},
+            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [], hints: s.hints || {}, played: s.played || {}, failed: s.failed || {}, review: s.review || {}, notes: s.notes || {},
             settings: Object.assign(e0.settings, s.settings || {}),
           };
           migrateOldAi(state);
@@ -1276,6 +1285,16 @@
   }, true);
 
   document.addEventListener("input", function (e) {
+    var nid = e.target.getAttribute && e.target.getAttribute("data-note");
+    if (nid) {
+      clearTimeout(noteTimer);
+      var val = e.target.value;
+      noteTimer = setTimeout(function () {
+        if (val.trim()) state.notes[nid] = val; else delete state.notes[nid];
+        save();
+      }, 500);
+      return;
+    }
     if (e.target.id === "sBase" || e.target.id === "sModel") {
       state.settings.baseUrl = document.getElementById("sBase").value.trim();
       state.settings.model = document.getElementById("sModel").value.trim();

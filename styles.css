@@ -495,3 +495,9 @@ details.readme > summary { cursor: pointer; padding: 8px 12px; font-weight: 600;
 .proof.due { color: var(--warn); font-weight: 600; }
 .qopt.sel { border-color: var(--accent); background: var(--surface-2); }
 #run .qq { margin: 16px 0; }
+
+/* нотатки до завдання */
+details.notebox { margin-top: 10px; }
+details.notebox > summary { cursor: pointer; color: var(--muted); font-size: .88rem; }
+details.notebox textarea { width: 100%; margin-top: 6px; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+  color: var(--text); font: inherit; font-size: .9rem; resize: vertical; }
