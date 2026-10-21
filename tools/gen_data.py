@@ -1002,6 +1002,13 @@ for s in stages:
     s["practice"] = [[x if isinstance(x, str) else f"t{x}" for x in row] for row in links]
     for tid in (x for row in s["practice"] for x in row):
         assert tid in _ids, f"PRACTICE[{s['id']}]: невідоме завдання {tid}"
+    reading = quiz_data.READING.get(s["id"], {})
+    for i, items in reading.items():
+        assert 0 <= i < len(s["concepts"]), f"READING[{s['id']}]: немає поняття {i}"
+        for name, url in items:
+            assert url.startswith("https://") and name.strip(), f"READING[{s['id']}][{i}]: {name!r} {url!r}"
+    if reading:
+        s["reading"] = {str(i): [{"name": n, "url": u} for n, u in items] for i, items in reading.items()}
     quiz = quiz_data.QUIZ.get(s["id"], {})
     for i, qs in quiz.items():
         assert 0 <= i < len(s["concepts"]), f"QUIZ[{s['id']}]: немає поняття {i}"
@@ -1016,11 +1023,26 @@ for s in stages:
         if _longest > len(_qs) * 0.2:
             print(f"УВАГА: QUIZ[{s['id']}]: правильний варіант помітно довший у {_longest} з {len(_qs)} питань")
 
+# ---- пісочниці --------------------------------------------------------------
+_sb_list = []
+_stage_by_id = {s["id"]: s for s in stages}
+for _sid, _sb in quiz_data.SANDBOX.items():
+    assert os.path.isfile(os.path.join(HERE, "..", "sandboxes", _sid + ".js")), f"SANDBOX[{_sid}]: немає sandboxes/{_sid}.js"
+    for _st, _i in _sb["concepts"]:
+        assert _st in _stage_by_id and 0 <= _i < len(_stage_by_id[_st]["concepts"]), f"SANDBOX[{_sid}]: немає поняття {_st}:{_i}"
+        _stage_by_id[_st].setdefault("sandboxes", {}).setdefault(str(_i), []).append(_sid)
+    for _n in _sb["tasks"]:
+        assert f"t{_n}" in _ids, f"SANDBOX[{_sid}]: невідоме завдання {_n}"
+    _sb_list.append({"id": _sid, "title": _sb["title"], "icon": _sb["icon"],
+                     "track": _stage_by_id[_sb["concepts"][0][0]].get("track", "core"),
+                     "concepts": [list(c) for c in _sb["concepts"]], "tasks": [f"t{n}" for n in _sb["tasks"]]})
+
 import cwe_data  # noqa: E402
 import gen_coverage  # noqa: E402
 _names = gen_coverage.cwe_names()
 _used = {re.sub(r"^[~?@]", "", tag) for t in all_tasks for tag in t.get("cwe", [])}
-data = {"tracks": TRACKS, "stages": stages, "legacy": LEGACY, "capstone": CAPSTONE,
+REPO = "https://github.com/ShumykR/skillbooster"
+data = {"repo": REPO, "sandboxes": _sb_list, "tracks": TRACKS, "stages": stages, "legacy": LEGACY, "capstone": CAPSTONE,
         "cwe": {k: _names[k] for k in sorted(_used, key=int) if k in _names}}
 with open(OUT, "w", encoding="utf-8") as f:
     f.write("// Згенеровано з tasks-catalog.md. Редагуй каталог і перегенеруй, або правь тут вручну.\n")
@@ -1035,6 +1057,51 @@ for m in CAPSTONE["milestones"]:
     md.append("")
 with open(os.path.join(HERE, "..", "docs", "capstone.md"), "w", encoding="utf-8") as f:
     f.write("\n".join(md))
+
+# ---- умови завдань для сайту (readmes.js, підвантажується за потреби) -------------------
+_HEAD = re.compile(r"^\*\*(.+?)\*\*(.*)$")
+
+
+def parse_readme(text):
+    """Розбиває README на секції: нова секція починається з рядка `**Заголовок**...`."""
+    secs, cur, fence = [], None, False
+    for line in text.splitlines()[1:]:  # перший рядок `# №N ...` вже є на картці
+        if line.startswith("```"):
+            fence = not fence
+        m = None if fence else _HEAD.match(line)
+        if m:
+            title = re.sub(r"[.:\s]+$", "", m.group(1)).strip()
+            cur = {"title": title, "body": m.group(2).lstrip(" .:").rstrip()}
+            secs.append(cur)
+        elif cur is None:
+            if line.strip():
+                cur = {"title": "", "body": line}
+                secs.append(cur)
+        else:
+            cur["body"] += "\n" + line
+    for sec in secs:
+        sec["body"] = sec["body"].strip("\n")
+    return secs
+
+
+_STD = ("Ситуація", "Що зробити", "Підказки", "Подумай", "Перевірка")
+_readmes, _odd = {}, {}
+for _tid, _dir in AUTO.items():
+    _p = os.path.join(_tasks_dir, _dir, "README.md")
+    if os.path.isfile(_p):
+        _secs = parse_readme(open(_p, encoding="utf-8").read())
+        _readmes[_tid] = _secs
+        for _sec in _secs:
+            if not _sec["title"].startswith(_STD):
+                _k = _sec["title"] or "(без заголовка)"
+                _odd[_k] = _odd.get(_k, 0) + 1
+with open(os.path.join(HERE, "..", "readmes.js"), "w", encoding="utf-8") as f:
+    f.write("// Згенеровано з tasks/*/README.md (tools/gen_data.py). Не правити руками.\n")
+    f.write("window.SKILLBOOSTER_README = ")
+    json.dump(_readmes, f, ensure_ascii=False, separators=(",", ":"))
+    f.write(";\n")
+if _odd:
+    print("README: нестандартні секції (показуються як є):", ", ".join(f"{k} ×{v}" for k, v in sorted(_odd.items())))
 
 # ---- звіт покриття CWE ------------------------------------------------------------
 with open(os.path.join(HERE, "..", "docs", "security-coverage.md"), "w", encoding="utf-8") as f:

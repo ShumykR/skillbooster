@@ -52,3 +52,96 @@ for _stage in PRACTICE:
     except ModuleNotFoundError as e:
         if e.name != f"quizzes.{_stage.replace('-', '_')}":
             raise
+
+
+# Інтерактивні пісочниці (`sandboxes/<id>.js`): {id: {title, icon, concepts: [(етап, індекс поняття)], tasks: [номери]}}.
+# Генератор перевіряє, що файл і поняття існують, і додає в data.js список `sandboxes` та поле `sandboxes` у етапи.
+SANDBOX = {
+    "llm-cost": {"title": "Калькулятор вартості LLM", "icon": "💸",
+                 "concepts": [("ai-api", 6), ("ai-llm", 1)], "tasks": [133, 132]},
+    "trifecta": {"title": "Lethal trifecta: де розірвати ланцюг", "icon": "🔱",
+                 "concepts": [("ai-security", 3)], "tasks": [197, 198, 196]},
+    "base-rate": {"title": "Base rate: чому «99% точний» не означає «99% блокувань правильні»", "icon": "🎯",
+                  "concepts": [("ai-llm", 6)], "tasks": [173, 196]},
+    "rrf": {"title": "RRF: злиття рейтингів BM25 і вектора", "icon": "🔀",
+            "concepts": [("ai-rag", 2), ("ai-rag", 9)], "tasks": [130]},
+    "context-budget": {"title": "Бюджет контексту: що влізе у вікно", "icon": "🪟",
+                       "concepts": [("ai-api", 4)], "tasks": [175]},
+    "backoff": {"title": "Backoff і jitter: чому клієнти б'ють хвилями", "icon": "🌊",
+                "concepts": [("api", 3), ("ai-api", 7)], "tasks": [42, 134]},
+    "breaker": {"title": "Circuit breaker: стани й ціна захисту", "icon": "🔌",
+                "concepts": [("sysdesign", 7), ("ai-api", 7)], "tasks": [109, 134]},
+    "token-bucket": {"title": "Token bucket: сплеск, поповнення, Retry-After", "icon": "🪣",
+                     "concepts": [("api", 4)], "tasks": [112]},
+    "error-budget": {"title": "Error budget і burn rate", "icon": "🔥",
+                     "concepts": [("observability", 4)], "tasks": [104]},
+    "eval-noise": {"title": "Шум в evals: коли різниця справжня", "icon": "📊",
+                   "concepts": [("ai-evals", 3)], "tasks": [192]},
+    "agent-fsm": {"title": "Агент як скінченний автомат", "icon": "🤖",
+                  "concepts": [("ai-agents", 3)], "tasks": [184]},
+    "rollout": {"title": "Rollout: rolling, blue-green, canary і ціна багу", "icon": "🚀",
+                "concepts": [("cicd", 4), ("k8s", 7)], "tasks": [77, 100]},
+    "hnsw": {"title": "HNSW: пошук у графі «малого світу»", "icon": "🕸",
+             "concepts": [("ai-llm", 5)], "tasks": [171, 39]},
+}
+
+
+# «Що читати» біля понять: READING[stage_id][індекс поняття] = [(назва, url)]. Лише https, кожен URL перевірено (HTTP 200).
+# Покриття часткове: починали з AI-треку, де поняття найвужчі. Поняття без запису просто не мають рядка «Читати».
+READING = {
+    "ai-llm": {
+        0: [("The Illustrated Transformer (Jay Alammar)", "https://jalammar.github.io/illustrated-transformer/"), ("Transformer Explainer", "https://poloclub.github.io/transformer-explainer/")],
+        1: [("Tiktokenizer", "https://tiktokenizer.vercel.app/")],
+        2: [("Hugging Face: How to generate text", "https://huggingface.co/blog/how-to-generate")],
+        3: [("Anthropic: Extended thinking", "https://platform.claude.com/docs/en/build-with-claude/extended-thinking")],
+        4: [("MTEB leaderboard", "https://huggingface.co/spaces/mteb/leaderboard")],
+        5: [("Pinecone: Hierarchical Navigable Small Worlds", "https://www.pinecone.io/learn/series/faiss/hnsw/")],
+        6: [("3Blue1Brown: Теорема Байєса", "https://www.3blue1brown.com/lessons/bayes-theorem"), ("Seeing Theory: Bayesian Inference", "https://seeing-theory.brown.edu/bayesian-inference/index.html")],
+    },
+    "ai-api": {
+        0: [("MDN: Using server-sent events", "https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events")],
+        1: [("OpenAI: Structured Outputs", "https://developers.openai.com/api/docs/guides/structured-outputs")],
+        2: [("Anthropic: Tool use", "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview")],
+        3: [("Anthropic: Prompt engineering overview", "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview"), ("DSPy", "https://dspy.ai/")],
+        4: [("Anthropic: Effective context engineering for AI agents", "https://www.anthropic.com/research/effective-context-engineering-for-ai-agents")],
+        5: [("Anthropic: Prompt caching", "https://platform.claude.com/docs/en/build-with-claude/prompt-caching")],
+        7: [("LiteLLM: документація", "https://docs.litellm.ai/")],
+    },
+    "ai-rag": {
+        1: [("Anthropic: Contextual Retrieval", "https://www.anthropic.com/research/contextual-retrieval")],
+        2: [("Pinecone: Hybrid search", "https://docs.pinecone.io/guides/search/hybrid-search")],
+        5: [("RAGAS: Faithfulness", "https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/faithfulness/")],
+        6: [("Microsoft GraphRAG", "https://microsoft.github.io/graphrag/")],
+        9: [("RAGAS: Context precision", "https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/context_precision/")],
+    },
+    "ai-agents": {
+        0: [("Anthropic: Building effective agents", "https://www.anthropic.com/research/building-effective-agents")],
+        6: [("Temporal: документація", "https://docs.temporal.io/")],
+        8: [("Model Context Protocol", "https://modelcontextprotocol.io/")],
+        9: [("A2A Protocol", "https://a2a-protocol.org/")],
+        11: [("12-Factor Agents", "https://github.com/humanlayer/12-factor-agents")],
+    },
+    "ai-evals": {
+        0: [("Hamel Husain: Your AI product needs evals", "https://hamel.dev/blog/posts/evals/")],
+        5: [("Langfuse: документація", "https://langfuse.com/docs"), ("OpenTelemetry: GenAI semantic conventions", "https://opentelemetry.io/docs/specs/semconv/gen-ai/")],
+        7: [("DSPy", "https://dspy.ai/")],
+    },
+    "ai-security": {
+        0: [("OWASP Top 10 for LLM Applications", "https://genai.owasp.org/llm-top-10/")],
+        1: [("Simon Willison: Prompt injection (серія)", "https://simonwillison.net/series/prompt-injection/")],
+        3: [("Simon Willison: The lethal trifecta", "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"), ("CaMeL: Defeating Prompt Injections by Design", "https://arxiv.org/abs/2503.18813")],
+        7: [("Hugging Face: safetensors", "https://huggingface.co/docs/safetensors/index")],
+        8: [("garak (NVIDIA)", "https://github.com/NVIDIA/garak"), ("promptfoo: red teaming", "https://www.promptfoo.dev/docs/red-team/"), ("MITRE ATLAS", "https://atlas.mitre.org/")],
+    },
+    "ai-ops": {
+        1: [("vLLM: документація", "https://docs.vllm.ai/en/latest/"), ("Ollama", "https://ollama.com/")],
+        2: [("PagedAttention (vLLM paper)", "https://arxiv.org/abs/2309.06180")],
+        4: [("Hugging Face PEFT", "https://huggingface.co/docs/peft/index")],
+        8: [("Claude Code: документація", "https://code.claude.com/docs/en/overview")],
+    },
+    "ai-gov": {
+        0: [("EU AI Act Explorer", "https://artificialintelligenceact.eu/")],
+        1: [("C2PA", "https://c2pa.org/")],
+        5: [("NIST AI Risk Management Framework", "https://www.nist.gov/itl/ai-risk-management-framework")],
+    },
+}

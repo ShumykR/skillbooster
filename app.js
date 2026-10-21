@@ -10,8 +10,9 @@
 
   // ---------- сховище -------------------------------------------------------
   function emptyState() {
-    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], settings: { baseUrl: "", model: "" } };
+    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], hints: {}, played: {}, failed: {}, review: {}, notes: {}, activity: {}, settings: { baseUrl: "", model: "" } };
   }
+  var OLD_AI = ["ai-api:1", "ai-llm:4", "ai-rag:2", "ai-evals:0", "ai-agents:1", "ai-agents:8", "ai-security:1", "ai-api:6", "ai-ops:8"];
   var state = load();
 
   function load() {
@@ -20,18 +21,39 @@
       if (!raw) return emptyState();
       var s = JSON.parse(raw);
       var e = emptyState();
-      return {
+      var out = {
         tasks: s.tasks || e.tasks,
         verified: s.verified || e.verified,
         checks: s.checks || e.checks,
         concepts: s.concepts || e.concepts,
         capstone: s.capstone || e.capstone,
         days: s.days || e.days,
+        hints: s.hints || e.hints,
+        played: s.played || e.played,
+        failed: s.failed || e.failed,
+        review: s.review || e.review,
+        notes: s.notes || e.notes,
+        activity: s.activity || e.activity,
         settings: Object.assign(e.settings, s.settings || {}),
       };
+      migrateOldAi(out);
+      return out;
     } catch (err) {
       return emptyState();
     }
+  }
+  // Старий етап `ai` розбито на 8 етапів: переносимо галочки за таблицею старий індекс → етап:індекс
+  function migrateOldAi(s) {
+    var old = s.concepts.ai;
+    if (!old) return;
+    Object.keys(old).forEach(function (i) {
+      var to = OLD_AI[+i];
+      if (!old[i] || !to) return;
+      var p = to.split(":");
+      s.concepts[p[0]] = s.concepts[p[0]] || {};
+      s.concepts[p[0]][p[1]] = true;
+    });
+    delete s.concepts.ai;
   }
   function save() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (err) { /* приватний режим */ }
@@ -43,6 +65,7 @@
   function touch() {
     var t = today();
     if (state.days.indexOf(t) === -1) state.days.push(t);
+    state.activity[t] = (state.activity[t] || 0) + 1;
     save();
   }
   function streak() {
@@ -64,7 +87,14 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-  function md(s) { return esc(s).replace(/`([^`]+)`/g, "<code>$1</code>"); }
+  // `код` і «№NNN»: номер існуючого завдання стає чипом-посиланням (поза <code>); plain вимикає чипи
+  function md(s, plain) {
+    var h = esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+    if (plain) return h;
+    return h.split(/(<code>[\s\S]*?<\/code>)/).map(function (part, i) {
+      return i % 2 ? part : part.replace(/№(\d+)/g, function (m, n) { return TASKS["t" + n] ? taskChip("t" + n) : m; });
+    }).join("");
+  }
   function stageById(id) { return DATA.stages.filter(function (s) { return s.id === id; })[0]; }
 
   // треки: окремі шляхи (Backend + DevOps, AI Engineering) зі своєю нумерацією етапів
@@ -166,9 +196,11 @@
     nav.innerHTML = html;
   }
   function renderTop() {
-    var o = overall();
+    var o = overall(curTrack), all = overall();
     document.getElementById("topBar").style.width = o.pct + "%";
-    document.getElementById("topText").textContent = o.pct + "% · " + o.tasksDone + "/" + o.tasksTotal + " завдань";
+    var tt = document.getElementById("topText");
+    tt.textContent = o.pct + "% · " + o.tasksDone + "/" + o.tasksTotal + " завдань";
+    tt.title = "Прогрес треку «" + trackById(curTrack).title + "». Загалом: " + all.pct + "% · " + all.tasksDone + "/" + all.tasksTotal + " завдань";
   }
 
   // ---------- сторінки ------------------------------------------------------
@@ -187,6 +219,24 @@
     return null;
   }
 
+  // сітка останніх 12 тижнів (пн-нд): рівень залежить від кількості подій за день
+  function renderCalendar() {
+    var act = {};
+    state.days.forEach(function (d) { act[d] = 1; });
+    Object.keys(state.activity).forEach(function (d) { act[d] = Math.max(act[d] || 0, state.activity[d]); });
+    var t = today(), dow = (new Date(t + "T12:00:00").getDay() + 6) % 7;
+    var start = addDays(t, -dow - 77), cells = "", total = 0;
+    for (var i = 0; i < 84; i++) {
+      var d = addDays(start, i);
+      if (d > t) { cells += '<i class="cal-c empty"></i>'; continue; }
+      var n = act[d] || 0, lvl = n === 0 ? 0 : n === 1 ? 1 : n < 4 ? 2 : n < 7 ? 3 : 4;
+      if (n) total++;
+      cells += '<i class="cal-c l' + lvl + '" title="' + d + ": " + (n ? n + " " + (n === 1 ? "дія" : "дій") : "без активності") + '"></i>';
+    }
+    return '<div class="card cal"><div class="cal-head"><b>Активність за 12 тижнів</b><span class="note">' + total + " днів з активністю · серія " + streak() +
+      '</span></div><div class="cal-grid" role="img" aria-label="Календар активності за 12 тижнів: ' + total + ' днів з активністю">' + cells + "</div></div>";
+  }
+
   function renderHome() {
     var tr = trackById(curTrack), list = stagesOf(curTrack);
     var o = overall(curTrack);
@@ -202,6 +252,12 @@
       '<div class="stat"><b>' + streak() + '</b><span>днів поспіль</span></div>' +
       '<div class="stat"><b>' + list.length + '</b><span>етапів</span></div></div>';
 
+    html += renderCalendar();
+    var due = dueKeys().length;
+    if (due) {
+      html += '<div class="card next-card"><div><small>Інтервальне повторення</small><strong>На повторення сьогодні: ' + due +
+        " " + (due === 1 ? "поняття" : "понять") + '</strong></div><a class="btn" href="#/review">Почати</a></div>';
+    }
     if (nt) {
       html += '<div class="card next-card"><div><small>' + (nt.doing ? "Продовжити" : "Наступне завдання") + " · " +
         nt.stage.icon + " " + esc(nt.stage.title) + "</small><strong>" + esc(nt.task.title) + "</strong></div>" +
@@ -232,7 +288,8 @@
       '<small class="note">' + s.pct + "% · розумію " + s.conceptsUnderstood + "/" + s.conceptsTotal +
       " · довів практикою " + s.conceptsProven + "/" + s.conceptsPractice +
       " · завдання " + s.tasksDone + "/" + s.tasksTotal + "</small></div></div>" +
-      '<div class="why"><strong>Навіщо це на роботі.</strong> ' + esc(st.why) + "</div>";
+      '<div class="why"><strong>Навіщо це на роботі.</strong> ' + esc(st.why) + "</div>" +
+      '<p><a class="chip" href="#/notes/' + st.id + '">📄 Шпаргалка етапу</a> <a class="chip" href="#/exam/' + st.id + '">📝 Іспит етапу</a></p>';
 
     html += "<h2>Що треба знати</h2>" +
       '<p class="note">Галочка означає «розумію» (її ставить і пройдений тест 🧠). ' +
@@ -257,12 +314,286 @@
       '<button class="chip" aria-pressed="false" data-f="open">Лише незавершені</button>' +
       (st.tasks.some(function (t) { return t.cwe && t.cwe.length; })
         ? '<button class="chip" aria-pressed="false" data-f="cwe" title="Завдання, що тренують конкретні слабкості CWE">🛡 CWE</button>' : "") +
+      [["ai", "🤖 LLM", "Потребують LLM"], ["auto", "🧪 автотест", "З автоперевіркою"],
+        ["manual", "🛠 практика / 📝 документ", "Без автотесту: кроки й чекліст"], ["pending", "⏳ готується", "Автотест ще пишеться"]]
+        .filter(function (x) { return st.tasks.some(function (t) { return taskKinds(t).indexOf(x[0]) !== -1; }); })
+        .map(function (x) { return '<button class="chip" aria-pressed="false" data-f="' + x[0] + '" title="' + x[2] + '">' + x[1] + "</button>"; }).join("") +
       "</div>" +
       '<div id="taskList">' + st.tasks.map(function (t, i) {
         var head = "";
         if (t.group && (i === 0 || st.tasks[i - 1].group !== t.group)) head = '<h3 class="grp">' + esc(t.group) + "</h3>";
         return head + taskHtml(t);
       }).join("") + "</div>";
+    return html;
+  }
+
+  // ---------- інтервальне повторення (Leitner) та іспит етапу ----------------
+  var BOXES = [1, 3, 7, 21, 60];   // днів до наступного повторення для box 1..5
+  var curRun = null;
+  function addDays(d, n) {
+    var t = new Date(d + "T12:00:00");
+    t.setDate(t.getDate() + n);
+    return t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0") + "-" + String(t.getDate()).padStart(2, "0");
+  }
+  // правильна відповідь піднімає на box вище, помилка повертає в box 1 і ставить позначку «варто повторити»
+  function reviewPass(key, ok) {
+    var r = state.review[key] || { box: 0 };
+    if (ok) { r.box = Math.min(BOXES.length, r.box + 1); r.weak = false; }
+    else { r.box = 1; r.weak = true; }
+    r.due = addDays(today(), BOXES[r.box - 1]);
+    state.review[key] = r;
+  }
+  function validKey(k) {
+    var p = k.split(":"), st = stageById(p[0]);
+    return !!(st && st.quiz && st.quiz[p[1]]);
+  }
+  function dueKeys() {
+    var t = today();
+    return Object.keys(state.review).filter(function (k) { return state.review[k].due <= t && validKey(k); }).sort();
+  }
+  function buildRun(mode, keys) {
+    return { mode: mode, finished: false, items: keys.map(function (k) {
+      var p = k.split(":"), qs = stageById(p[0]).quiz[p[1]], q = qs[Math.floor(Math.random() * qs.length)];
+      return { key: k, stage: p[0], i: +p[1], q: q, picked: null,
+        opts: shuffled(q.options.map(function (o, oi) { return { o: o, ok: oi === q.answer }; })) };
+    }) };
+  }
+  function runHtml(run, title, intro) {
+    return "<h1>" + title + "</h1>" + '<p class="note">' + intro + "</p>" +
+      '<div id="run">' + run.items.map(function (it, n) {
+        var st = stageById(it.stage);
+        return '<div class="qq" data-ri="' + n + '"><p><b>' + (n + 1) + ".</b> " + md(it.q.q) + '<br><small class="note">' + esc(st.title) +
+          " · " + md(st.concepts[it.i].split(":")[0]) + "</small></p>" +
+          it.opts.map(function (x, oi) {
+            return '<button class="qopt rq" data-ri="' + n + '" data-oi="' + oi + '">' + md(x.o, true) + "</button>";
+          }).join("") + '<p class="why-q" hidden>' + md(it.q.why) + "</p></div>";
+      }).join("") + '</div><div id="runRes" class="why" aria-live="polite" hidden></div>' +
+      (run.mode === "exam" ? '<p><button class="btn" data-run-finish disabled>Завершити іспит</button></p>' : "");
+  }
+  function renderReview() {
+    var keys = dueKeys();
+    if (!keys.length) {
+      curRun = null;
+      return "<h1>Повторення</h1><p class=\"lead\">На сьогодні нічого повторювати. Проходь тести 🧠 біля понять на сторінках етапів: вони потрапляють у розклад повторень (1, 3, 7, 21, 60 днів).</p>";
+    }
+    curRun = buildRun("review", keys);
+    return runHtml(curRun, "Повторення", "По одному питанню з кожного поняття, що настав час повторити. Відповідь одразу з поясненням. Помилка не знімає «розумію», але поверне поняття на початок розкладу.");
+  }
+  function renderExam(st) {
+    var idx = Object.keys(st.quiz || {});
+    if (!idx.length) return "<h1>Іспит етапу</h1><p>Для цього етапу ще немає питань.</p>";
+    curRun = buildRun("exam", shuffled(idx).slice(0, 10).map(function (i) { return st.id + ":" + i; }));
+    return '<div class="crumbs"><a href="#/stage/' + st.id + '">← ' + esc(st.title) + "</a> / Іспит</div>" +
+      runHtml(curRun, "Іспит: " + esc(st.title), curRun.items.length + " випадкових питань з різних понять. Пояснення з'являться лише після завершення.");
+  }
+  function revealItem(n) {
+    var it = curRun.items[n], qq = document.querySelector('#run .qq[data-ri="' + n + '"]');
+    qq.querySelectorAll(".qopt").forEach(function (b, oi) {
+      b.disabled = true;
+      b.classList.remove("sel");
+      if (it.opts[oi].ok) b.classList.add("right");
+      else if (oi === it.picked) b.classList.add("wrong");
+    });
+    qq.querySelector(".why-q").hidden = false;
+  }
+  function finishRun() {
+    var run = curRun, wrong = [];
+    if (!run || run.finished) return;
+    run.finished = true;
+    run.items.forEach(function (it, n) {
+      var ok = it.picked !== null && it.opts[it.picked].ok;
+      if (run.mode === "exam") revealItem(n);
+      if (run.mode === "review") reviewPass(it.key, ok);
+      else if (!ok) reviewPass(it.key, false);     // помилка на іспиті повертає поняття в розклад повторень
+      if (!ok) wrong.push(it);
+    });
+    touch();
+    var res = document.getElementById("runRes");
+    res.hidden = false;
+    res.innerHTML = "<strong>Правильно " + (run.items.length - wrong.length) + " з " + run.items.length + ".</strong>" +
+      (wrong.length ? " Повернись до понять: " + wrong.map(function (it) {
+        return '<a href="#/concept/' + it.stage + "/" + it.i + '">' + md(stageById(it.stage).concepts[it.i].split(":")[0]) + "</a>";
+      }).join(" · ") + "." : " Чистий результат.");
+    var fb = document.querySelector("[data-run-finish]");
+    if (fb) fb.hidden = true;
+  }
+
+  // ---------- пошук по сайту -----------------------------------------------
+  var searchIndex = null;
+  function norm(x) {
+    return String(x).toLowerCase().replace(/[`ʼ’‘]/g, "'").replace(/№/g, " ").replace(/\s+/g, " ").trim();
+  }
+  function buildSearchIndex() {
+    var idx = [];
+    DATA.stages.forEach(function (st) {
+      idx.push({ k: "Етап", t: st.title, sub: st.why, hash: "#/stage/" + st.id, hay: norm(st.title + " " + st.why), w: 3 });
+      st.concepts.forEach(function (c, i) {
+        idx.push({ k: "Поняття", t: c.replace(/`/g, ""), sub: st.title, hash: "#/concept/" + st.id + "/" + i, hay: norm(c + " " + st.title), w: 2 });
+      });
+      st.resources.forEach(function (r) {
+        idx.push({ k: "Ресурс", t: r.name, sub: st.title, hash: "#/stage/" + st.id, hay: norm(r.name + " " + r.note + " " + st.title), w: 1 });
+      });
+      st.tasks.forEach(function (t) {
+        var cwe = (t.cwe || []).map(function (c) { var id = c.replace(/^[~?@]/, ""); return "cwe-" + id + " " + id + " " + ((DATA.cwe || {})[id] || ""); }).join(" ");
+        idx.push({ k: "Завдання", t: (t.n ? "№" + t.n + " " : "") + t.title, sub: st.title, hash: "#/task/" + t.id,
+          hay: " " + norm((t.n || t.id) + " " + t.title + " " + t.desc + " " + (t.pattern || []).join(" ") + " " + cwe) + " ", num: t.n ? String(t.n) : "", w: 4 });
+      });
+    });
+    (DATA.sandboxes || []).forEach(function (x) {
+      idx.push({ k: "Пісочниця", t: x.title, sub: "▶ Пісочниці", hash: "#/play/" + x.id, hay: norm(x.title), w: 3 });
+    });
+    return idx;
+  }
+  function searchFor(q) {
+    var qn = norm(q);
+    if (!qn) return [];
+    if (!searchIndex) searchIndex = buildSearchIndex();
+    var toks = qn.split(" ");
+    var res = [];
+    searchIndex.forEach(function (e) {
+      for (var i = 0; i < toks.length; i++) {
+        // cwe-79 не має збігатися з cwe-799: порівнюємо повним словом
+        if (e.hay.indexOf(/^cwe-\d+$/.test(toks[i]) ? " " + toks[i] + " " : toks[i]) === -1) return;
+      }
+      var score = e.w + (norm(e.t).indexOf(qn) !== -1 ? 5 : 0) + (e.num && e.num === qn ? 20 : 0);
+      res.push({ e: e, score: score });
+    });
+    res.sort(function (a, b) { return b.score - a.score; });
+    return res.slice(0, 20).map(function (r) { return r.e; });
+  }
+
+  var searchBox = document.getElementById("q"), searchOut = document.getElementById("qres"), searchSel = -1;
+  function searchRender() {
+    var items = searchFor(searchBox.value);
+    searchSel = items.length ? 0 : -1;
+    if (!searchBox.value.trim()) { searchOut.hidden = true; return; }
+    searchOut.hidden = false;
+    searchOut.innerHTML = items.length ? items.map(function (e, i) {
+      return '<a role="option" class="qr' + (i === 0 ? " sel" : "") + '" href="' + e.hash + '"><span class="qk">' + e.k + "</span> " +
+        esc(e.t) + (e.sub ? '<small>' + esc(e.sub.length > 70 ? e.sub.slice(0, 70) + "…" : e.sub) + "</small>" : "") + "</a>";
+    }).join("") : '<p class="note" style="padding:8px 12px">Нічого не знайдено</p>';
+  }
+  function searchClose() { searchOut.hidden = true; searchBox.value = ""; searchBox.blur(); }
+  function searchMove(d) {
+    var rows = searchOut.querySelectorAll(".qr");
+    if (!rows.length) return;
+    rows[searchSel].classList.remove("sel");
+    searchSel = (searchSel + d + rows.length) % rows.length;
+    rows[searchSel].classList.add("sel");
+    rows[searchSel].scrollIntoView({ block: "nearest" });
+  }
+  if (searchBox) {
+    searchBox.addEventListener("input", searchRender);
+    searchBox.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown") { e.preventDefault(); searchMove(1); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); searchMove(-1); }
+      else if (e.key === "Enter") { var r = searchOut.querySelector(".qr.sel"); if (r) { location.hash = r.getAttribute("href"); searchClose(); } }
+      else if (e.key === "Escape") searchClose();
+    });
+    document.addEventListener("keydown", function (e) {
+      var typing = /^(input|textarea|select)$/i.test((e.target.tagName || ""));
+      if ((e.key === "/" && !typing && !e.ctrlKey && !e.metaKey) || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k")) {
+        e.preventDefault();
+        searchBox.focus();
+        searchBox.select();
+      }
+    });
+    document.addEventListener("click", function (e) {
+      if (e.target.closest("#qres a")) searchClose();
+      else if (!e.target.closest(".search")) searchOut.hidden = true;
+    });
+  }
+
+  // ---------- пісочниці -----------------------------------------------------
+  var sbLoading = {};
+  function sbScript(src, cb) {
+    var sc = document.createElement("script");
+    sc.src = src;
+    sc.onload = function () { cb(true); };
+    sc.onerror = function () { cb(false); };
+    document.head.appendChild(sc);
+  }
+  function loadSandbox(id, cb) {
+    if (window.SB_SANDBOXES && window.SB_SANDBOXES[id]) { cb(window.SB_SANDBOXES[id]); return; }
+    function fetchOne() {
+      sbScript("sandboxes/" + id + ".js", function (ok) { cb(ok && window.SB_SANDBOXES[id] ? window.SB_SANDBOXES[id] : null); });
+    }
+    if (window.SB_KIT) fetchOne();
+    else sbScript("sandboxes/_kit.js", function (ok) { if (ok) fetchOne(); else cb(null); });
+  }
+  function sandboxMeta(id) { return (DATA.sandboxes || []).filter(function (x) { return x.id === id; })[0]; }
+
+  function renderPlayList() {
+    var list = DATA.sandboxes || [];
+    var html = "<h1>▶ Пісочниці</h1>" +
+      '<p class="note">Інтерактивні моделі до понять: покрути повзунки й побачиш, як змінюється результат. Це навчальний крок, на прогрес він не впливає.</p>';
+    if (!list.length) return html + "<p>Поки що пісочниць немає.</p>";
+    TRACKS.forEach(function (tr) {
+      var items = list.filter(function (x) { return x.track === tr.id; });
+      if (!items.length) return;
+      html += "<h2>" + esc(tr.title) + "</h2><div class=\"res-grid\">" + items.map(function (x) {
+        return '<a class="card res" href="#/play/' + x.id + '"><span class="rt">' + x.icon + " " + esc(x.title) +
+          (state.played[x.id] ? " ✓" : "") + "</span><span class=\"rn\">" +
+          x.concepts.map(function (c) { var st = stageById(c[0]); return esc(st.concepts[c[1]].replace(/`/g, "").split(":")[0]); }).join(" · ") +
+          "</span></a>";
+      }).join("") + "</div>";
+    });
+    return html;
+  }
+
+  function renderPlay(id) {
+    var meta = sandboxMeta(id);
+    var list = (DATA.sandboxes || []).filter(function (x) { return x.track === meta.track; });
+    var at = list.indexOf(meta);
+    var html = '<div class="crumbs"><a href="#/play">← Пісочниці</a></div>' +
+      "<h1>" + meta.icon + " " + esc(meta.title) + "</h1>" +
+      '<div id="sbMount" class="sandbox"><p class="note">Завантаження…</p></div><div id="sbInfo"></div>' +
+      '<h2>Перевір себе</h2><p>' + meta.concepts.map(function (c) {
+        var st = stageById(c[0]);
+        return '<a class="chip" href="#/concept/' + c[0] + "/" + c[1] + '">🧠 ' + md(st.concepts[c[1]].split(":")[0]) + "</a>";
+      }).join(" ") + "</p>" +
+      (meta.tasks.length ? "<h2>Реалізуй</h2><p>" + meta.tasks.map(taskChip).join(" ") + "</p>" : "") +
+      '<p class="sb-nav">' + (at > 0 ? '<a href="#/play/' + list[at - 1].id + '">← ' + esc(list[at - 1].title) + "</a>" : "<span></span>") +
+      (at < list.length - 1 ? '<a href="#/play/' + list[at + 1].id + '">' + esc(list[at + 1].title) + " →</a>" : "") + "</p>";
+    loadSandbox(id, function (sb) {
+      var box = document.getElementById("sbMount");
+      if (!box || location.hash.indexOf("#/play/" + id) !== 0) return;
+      if (!sb) { box.innerHTML = '<p class="note">Не вдалося завантажити пісочницю.</p>'; return; }
+      box.textContent = "";
+      var intro = document.createElement("div");
+      intro.innerHTML = "<p>" + esc(sb.analogy) + "</p>";
+      box.appendChild(intro);
+      var area = document.createElement("div");
+      box.appendChild(area);
+      sb.mount(area, {});
+      document.getElementById("sbInfo").innerHTML = '<div class="why"><strong>Формула.</strong> ' + md(sb.formula) + "</div>" +
+        "<h2>Що тут що</h2><table class=\"sb-map\"><thead><tr><th>У пісочниці</th><th>Аналогія</th><th>У реальності</th></tr></thead><tbody>" +
+        sb.mapping.map(function (r) { return "<tr>" + r.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") + "</tr>"; }).join("") +
+        "</tbody></table>";
+      if (!state.played[id]) { state.played[id] = today(); touch(); }
+    });
+    return html;
+  }
+
+  // шпаргалка етапу: поняття з поясненнями з питань самоперевірки, практика й ресурси (друкується як PDF)
+  function renderNotes(st) {
+    var tr = trackById(trackOf(st));
+    var html = '<div class="crumbs"><a href="#/stage/' + st.id + '">← ' + esc(st.title) + "</a> / Шпаргалка</div>" +
+      '<div class="notes"><div class="notes-actions"><button class="chip" data-print>🖨 Друк / PDF</button></div>' +
+      "<h1>" + st.icon + " " + esc(st.title) + "</h1>" +
+      '<p class="note">' + esc(tr.title) + ", етап " + stageNo(st) + ". " + esc(st.why) + "</p>";
+    st.concepts.forEach(function (c, i) {
+      var qs = (st.quiz && st.quiz[i]) || [], ids = practiceOf(st, i);
+      html += '<section class="nc"><h3>' + md(c) + "</h3>" +
+        qs.map(function (q) { return "<p>" + md(q.why) + "</p>"; }).join("") +
+        (ids.length ? '<p class="note">Практика: ' + ids.map(taskChip).join(" ") + "</p>" : "") +
+        (((st.reading && st.reading[i]) || []).length ? '<p class="note">Читати: ' + st.reading[i].map(function (r) {
+          return '<a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer">' + esc(r.name) + "</a>";
+        }).join(" · ") + "</p>" : "") + "</section>";
+    });
+    html += "<h2>Ресурси</h2><ul>" + st.resources.map(function (r) {
+      return '<li><a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer">' + esc(r.name) + "</a> — " + esc(r.note) + "</li>";
+    }).join("") + "</ul></div>";
     return html;
   }
 
@@ -284,9 +615,20 @@
     if (qs.length) {
       meta += '<button class="qbtn" data-quiz="' + key + '" aria-expanded="false">🧠 Перевірити себе · ' + qs.length + "</button>";
     }
+    var rd = (st.reading && st.reading[i]) || [];
+    var readHtml = rd.length ? '<div class="cmeta read"><span class="proof">Читати:</span> ' + rd.map(function (r) {
+      return '<a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer">' + esc(r.name) + " ↗</a>";
+    }).join(" · ") + "</div>" : "";
+    var rv = state.review[key];
+    if (rv && rv.weak) meta += '<span class="proof weak" title="Остання перевірка була з помилкою">↻ варто повторити</span>';
+    else if (rv && rv.due <= today()) meta += '<span class="proof due" title="Настав час інтервального повторення">↻ час повторити</span>';
+    ((st.sandboxes && st.sandboxes[i]) || []).forEach(function (sid) {
+      meta += '<a class="qbtn" href="#/play/' + sid + '">▶ Спробувати</a>';
+    });
     return '<li id="c-' + st.id + "-" + i + '"><label><input type="checkbox" data-concept="' + key + '"' +
       (conceptDone(st.id, i) ? " checked" : "") + "><span>" + md(st.concepts[i]) + "</span></label>" +
       (meta ? '<div class="cmeta">' + meta + "</div>" : "") +
+      readHtml +
       (qs.length ? '<div class="quiz" id="quiz-' + st.id + "-" + i + '" hidden></div>' : "") + "</li>";
   }
 
@@ -305,7 +647,7 @@
     box.innerHTML = qs.map(function (q, qi) {
       return '<div class="qq" data-qi="' + qi + '"><p><b>' + (qi + 1) + ".</b> " + md(q.q) + "</p>" +
         shuffled(q.options.map(function (o, oi) { return { o: o, ok: oi === q.answer }; })).map(function (x) {
-          return '<button class="qopt" data-ok="' + (x.ok ? 1 : 0) + '">' + md(x.o) + "</button>";
+          return '<button class="qopt" data-ok="' + (x.ok ? 1 : 0) + '">' + md(x.o, true) + "</button>";
         }).join("") + '<p class="why-q" hidden>' + md(q.why) + "</p></div>";
     }).join("") + '<div class="qres" aria-live="polite"></div>';
     box.hidden = false;
@@ -323,6 +665,8 @@
     qq.querySelector(".why-q").hidden = false;
     if (--quizRun.left > 0) return;
     var res = box.querySelector(".qres"), key = quizRun.key;
+    reviewPass(key, quizRun.wrong === 0);
+    save();
     if (quizRun.wrong === 0) {
       var p = key.split(":");
       state.concepts[p[0]] = state.concepts[p[0]] || {};
@@ -376,6 +720,112 @@
     return out ? '<div class="tags">' + out + "</div>" : "";
   }
 
+  // власні нотатки до завдання (висновки, посилання на свій репозиторій), зберігаються з debounce
+  function noteHtml(id) {
+    var v = state.notes[id] || "";
+    return '<details class="notebox"' + (v ? " open" : "") + "><summary>📝 Мої нотатки" + (v ? " ·" : "") + (v ? " є" : "") +
+      '</summary><textarea data-note="' + id + '" rows="3" placeholder="Висновки, посилання на свій код, що було складно…" aria-label="Нотатки до завдання">' + esc(v) + "</textarea></details>";
+  }
+  var noteTimer = null;
+
+  function taskKinds(t) {
+    var k = [];
+    if (t.ai) k.push("ai");
+    if (t.auto) k.push("auto");
+    else if (t.kind === "автотест") k.push("pending");
+    else k.push("manual");
+    return k;
+  }
+
+  // умова завдання з README (readmes.js підвантажується лише при першому розкритті; <script> працює і з file://)
+  var readmeOpen = {};
+  var readmeLoading = null;
+  function withReadmes(cb) {
+    if (window.SKILLBOOSTER_README) { cb(); return; }
+    if (readmeLoading) { readmeLoading.push(cb); return; }
+    readmeLoading = [cb];
+    var sc = document.createElement("script");
+    sc.src = "readmes.js";
+    sc.onload = function () { var q = readmeLoading; readmeLoading = null; q.forEach(function (f) { f(); }); };
+    sc.onerror = function () { readmeLoading = null; toast("Не вдалося завантажити readmes.js"); };
+    document.head.appendChild(sc);
+  }
+
+  function inlineMd(s) {
+    return md(s).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/(^|[\s(])\*([^*\s][^*]*?)\*(?=[\s).,;:!?]|$)/g, "$1<i>$2</i>");
+  }
+  // мінімальний Markdown: абзаци, списки (- і 1.), блок коду, `code`, **жирний**, цитата
+  function blockMd(body) {
+    var out = [], list = null, para = [], code = null;
+    function flushPara() { if (para.length) { out.push("<p>" + inlineMd(para.join(" ")) + "</p>"); para = []; } }
+    function flushList() { if (list) { out.push("<" + list.tag + ">" + list.items.join("") + "</" + list.tag + ">"); list = null; } }
+    body.split("\n").forEach(function (line) {
+      if (/^```/.test(line)) {
+        if (code) { out.push("<pre><code>" + esc(code.join("\n")) + "</code></pre>"); code = null; }
+        else { flushPara(); flushList(); code = []; }
+        return;
+      }
+      if (code) { code.push(line); return; }
+      var m = line.match(/^\s*(?:([-*])|(\d+)\.)\s+(.*)$/);
+      if (m) {
+        flushPara();
+        var tag = m[1] ? "ul" : "ol";
+        if (!list || list.tag !== tag) { flushList(); list = { tag: tag, items: [] }; }
+        list.items.push("<li>" + inlineMd(m[3]) + "</li>");
+      } else if (list && /^\s+\S/.test(line)) {
+        list.items[list.items.length - 1] = list.items[list.items.length - 1].replace(/<\/li>$/, " " + inlineMd(line.trim()) + "</li>");
+      } else if (!line.trim()) {
+        flushPara(); flushList();
+      } else {
+        flushList();
+        para.push(line.replace(/^>\s?/, ""));
+      }
+    });
+    if (code) out.push("<pre><code>" + esc(code.join("\n")) + "</code></pre>");
+    flushPara(); flushList();
+    return out.join("");
+  }
+
+  function hintItems(body) {
+    var items = [];
+    body.split("\n").forEach(function (line) {
+      var m = line.match(/^\s*[-*]\s+(.*)$/);
+      if (m) items.push(m[1]);
+      else if (items.length && /^\s+\S/.test(line)) items[items.length - 1] += " " + line.trim();
+    });
+    return items;
+  }
+
+  function readmeBodyHtml(id) {
+    var secs = (window.SKILLBOOSTER_README || {})[id];
+    if (!secs) return "<p>Умови для цього завдання немає в readmes.js.</p>";
+    return secs.map(function (sec) {
+      var head = sec.title ? "<h4>" + esc(sec.title) + "</h4>" : "";
+      if (/^Підказки/.test(sec.title)) {
+        var items = hintItems(sec.body);
+        if (items.length) {
+          var n = Math.min(state.hints[id] || 0, items.length);
+          return '<div class="rsec hints">' + head +
+            (n ? "<ul>" + items.slice(0, n).map(function (x) { return "<li>" + inlineMd(x) + "</li>"; }).join("") + "</ul>" : "") +
+            (n < items.length ? '<button class="chip" data-hint="' + id + '">Ще підказка (' + n + "/" + items.length + ")</button>"
+              : '<p class="note">Усі підказки відкрито.</p>') + "</div>";
+        }
+      }
+      return '<div class="rsec">' + head + blockMd(sec.body) + "</div>";
+    }).join("");
+  }
+
+  function readmeShell(id) {
+    return '<details class="readme" data-readme="' + id + '"' + (readmeOpen[id] ? " open" : "") +
+      "><summary>📖 Умова завдання</summary><div class=\"readme-body\">" +
+      (readmeOpen[id] && window.SKILLBOOSTER_README ? readmeBodyHtml(id) : "Завантаження…") + "</div></details>";
+  }
+
+  function fillReadme(id) {
+    var d = document.querySelector('details.readme[data-readme="' + id + '"]');
+    if (d) d.querySelector(".readme-body").innerHTML = readmeBodyHtml(id);
+  }
+
   // завдання без автотесту: кроки і чекліст «Готово, коли»; усі пункти відмічені = завдання зроблене
   function manualHtml(t) {
     if (t.auto || !t.done) return "";
@@ -416,14 +866,17 @@
     var icon = s === "done" ? "✓" : s === "doing" ? "…" : "";
     var label = s === "done" ? "Зроблено" : s === "doing" ? "У процесі" : "Не розпочато";
     return '<div class="card task ' + (s === "done" ? "done" : "") + '" data-s="' + s + '" data-lvl="' + t.level +
-      '" data-tag="' + ((t.cwe && t.cwe.length) ? "cwe" : "") + '" id="task-' + t.id + '">' +
+      '" data-tag="' + ((t.cwe && t.cwe.length) ? "cwe" : "") + '" data-kinds=" ' + taskKinds(t).join(" ") + ' " id="task-' + t.id + '">' +
       '<button class="st" data-task="' + t.id + '" aria-label="' + label + ': ' + esc(t.title) + '. Змінити статус">' + icon + "</button>" +
+      '<button class="linkbtn" data-copylink="task/' + t.id + '" title="Скопіювати посилання на завдання" aria-label="Скопіювати посилання на завдання">🔗</button>' +
       "<div><h3>" + (t.n ? '<span class="num">№' + t.n + "</span>" : "") + esc(t.title) + " " + lvlBadge(t.level) +
       (t.ai ? ' <span class="badge ai">🤖 LLM</span>' : "") +
       (t.auto ? ' <span class="badge free">🧪 автоперевірка</span>' : "") +
       (!t.auto && t.kind === "автотест" ? ' <span class="badge part" title="Умова готова, автоперевірка ще пишеться: поки можна розв\'язувати й перевіряти себе за умовою">⏳ автотест готується</span>' : "") +
       (!t.auto && t.kind === "документ" ?' <span class="badge part" title="Документ або розрахунок: оцінюєш себе за чеклістом">📝 документ</span>' : "") +
       (!t.auto && t.kind !== "документ" && t.done ? ' <span class="badge part" title="Практика в реальному інструменті: перевіряєш себе за чеклістом">🛠 практика</span>' : "") +
+      (state.failed[t.id] ? ' <span class="badge bad" title="Останній запуск check.py ' + esc(state.failed[t.id]) +
+        ' не пройшов; позначка зникне після успішного прогону">❌ тести падають (' + esc(state.failed[t.id]) + ")</span>" : "") +
       (state.verified[t.id] ? ' <span class="badge ok" title="Тести пройдено ' + esc(state.verified[t.id]) +
         '">✅ перевірено тестами</span>' : "") + "</h3>" +
       "<p>" + md(t.desc) + ".</p>" +
@@ -434,7 +887,11 @@
       }).join(" · ") + "</div>" : "") +
       tagsHtml(t) + manualHtml(t) +
       (t.auto ? '<div class="chk">Папка <code>tasks/' + esc(t.auto) + "</code> · запуск: <code>python check.py " +
-        esc(t.auto.split("_")[0]) + "</code></div>" : "") + "</div></div>";
+        esc(t.auto.split("_")[0]) + '</code> <button class="linkbtn inline" data-copy="python check.py ' + esc(t.auto.split("_")[0]) +
+        '" title="Скопіювати команду">📋 Копіювати</button>' +
+        (DATA.repo ? ' · <a href="' + DATA.repo + "/tree/main/tasks/" + esc(t.auto) + '" target="_blank" rel="noopener">Код на GitHub</a>' +
+          ' · <a href="' + DATA.repo.replace("github.com", "github.dev") + "/tree/main/tasks/" + esc(t.auto) +
+          '" target="_blank" rel="noopener">Відкрити в github.dev</a>' : "") + "</div>" + readmeShell(t.id) : "") + noteHtml(t.id) + "</div></div>";
   }
 
 
@@ -482,33 +939,42 @@
       if (!TASKS[id]) return;
       state.tasks[id] = "done";
       state.verified[id] = d;
+      delete state.failed[id];
       n++;
     });
     touch();
     return n;
   }
-  function syncIds(h) {
+  // #/sync/t2,t6?fail=t7,t9: пройдені й впалі завдання
+  function syncIds(h, key) {
     var seen = {};
     var raw = h.replace(/^#\/sync\/?/, "");
     try { raw = decodeURIComponent(raw); } catch (err) { /* лишаємо як є */ }
-    return raw.split(",").map(function (id) { return id.trim(); }).filter(function (id) {
+    var cut = raw.indexOf("?fail=");
+    var part = key === "fail" ? (cut === -1 ? "" : raw.slice(cut + 6)) : (cut === -1 ? raw : raw.slice(0, cut));
+    return part.split(",").map(function (id) { return id.trim(); }).filter(function (id) {
       if (!TASKS[id] || seen[id]) return false;
       seen[id] = true;
       return true;
     });
   }
-  function renderSync(ids) {
-    if (!ids.length) return "<h1>Синхронізація</h1><p class=\"lead\">У посиланні немає відомих завдань.</p>";
+  function renderSync(ids, fails) {
+    fails = fails || [];
+    if (!ids.length && !fails.length) return "<h1>Синхронізація</h1><p class=\"lead\">У посиланні немає відомих завдань.</p>";
     var fresh = ids.filter(function (id) { return !state.verified[id]; });
-    return "<h1>Результати check.py</h1>" +
-      '<p class="lead">Тести пройдено для ' + ids.length + " завдань" +
-      (fresh.length < ids.length ? " (нових: " + fresh.length + ")" : "") +
-      ". Позначити їх як «зроблено · перевірено тестами»? Решта прогресу не зміниться.</p>" +
-      '<div class="card"><ul class="sync-list">' + ids.map(function (id) {
+    function items(list) {
+      return '<ul class="sync-list">' + list.map(function (id) {
         return "<li>" + taskChip(id) + " " + esc(TASKS[id].title) + "</li>";
-      }).join("") + "</ul>" +
+      }).join("") + "</ul>";
+    }
+    return "<h1>Результати check.py</h1>" +
+      (ids.length ? '<p class="lead">Тести пройдено для ' + ids.length + " завдань" +
+        (fresh.length < ids.length ? " (нових: " + fresh.length + ")" : "") +
+        ". Позначити їх як «зроблено · перевірено тестами»? Решта прогресу не зміниться.</p>" : "") +
+      '<div class="card">' + (ids.length ? items(ids) : "") +
+      (fails.length ? '<p class="lead">❌ Тести падають для ' + fails.length + " завдань: вони отримають статус «у процесі» і позначку «тести падають», яка зникне після наступного успішного прогону.</p>" + items(fails) : "") +
       '<div class="row" style="margin-top:14px"><button class="btn" id="syncOk" data-ids="' + esc(ids.join(",")) +
-      '">Позначити</button><a class="btn ghost" href="#/">Скасувати</a></div></div>';
+      '" data-fail="' + esc(fails.join(",")) + '">Позначити</button><a class="btn ghost" href="#/">Скасувати</a></div></div>';
   }
 
   function envText() {
@@ -517,6 +983,32 @@
       "LLM_API_KEY=вставте-ключ-сюди\n" +
       "LLM_MODEL=" + (s.model || "your-model-name");
   }
+  // Markdown-звіт для резюме/портфоліо: зроблені завдання за треками й етапами, нотатки та прогрес capstone
+  function buildReport() {
+    var o = overall(), cs = capStats(), verified = Object.keys(state.verified).length;
+    var out = ["# Мій прогрес у SkillBooster (" + today() + ")", "",
+      "Завдань виконано: " + o.tasksDone + " з " + o.tasksTotal + (verified ? ", з них перевірено автотестами: " + verified : "") +
+      ". Наскрізний проєкт: " + cs.done + " з " + cs.total + " пунктів.", ""];
+    TRACKS.forEach(function (tr) {
+      var lines = [];
+      stagesOf(tr.id).forEach(function (st) {
+        var tasks = st.tasks.filter(function (t) { return taskState(t.id) !== "todo"; });
+        if (!tasks.length) return;
+        var done = st.tasks.filter(function (t) { return taskState(t.id) === "done"; }).length;
+        lines.push("### " + st.title + " (" + done + " з " + st.tasks.length + " завдань)", "");
+        tasks.forEach(function (t) {
+          var mark = taskState(t.id) === "done" ? (state.verified[t.id] ? "✅" : "☑") : "🔄";
+          lines.push("- " + mark + " " + (t.n ? "№" + t.n + " " : "") + t.title + (state.verified[t.id] ? " (тести пройдено " + state.verified[t.id] + ")" : ""));
+          if (state.notes[t.id]) state.notes[t.id].trim().split("\n").forEach(function (l) { lines.push("  > " + l); });
+        });
+        lines.push("");
+      });
+      if (lines.length) out.push("## " + tr.title, "", lines.join("\n"));
+    });
+    out.push("Легенда: ✅ перевірено автотестами, ☑ відмічено вручну, 🔄 у процесі.");
+    return out.join("\n");
+  }
+
   function renderSettings() {
     return "<h1>Налаштування</h1>" +
       "<h2>AI-проксі для завдань з LLM</h2>" +
@@ -531,13 +1023,37 @@
       '<div class="row"><button class="btn ghost" id="exportBtn">Експорт JSON</button>' +
       '<button class="btn ghost" id="importBtn">Імпорт JSON</button>' +
       '<button class="btn danger" id="resetBtn">Скинути прогрес</button></div>' +
-      '<input type="file" id="importFile" accept="application/json" hidden></div>';
+      '<input type="file" id="importFile" accept="application/json" hidden></div>' +
+      "<h2>Звіт для резюме</h2>" +
+      '<div class="card form"><p class="note" style="margin:0">Markdown зі зробленими завданнями, нотатками й прогресом capstone: встав у README портфоліо чи використай для підготовки до співбесіди.</p>' +
+      '<textarea id="reportOut" rows="10" readonly aria-label="Звіт у форматі Markdown">' + esc(buildReport()) + "</textarea>" +
+      '<div class="row"><button class="btn" id="copyReport">Копіювати</button></div></div>';
   }
 
   // ---------- роутинг -------------------------------------------------------
   var pendingFocus = null;
+  // глибокі посилання: #/task/t129 і #/concept/ai-rag/4 (індекс 0-based, як у id картки) відкривають етап і підсвічують картку
+  function deepLink(h) {
+    var tk = h.match(/^#\/task\/(t\d+)\/?$/);
+    if (tk && TASK_STAGE[tk[1]]) return { stage: TASK_STAGE[tk[1]], focus: "task-" + tk[1] };
+    var cn = h.match(/^#\/concept\/([\w-]+)\/(\d+)\/?$/);
+    var st = cn && stageById(cn[1]);
+    if (st && +cn[2] < st.concepts.length) return { stage: st.id, focus: "c-" + st.id + "-" + cn[2] };
+    return null;
+  }
   function route() {
     var h = location.hash || "#/";
+    var dl = deepLink(h);
+    if (dl) {  // показуємо етап під канонічною адресою, посилання лишається в буфері
+      pendingFocus = dl.focus;
+      history.replaceState(null, "", "#/stage/" + dl.stage);
+      h = "#/stage/" + dl.stage;
+    }
+    var legacy = h.match(/^#\/stage\/([\w-]+)\/?$/);
+    if (legacy && !stageById(legacy[1]) && trackById(legacy[1])) {  // старий етап «ai» став треком
+      history.replaceState(null, "", "#/track/" + legacy[1]);
+      h = "#/track/" + legacy[1];
+    }
     var m = h.match(/^#\/stage\/([\w-]+)/);
     var activeId = null;
     var html;
@@ -549,8 +1065,31 @@
       setTrack(trackOf(st));
       html = renderStage(st);
       title = st.title + " · SkillBooster";
+    } else if (/^#\/notes\/[\w-]+/.test(h) && stageById(h.match(/^#\/notes\/([\w-]+)/)[1])) {
+      var ns = stageById(h.match(/^#\/notes\/([\w-]+)/)[1]);
+      activeId = ns.id;
+      setTrack(trackOf(ns));
+      html = renderNotes(ns);
+      title = "Шпаргалка: " + ns.title + " · SkillBooster";
+    } else if (/^#\/play\/[\w-]+/.test(h) && sandboxMeta(h.match(/^#\/play\/([\w-]+)/)[1])) {
+      var pm = sandboxMeta(h.match(/^#\/play\/([\w-]+)/)[1]);
+      setTrack(pm.track);
+      html = renderPlay(pm.id);
+      title = pm.title + " · SkillBooster";
+    } else if (h.indexOf("#/play") === 0) {
+      html = renderPlayList();
+      title = "Пісочниці · SkillBooster";
+    } else if (h.indexOf("#/review") === 0) {
+      html = renderReview();
+      title = "Повторення · SkillBooster";
+    } else if (/^#\/exam\/[\w-]+/.test(h) && stageById(h.match(/^#\/exam\/([\w-]+)/)[1])) {
+      var es = stageById(h.match(/^#\/exam\/([\w-]+)/)[1]);
+      activeId = es.id;
+      setTrack(trackOf(es));
+      html = renderExam(es);
+      title = "Іспит: " + es.title + " · SkillBooster";
     } else if (h.indexOf("#/sync") === 0) {
-      html = renderSync(syncIds(h));
+      html = renderSync(syncIds(h), syncIds(h, "fail"));
       title = "Синхронізація · SkillBooster";
     } else if (h.indexOf("#/capstone") === 0) {
       html = renderCapstone();
@@ -575,6 +1114,25 @@
       focusEl(pendingFocus);
       pendingFocus = null;
     }
+  }
+  function copyText(txt, okMsg) {
+    function fallback() {
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = txt;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        toast(ok ? okMsg : "Не вдалося скопіювати");
+      } catch (err) { toast("Не вдалося скопіювати"); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function () { toast(okMsg); }, fallback);
+    } else { fallback(); }
   }
   function focusEl(id) {
     var el = document.getElementById(id);
@@ -614,12 +1172,19 @@
     }
     var retry = e.target.closest("[data-quiz-retry]");
     if (retry) { openQuiz(retry.getAttribute("data-quiz-retry")); return; }
-    var opt = e.target.closest(".qopt");
+    var opt = e.target.closest(".qopt:not(.rq)");
     if (opt) { answerQuiz(opt); return; }
 
     if (e.target.id === "syncOk") {
-      var n = markVerified(e.target.getAttribute("data-ids").split(","));
-      toast("Перевірено тестами: " + n);
+      var n = markVerified(e.target.getAttribute("data-ids").split(",").filter(Boolean));
+      var bad = (e.target.getAttribute("data-fail") || "").split(",").filter(function (id) { return TASKS[id]; });
+      bad.forEach(function (id) {
+        state.failed[id] = today();
+        delete state.verified[id];
+        state.tasks[id] = "doing";
+      });
+      if (bad.length) touch();
+      toast("Перевірено тестами: " + n + (bad.length ? ", падає: " + bad.length : ""));
       location.hash = "#/";
       return;
     }
@@ -641,6 +1206,49 @@
       document.querySelectorAll("#filters .chip").forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
       chip.setAttribute("aria-pressed", "true");
       applyFilter();
+      return;
+    }
+
+    if (e.target.closest("[data-print]")) { window.print(); return; }
+
+    var rq = e.target.closest(".rq");
+    if (rq && curRun && !curRun.finished) {
+      var rn = +rq.getAttribute("data-ri"), ro = +rq.getAttribute("data-oi"), rit = curRun.items[rn];
+      if (curRun.mode === "review") {
+        if (rit.picked !== null) return;
+        rit.picked = ro;
+        revealItem(rn);
+        if (curRun.items.every(function (x) { return x.picked !== null; })) finishRun();
+      } else {   // іспит: відповідь можна змінити до завершення
+        rit.picked = ro;
+        document.querySelectorAll('#run .qq[data-ri="' + rn + '"] .qopt').forEach(function (b) { b.classList.toggle("sel", b === rq); });
+        var fbtn = document.querySelector("[data-run-finish]");
+        if (fbtn) fbtn.disabled = !curRun.items.every(function (x) { return x.picked !== null; });
+      }
+      return;
+    }
+    if (e.target.closest("[data-run-finish]")) { finishRun(); return; }
+
+    var hb = e.target.closest("[data-hint]");
+    if (hb) {
+      var hid = hb.getAttribute("data-hint");
+      state.hints[hid] = (state.hints[hid] || 0) + 1;
+      touch();
+      fillReadme(hid);
+      return;
+    }
+
+    if (e.target.id === "copyReport") { copyText(document.getElementById("reportOut").value, "Звіт скопійовано"); return; }
+
+    var cp = e.target.closest("[data-copy]");
+    if (cp) {
+      copyText(cp.getAttribute("data-copy"), "Команду скопійовано");
+      return;
+    }
+
+    var cl = e.target.closest("[data-copylink]");
+    if (cl) {
+      copyText(location.href.split("#")[0] + "#/" + cl.getAttribute("data-copylink"), "Посилання скопійовано");
       return;
     }
 
@@ -717,9 +1325,10 @@
           }
           var e0 = emptyState();
           state = {
-            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [],
+            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [], hints: s.hints || {}, played: s.played || {}, failed: s.failed || {}, review: s.review || {}, notes: s.notes || {}, activity: s.activity || {},
             settings: Object.assign(e0.settings, s.settings || {}),
           };
+          migrateOldAi(state);
           save();
           route();
           toast("Прогрес імпортовано");
@@ -729,7 +1338,26 @@
     }
   });
 
+  // toggle не спливає, тому слухаємо у фазі захоплення
+  document.addEventListener("toggle", function (e) {
+    var d = e.target;
+    if (!d.matches || !d.matches("details.readme")) return;
+    var id = d.getAttribute("data-readme");
+    readmeOpen[id] = d.open;
+    if (d.open) withReadmes(function () { fillReadme(id); });
+  }, true);
+
   document.addEventListener("input", function (e) {
+    var nid = e.target.getAttribute && e.target.getAttribute("data-note");
+    if (nid) {
+      clearTimeout(noteTimer);
+      var val = e.target.value;
+      noteTimer = setTimeout(function () {
+        if (val.trim()) state.notes[nid] = val; else delete state.notes[nid];
+        save();
+      }, 500);
+      return;
+    }
     if (e.target.id === "sBase" || e.target.id === "sModel") {
       state.settings.baseUrl = document.getElementById("sBase").value.trim();
       state.settings.model = document.getElementById("sModel").value.trim();
@@ -746,6 +1374,7 @@
       var show = true;
       if (f === "open") show = el.getAttribute("data-s") !== "done";
       else if (f === "cwe") show = el.getAttribute("data-tag") === "cwe";
+      else if (f === "ai" || f === "auto" || f === "manual" || f === "pending") show = el.getAttribute("data-kinds").indexOf(" " + f + " ") !== -1;
       else if (f !== "all") show = el.getAttribute("data-lvl") === f;
       el.style.display = show ? "" : "none";
     });
