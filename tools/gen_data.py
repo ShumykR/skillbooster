@@ -1037,6 +1037,51 @@ for m in CAPSTONE["milestones"]:
 with open(os.path.join(HERE, "..", "docs", "capstone.md"), "w", encoding="utf-8") as f:
     f.write("\n".join(md))
 
+# ---- умови завдань для сайту (readmes.js, підвантажується за потреби) -------------------
+_HEAD = re.compile(r"^\*\*(.+?)\*\*(.*)$")
+
+
+def parse_readme(text):
+    """Розбиває README на секції: нова секція починається з рядка `**Заголовок**...`."""
+    secs, cur, fence = [], None, False
+    for line in text.splitlines()[1:]:  # перший рядок `# №N ...` вже є на картці
+        if line.startswith("```"):
+            fence = not fence
+        m = None if fence else _HEAD.match(line)
+        if m:
+            title = re.sub(r"[.:\s]+$", "", m.group(1)).strip()
+            cur = {"title": title, "body": m.group(2).lstrip(" .:").rstrip()}
+            secs.append(cur)
+        elif cur is None:
+            if line.strip():
+                cur = {"title": "", "body": line}
+                secs.append(cur)
+        else:
+            cur["body"] += "\n" + line
+    for sec in secs:
+        sec["body"] = sec["body"].strip("\n")
+    return secs
+
+
+_STD = ("Ситуація", "Що зробити", "Підказки", "Подумай", "Перевірка")
+_readmes, _odd = {}, {}
+for _tid, _dir in AUTO.items():
+    _p = os.path.join(_tasks_dir, _dir, "README.md")
+    if os.path.isfile(_p):
+        _secs = parse_readme(open(_p, encoding="utf-8").read())
+        _readmes[_tid] = _secs
+        for _sec in _secs:
+            if not _sec["title"].startswith(_STD):
+                _k = _sec["title"] or "(без заголовка)"
+                _odd[_k] = _odd.get(_k, 0) + 1
+with open(os.path.join(HERE, "..", "readmes.js"), "w", encoding="utf-8") as f:
+    f.write("// Згенеровано з tasks/*/README.md (tools/gen_data.py). Не правити руками.\n")
+    f.write("window.SKILLBOOSTER_README = ")
+    json.dump(_readmes, f, ensure_ascii=False, separators=(",", ":"))
+    f.write(";\n")
+if _odd:
+    print("README: нестандартні секції (показуються як є):", ", ".join(f"{k} ×{v}" for k, v in sorted(_odd.items())))
+
 # ---- звіт покриття CWE ------------------------------------------------------------
 with open(os.path.join(HERE, "..", "docs", "security-coverage.md"), "w", encoding="utf-8") as f:
     f.write(gen_coverage.build(all_tasks, len(AUTO), total) + "\n")

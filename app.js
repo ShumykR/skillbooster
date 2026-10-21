@@ -10,7 +10,7 @@
 
   // ---------- сховище -------------------------------------------------------
   function emptyState() {
-    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], settings: { baseUrl: "", model: "" } };
+    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], hints: {}, settings: { baseUrl: "", model: "" } };
   }
   var OLD_AI = ["ai-api:1", "ai-llm:4", "ai-rag:2", "ai-evals:0", "ai-agents:1", "ai-agents:8", "ai-security:1", "ai-api:6", "ai-ops:8"];
   var state = load();
@@ -28,6 +28,7 @@
         concepts: s.concepts || e.concepts,
         capstone: s.capstone || e.capstone,
         days: s.days || e.days,
+        hints: s.hints || e.hints,
         settings: Object.assign(e.settings, s.settings || {}),
       };
       migrateOldAi(out);
@@ -412,6 +413,95 @@
     return k;
   }
 
+  // умова завдання з README (readmes.js підвантажується лише при першому розкритті; <script> працює і з file://)
+  var readmeOpen = {};
+  var readmeLoading = null;
+  function withReadmes(cb) {
+    if (window.SKILLBOOSTER_README) { cb(); return; }
+    if (readmeLoading) { readmeLoading.push(cb); return; }
+    readmeLoading = [cb];
+    var sc = document.createElement("script");
+    sc.src = "readmes.js";
+    sc.onload = function () { var q = readmeLoading; readmeLoading = null; q.forEach(function (f) { f(); }); };
+    sc.onerror = function () { readmeLoading = null; toast("Не вдалося завантажити readmes.js"); };
+    document.head.appendChild(sc);
+  }
+
+  function inlineMd(s) {
+    return md(s).replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/(^|[\s(])\*([^*\s][^*]*?)\*(?=[\s).,;:!?]|$)/g, "$1<i>$2</i>");
+  }
+  // мінімальний Markdown: абзаци, списки (- і 1.), блок коду, `code`, **жирний**, цитата
+  function blockMd(body) {
+    var out = [], list = null, para = [], code = null;
+    function flushPara() { if (para.length) { out.push("<p>" + inlineMd(para.join(" ")) + "</p>"); para = []; } }
+    function flushList() { if (list) { out.push("<" + list.tag + ">" + list.items.join("") + "</" + list.tag + ">"); list = null; } }
+    body.split("\n").forEach(function (line) {
+      if (/^```/.test(line)) {
+        if (code) { out.push("<pre><code>" + esc(code.join("\n")) + "</code></pre>"); code = null; }
+        else { flushPara(); flushList(); code = []; }
+        return;
+      }
+      if (code) { code.push(line); return; }
+      var m = line.match(/^\s*(?:([-*])|(\d+)\.)\s+(.*)$/);
+      if (m) {
+        flushPara();
+        var tag = m[1] ? "ul" : "ol";
+        if (!list || list.tag !== tag) { flushList(); list = { tag: tag, items: [] }; }
+        list.items.push("<li>" + inlineMd(m[3]) + "</li>");
+      } else if (list && /^\s+\S/.test(line)) {
+        list.items[list.items.length - 1] = list.items[list.items.length - 1].replace(/<\/li>$/, " " + inlineMd(line.trim()) + "</li>");
+      } else if (!line.trim()) {
+        flushPara(); flushList();
+      } else {
+        flushList();
+        para.push(line.replace(/^>\s?/, ""));
+      }
+    });
+    if (code) out.push("<pre><code>" + esc(code.join("\n")) + "</code></pre>");
+    flushPara(); flushList();
+    return out.join("");
+  }
+
+  function hintItems(body) {
+    var items = [];
+    body.split("\n").forEach(function (line) {
+      var m = line.match(/^\s*[-*]\s+(.*)$/);
+      if (m) items.push(m[1]);
+      else if (items.length && /^\s+\S/.test(line)) items[items.length - 1] += " " + line.trim();
+    });
+    return items;
+  }
+
+  function readmeBodyHtml(id) {
+    var secs = (window.SKILLBOOSTER_README || {})[id];
+    if (!secs) return "<p>Умови для цього завдання немає в readmes.js.</p>";
+    return secs.map(function (sec) {
+      var head = sec.title ? "<h4>" + esc(sec.title) + "</h4>" : "";
+      if (/^Підказки/.test(sec.title)) {
+        var items = hintItems(sec.body);
+        if (items.length) {
+          var n = Math.min(state.hints[id] || 0, items.length);
+          return '<div class="rsec hints">' + head +
+            (n ? "<ul>" + items.slice(0, n).map(function (x) { return "<li>" + inlineMd(x) + "</li>"; }).join("") + "</ul>" : "") +
+            (n < items.length ? '<button class="chip" data-hint="' + id + '">Ще підказка (' + n + "/" + items.length + ")</button>"
+              : '<p class="note">Усі підказки відкрито.</p>') + "</div>";
+        }
+      }
+      return '<div class="rsec">' + head + blockMd(sec.body) + "</div>";
+    }).join("");
+  }
+
+  function readmeShell(id) {
+    return '<details class="readme" data-readme="' + id + '"' + (readmeOpen[id] ? " open" : "") +
+      "><summary>📖 Умова завдання</summary><div class=\"readme-body\">" +
+      (readmeOpen[id] && window.SKILLBOOSTER_README ? readmeBodyHtml(id) : "Завантаження…") + "</div></details>";
+  }
+
+  function fillReadme(id) {
+    var d = document.querySelector('details.readme[data-readme="' + id + '"]');
+    if (d) d.querySelector(".readme-body").innerHTML = readmeBodyHtml(id);
+  }
+
   // завдання без автотесту: кроки і чекліст «Готово, коли»; усі пункти відмічені = завдання зроблене
   function manualHtml(t) {
     if (t.auto || !t.done) return "";
@@ -475,7 +565,7 @@
         '" title="Скопіювати команду">📋 Копіювати</button>' +
         (DATA.repo ? ' · <a href="' + DATA.repo + "/tree/main/tasks/" + esc(t.auto) + '" target="_blank" rel="noopener">Код на GitHub</a>' +
           ' · <a href="' + DATA.repo.replace("github.com", "github.dev") + "/tree/main/tasks/" + esc(t.auto) +
-          '" target="_blank" rel="noopener">Відкрити в github.dev</a>' : "") + "</div>" : "") + "</div></div>";
+          '" target="_blank" rel="noopener">Відкрити в github.dev</a>' : "") + "</div>" + readmeShell(t.id) : "") + "</div></div>";
   }
 
 
@@ -724,6 +814,15 @@
       return;
     }
 
+    var hb = e.target.closest("[data-hint]");
+    if (hb) {
+      var hid = hb.getAttribute("data-hint");
+      state.hints[hid] = (state.hints[hid] || 0) + 1;
+      touch();
+      fillReadme(hid);
+      return;
+    }
+
     var cp = e.target.closest("[data-copy]");
     if (cp) {
       copyText(cp.getAttribute("data-copy"), "Команду скопійовано");
@@ -809,7 +908,7 @@
           }
           var e0 = emptyState();
           state = {
-            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [],
+            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [], hints: s.hints || {},
             settings: Object.assign(e0.settings, s.settings || {}),
           };
           migrateOldAi(state);
@@ -821,6 +920,15 @@
       reader.readAsText(e.target.files[0]);
     }
   });
+
+  // toggle не спливає, тому слухаємо у фазі захоплення
+  document.addEventListener("toggle", function (e) {
+    var d = e.target;
+    if (!d.matches || !d.matches("details.readme")) return;
+    var id = d.getAttribute("data-readme");
+    readmeOpen[id] = d.open;
+    if (d.open) withReadmes(function () { fillReadme(id); });
+  }, true);
 
   document.addEventListener("input", function (e) {
     if (e.target.id === "sBase" || e.target.id === "sModel") {

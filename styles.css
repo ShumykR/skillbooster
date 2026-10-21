@@ -356,3 +356,13 @@ pre.env {
 .track-tab:hover { border-color: var(--accent); text-decoration: none; }
 .track-tab.active { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; }
 .track-tab .np { font-size: .75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* умова завдання (README) на картці */
+details.readme { margin-top: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+details.readme > summary { cursor: pointer; padding: 8px 12px; font-weight: 600; }
+.readme-body { padding: 0 14px 12px; font-size: .92rem; line-height: 1.55; overflow-wrap: anywhere; }
+.readme-body h4 { margin: 14px 0 4px; font-size: .95rem; }
+.readme-body p { margin: 4px 0; }
+.readme-body ul, .readme-body ol { margin: 4px 0; padding-left: 22px; }
+.readme-body pre { overflow-x: auto; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; }
+.rsec.hints .chip { margin-top: 6px; }
