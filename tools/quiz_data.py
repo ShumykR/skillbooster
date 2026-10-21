@@ -61,4 +61,6 @@ SANDBOX = {
                  "concepts": [("ai-api", 6), ("ai-llm", 1)], "tasks": [133, 132]},
     "trifecta": {"title": "Lethal trifecta: де розірвати ланцюг", "icon": "🔱",
                  "concepts": [("ai-security", 3)], "tasks": [197, 198, 196]},
+    "base-rate": {"title": "Base rate: чому «99% точний» не означає «99% блокувань правильні»", "icon": "🎯",
+                  "concepts": [("ai-llm", 6)], "tasks": [173, 196]},
 }

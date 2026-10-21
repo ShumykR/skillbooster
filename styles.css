@@ -437,3 +437,5 @@ details.readme > summary { cursor: pointer; padding: 8px 12px; font-weight: 600;
 .sb-verdict { padding: 10px 14px; border-radius: 8px; font-weight: 600; }
 .sb-verdict.leak { background: var(--bad-soft); color: var(--bad); }
 .sb-verdict.blocked, .sb-verdict.safe { background: var(--surface-2); color: var(--ok); }
+.sb-cell-bad { background: var(--bad-soft); color: var(--bad); font-weight: 600; }
+.sb-cell-ok { background: var(--surface-2); color: var(--ok); font-weight: 600; }

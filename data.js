@@ -38,6 +38,22 @@ window.SKILLBOOSTER = {
     "t198",
     "t196"
    ]
+  },
+  {
+   "id": "base-rate",
+   "title": "Base rate: чому «99% точний» не означає «99% блокувань правильні»",
+   "icon": "🎯",
+   "track": "ai",
+   "concepts": [
+    [
+     "ai-llm",
+     6
+    ]
+   ],
+   "tasks": [
+    "t173",
+    "t196"
+   ]
   }
  ],
  "tracks": [
@@ -9482,6 +9498,9 @@ window.SKILLBOOSTER = {
    "sandboxes": {
     "1": [
      "llm-cost"
+    ],
+    "6": [
+     "base-rate"
     ]
    }
   },
