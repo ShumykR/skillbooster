@@ -73,4 +73,6 @@ SANDBOX = {
                 "concepts": [("sysdesign", 7), ("ai-api", 7)], "tasks": [109, 134]},
     "token-bucket": {"title": "Token bucket: сплеск, поповнення, Retry-After", "icon": "🪣",
                      "concepts": [("api", 4)], "tasks": [112]},
+    "error-budget": {"title": "Error budget і burn rate", "icon": "🔥",
+                     "concepts": [("observability", 4)], "tasks": [104]},
 }

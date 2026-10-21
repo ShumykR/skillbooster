@@ -143,6 +143,21 @@ window.SKILLBOOSTER = {
    "tasks": [
     "t112"
    ]
+  },
+  {
+   "id": "error-budget",
+   "title": "Error budget і burn rate",
+   "icon": "🔥",
+   "track": "core",
+   "concepts": [
+    [
+     "observability",
+     4
+    ]
+   ],
+   "tasks": [
+    "t104"
+   ]
   }
  ],
  "tracks": [
@@ -5588,6 +5603,11 @@ window.SKILLBOOSTER = {
       "answer": 0,
       "why": "Таймаути замість зависань, fallback (читання з БД), circuit breaker і зрозумілі помилки (завдання №109)."
      }
+    ]
+   },
+   "sandboxes": {
+    "4": [
+     "error-budget"
     ]
    }
   },
