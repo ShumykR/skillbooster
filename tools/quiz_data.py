@@ -67,4 +67,6 @@ SANDBOX = {
             "concepts": [("ai-rag", 2), ("ai-rag", 9)], "tasks": [130]},
     "context-budget": {"title": "Бюджет контексту: що влізе у вікно", "icon": "🪟",
                        "concepts": [("ai-api", 4)], "tasks": [175]},
+    "backoff": {"title": "Backoff і jitter: чому клієнти б'ють хвилями", "icon": "🌊",
+                "concepts": [("api", 3), ("ai-api", 7)], "tasks": [42, 134]},
 }

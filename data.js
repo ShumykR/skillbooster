@@ -88,6 +88,26 @@ window.SKILLBOOSTER = {
    "tasks": [
     "t175"
    ]
+  },
+  {
+   "id": "backoff",
+   "title": "Backoff і jitter: чому клієнти б'ють хвилями",
+   "icon": "🌊",
+   "track": "core",
+   "concepts": [
+    [
+     "api",
+     3
+    ],
+    [
+     "ai-api",
+     7
+    ]
+   ],
+   "tasks": [
+    "t42",
+    "t134"
+   ]
   }
  ],
  "tracks": [
@@ -2715,6 +2735,11 @@ window.SKILLBOOSTER = {
       "answer": 0,
       "why": "На дроті поля ідентифікуються номерами. Видалене поле позначають `reserved`, щоб номер не зайняли."
      }
+    ]
+   },
+   "sandboxes": {
+    "3": [
+     "backoff"
     ]
    }
   },
@@ -9964,6 +9989,9 @@ window.SKILLBOOSTER = {
     ],
     "4": [
      "context-budget"
+    ],
+    "7": [
+     "backoff"
     ]
    }
   },

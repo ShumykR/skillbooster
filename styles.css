@@ -455,3 +455,12 @@ details.readme > summary { cursor: pointer; padding: 8px 12px; font-weight: 600;
   background: var(--accent); color: #fff; font-size: .78rem; font-weight: 600; }
 .sb-cell.key { outline: 3px solid var(--warn); outline-offset: 1px; }
 .sb-cell.cut { background: var(--bad); text-decoration: line-through; }
+.sb-cols { position: relative; display: flex; align-items: flex-end; gap: 1px; border-bottom: 1px solid var(--border); margin: 8px 0; }
+.sb-col { flex: 1; min-width: 1px; background: var(--accent); border-radius: 2px 2px 0 0; }
+.sb-col.down { background: var(--muted); opacity: .5; }
+.sb-col.bad { background: var(--bad); }
+.sb-col.ok { background: var(--ok); }
+.sb-line { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--warn); pointer-events: none; }
+.sb-map tr.sel th, .sb-map tr.sel td { background: var(--surface-2); font-weight: 600; }
+.sb-result, .sb-controls { min-width: 0; }
+.sb-result { overflow-x: auto; }

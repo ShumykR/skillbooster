@@ -67,6 +67,26 @@
     return { get: function () { return ta.value; } };
   }
 
+  function button(parent, label, onClick) {
+    var b = el("button", { type: "button", class: "chip", text: label });
+    b.addEventListener("click", onClick);
+    parent.appendChild(el("div", { class: "sb-ctl" }, [b]));
+    return b;
+  }
+
+  // стовпчикова діаграма: cols [{v, cls, title}], лінія ліміту line (у тих самих одиницях), висота в px
+  function columns(parent, cols, o) {
+    o = o || {};
+    var max = Math.max.apply(null, cols.map(function (c) { return c.v; }).concat([o.line || 0, 1]));
+    var box = el("div", { class: "sb-cols", style: "height:" + (o.height || 120) + "px", role: "img", "aria-label": o.label || "Діаграма" });
+    cols.forEach(function (c) {
+      box.appendChild(el("span", { class: "sb-col " + (c.cls || ""), style: "height:" + (c.v / max * 100) + "%", title: c.title || "" }));
+    });
+    if (o.line) box.appendChild(el("span", { class: "sb-line", style: "bottom:" + (o.line / max * 100) + "%", title: o.lineLabel || "" }));
+    parent.appendChild(box);
+    return box;
+  }
+
   // горизонтальна смуга: сегменти [{label, value, cls}] у пропорції до max (або до суми)
   function bars(parent, rows, max) {
     var top = max || Math.max.apply(null, rows.map(function (r) { return r.value; }).concat([1e-9]));
@@ -103,5 +123,5 @@
     return "$" + Number(n).toLocaleString("uk-UA", { maximumFractionDigits: d, minimumFractionDigits: d });
   }
 
-  window.SB_KIT = { el: el, slider: slider, check: check, num: num, select: select, textarea: textarea, bars: bars, rng: rng, fmtNum: fmtNum, fmtUsd: fmtUsd };
+  window.SB_KIT = { el: el, slider: slider, check: check, num: num, select: select, textarea: textarea, button: button, columns: columns, bars: bars, rng: rng, fmtNum: fmtNum, fmtUsd: fmtUsd };
 })();
