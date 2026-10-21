@@ -1020,7 +1020,8 @@ import cwe_data  # noqa: E402
 import gen_coverage  # noqa: E402
 _names = gen_coverage.cwe_names()
 _used = {re.sub(r"^[~?@]", "", tag) for t in all_tasks for tag in t.get("cwe", [])}
-data = {"tracks": TRACKS, "stages": stages, "legacy": LEGACY, "capstone": CAPSTONE,
+REPO = "https://github.com/ShumykR/skillbooster"
+data = {"repo": REPO, "tracks": TRACKS, "stages": stages, "legacy": LEGACY, "capstone": CAPSTONE,
         "cwe": {k: _names[k] for k in sorted(_used, key=int) if k in _names}}
 with open(OUT, "w", encoding="utf-8") as f:
     f.write("// Згенеровано з tasks-catalog.md. Редагуй каталог і перегенеруй, або правь тут вручну.\n")

@@ -269,6 +269,8 @@ a.tag:hover { text-decoration: underline; }
 .task .linkbtn { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; padding: 0; border: 1px solid transparent; border-radius: 6px;
   background: transparent; color: var(--muted); cursor: pointer; font-size: .9rem; line-height: 1; opacity: .55; }
 .task .linkbtn:hover, .task .linkbtn:focus-visible { opacity: 1; border-color: var(--border); color: var(--accent); }
+.task .linkbtn.inline { position: static; width: auto; height: auto; padding: 2px 8px; font-size: .8rem; opacity: 1;
+  border-color: var(--border); color: var(--text); }
 .task h3 { padding-right: 30px; }
 .task.done { opacity: .62; }
 .task .st {

@@ -1,5 +1,6 @@
 // Згенеровано з tasks-catalog.md. Редагуй каталог і перегенеруй, або правь тут вручну.
 window.SKILLBOOSTER = {
+ "repo": "https://github.com/ShumykR/skillbooster",
  "tracks": [
   {
    "id": "core",

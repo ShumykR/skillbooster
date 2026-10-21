@@ -442,7 +442,11 @@
       }).join(" · ") + "</div>" : "") +
       tagsHtml(t) + manualHtml(t) +
       (t.auto ? '<div class="chk">Папка <code>tasks/' + esc(t.auto) + "</code> · запуск: <code>python check.py " +
-        esc(t.auto.split("_")[0]) + "</code></div>" : "") + "</div></div>";
+        esc(t.auto.split("_")[0]) + '</code> <button class="linkbtn inline" data-copy="python check.py ' + esc(t.auto.split("_")[0]) +
+        '" title="Скопіювати команду">📋 Копіювати</button>' +
+        (DATA.repo ? ' · <a href="' + DATA.repo + "/tree/main/tasks/" + esc(t.auto) + '" target="_blank" rel="noopener">Код на GitHub</a>' +
+          ' · <a href="' + DATA.repo.replace("github.com", "github.dev") + "/tree/main/tasks/" + esc(t.auto) +
+          '" target="_blank" rel="noopener">Відкрити в github.dev</a>' : "") + "</div>" : "") + "</div></div>";
   }
 
 
@@ -688,6 +692,12 @@
       document.querySelectorAll("#filters .chip").forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
       chip.setAttribute("aria-pressed", "true");
       applyFilter();
+      return;
+    }
+
+    var cp = e.target.closest("[data-copy]");
+    if (cp) {
+      copyText(cp.getAttribute("data-copy"), "Команду скопійовано");
       return;
     }
 
