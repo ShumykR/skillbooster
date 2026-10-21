@@ -10,7 +10,7 @@
 
   // ---------- сховище -------------------------------------------------------
   function emptyState() {
-    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], hints: {}, played: {}, failed: {}, review: {}, notes: {}, settings: { baseUrl: "", model: "" } };
+    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], hints: {}, played: {}, failed: {}, review: {}, notes: {}, activity: {}, settings: { baseUrl: "", model: "" } };
   }
   var OLD_AI = ["ai-api:1", "ai-llm:4", "ai-rag:2", "ai-evals:0", "ai-agents:1", "ai-agents:8", "ai-security:1", "ai-api:6", "ai-ops:8"];
   var state = load();
@@ -33,6 +33,7 @@
         failed: s.failed || e.failed,
         review: s.review || e.review,
         notes: s.notes || e.notes,
+        activity: s.activity || e.activity,
         settings: Object.assign(e.settings, s.settings || {}),
       };
       migrateOldAi(out);
@@ -64,6 +65,7 @@
   function touch() {
     var t = today();
     if (state.days.indexOf(t) === -1) state.days.push(t);
+    state.activity[t] = (state.activity[t] || 0) + 1;
     save();
   }
   function streak() {
@@ -194,9 +196,11 @@
     nav.innerHTML = html;
   }
   function renderTop() {
-    var o = overall();
+    var o = overall(curTrack), all = overall();
     document.getElementById("topBar").style.width = o.pct + "%";
-    document.getElementById("topText").textContent = o.pct + "% · " + o.tasksDone + "/" + o.tasksTotal + " завдань";
+    var tt = document.getElementById("topText");
+    tt.textContent = o.pct + "% · " + o.tasksDone + "/" + o.tasksTotal + " завдань";
+    tt.title = "Прогрес треку «" + trackById(curTrack).title + "». Загалом: " + all.pct + "% · " + all.tasksDone + "/" + all.tasksTotal + " завдань";
   }
 
   // ---------- сторінки ------------------------------------------------------
@@ -215,6 +219,24 @@
     return null;
   }
 
+  // сітка останніх 12 тижнів (пн-нд): рівень залежить від кількості подій за день
+  function renderCalendar() {
+    var act = {};
+    state.days.forEach(function (d) { act[d] = 1; });
+    Object.keys(state.activity).forEach(function (d) { act[d] = Math.max(act[d] || 0, state.activity[d]); });
+    var t = today(), dow = (new Date(t + "T12:00:00").getDay() + 6) % 7;
+    var start = addDays(t, -dow - 77), cells = "", total = 0;
+    for (var i = 0; i < 84; i++) {
+      var d = addDays(start, i);
+      if (d > t) { cells += '<i class="cal-c empty"></i>'; continue; }
+      var n = act[d] || 0, lvl = n === 0 ? 0 : n === 1 ? 1 : n < 4 ? 2 : n < 7 ? 3 : 4;
+      if (n) total++;
+      cells += '<i class="cal-c l' + lvl + '" title="' + d + ": " + (n ? n + " " + (n === 1 ? "дія" : "дій") : "без активності") + '"></i>';
+    }
+    return '<div class="card cal"><div class="cal-head"><b>Активність за 12 тижнів</b><span class="note">' + total + " днів з активністю · серія " + streak() +
+      '</span></div><div class="cal-grid" role="img" aria-label="Календар активності за 12 тижнів: ' + total + ' днів з активністю">' + cells + "</div></div>";
+  }
+
   function renderHome() {
     var tr = trackById(curTrack), list = stagesOf(curTrack);
     var o = overall(curTrack);
@@ -230,6 +252,7 @@
       '<div class="stat"><b>' + streak() + '</b><span>днів поспіль</span></div>' +
       '<div class="stat"><b>' + list.length + '</b><span>етапів</span></div></div>';
 
+    html += renderCalendar();
     var due = dueKeys().length;
     if (due) {
       html += '<div class="card next-card"><div><small>Інтервальне повторення</small><strong>На повторення сьогодні: ' + due +
@@ -1294,7 +1317,7 @@
           }
           var e0 = emptyState();
           state = {
-            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [], hints: s.hints || {}, played: s.played || {}, failed: s.failed || {}, review: s.review || {}, notes: s.notes || {},
+            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [], hints: s.hints || {}, played: s.played || {}, failed: s.failed || {}, review: s.review || {}, notes: s.notes || {}, activity: s.activity || {},
             settings: Object.assign(e0.settings, s.settings || {}),
           };
           migrateOldAi(state);
