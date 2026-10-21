@@ -952,6 +952,32 @@
       "LLM_API_KEY=вставте-ключ-сюди\n" +
       "LLM_MODEL=" + (s.model || "your-model-name");
   }
+  // Markdown-звіт для резюме/портфоліо: зроблені завдання за треками й етапами, нотатки та прогрес capstone
+  function buildReport() {
+    var o = overall(), cs = capStats(), verified = Object.keys(state.verified).length;
+    var out = ["# Мій прогрес у SkillBooster (" + today() + ")", "",
+      "Завдань виконано: " + o.tasksDone + " з " + o.tasksTotal + (verified ? ", з них перевірено автотестами: " + verified : "") +
+      ". Наскрізний проєкт: " + cs.done + " з " + cs.total + " пунктів.", ""];
+    TRACKS.forEach(function (tr) {
+      var lines = [];
+      stagesOf(tr.id).forEach(function (st) {
+        var tasks = st.tasks.filter(function (t) { return taskState(t.id) !== "todo"; });
+        if (!tasks.length) return;
+        var done = st.tasks.filter(function (t) { return taskState(t.id) === "done"; }).length;
+        lines.push("### " + st.title + " (" + done + " з " + st.tasks.length + " завдань)", "");
+        tasks.forEach(function (t) {
+          var mark = taskState(t.id) === "done" ? (state.verified[t.id] ? "✅" : "☑") : "🔄";
+          lines.push("- " + mark + " " + (t.n ? "№" + t.n + " " : "") + t.title + (state.verified[t.id] ? " (тести пройдено " + state.verified[t.id] + ")" : ""));
+          if (state.notes[t.id]) state.notes[t.id].trim().split("\n").forEach(function (l) { lines.push("  > " + l); });
+        });
+        lines.push("");
+      });
+      if (lines.length) out.push("## " + tr.title, "", lines.join("\n"));
+    });
+    out.push("Легенда: ✅ перевірено автотестами, ☑ відмічено вручну, 🔄 у процесі.");
+    return out.join("\n");
+  }
+
   function renderSettings() {
     return "<h1>Налаштування</h1>" +
       "<h2>AI-проксі для завдань з LLM</h2>" +
@@ -966,7 +992,11 @@
       '<div class="row"><button class="btn ghost" id="exportBtn">Експорт JSON</button>' +
       '<button class="btn ghost" id="importBtn">Імпорт JSON</button>' +
       '<button class="btn danger" id="resetBtn">Скинути прогрес</button></div>' +
-      '<input type="file" id="importFile" accept="application/json" hidden></div>';
+      '<input type="file" id="importFile" accept="application/json" hidden></div>' +
+      "<h2>Звіт для резюме</h2>" +
+      '<div class="card form"><p class="note" style="margin:0">Markdown зі зробленими завданнями, нотатками й прогресом capstone: встав у README портфоліо чи використай для підготовки до співбесіди.</p>' +
+      '<textarea id="reportOut" rows="10" readonly aria-label="Звіт у форматі Markdown">' + esc(buildReport()) + "</textarea>" +
+      '<div class="row"><button class="btn" id="copyReport">Копіювати</button></div></div>';
   }
 
   // ---------- роутинг -------------------------------------------------------
@@ -1176,6 +1206,8 @@
       fillReadme(hid);
       return;
     }
+
+    if (e.target.id === "copyReport") { copyText(document.getElementById("reportOut").value, "Звіт скопійовано"); return; }
 
     var cp = e.target.closest("[data-copy]");
     if (cp) {
