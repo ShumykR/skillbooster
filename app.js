@@ -297,6 +297,92 @@
     return html;
   }
 
+  // ---------- пошук по сайту -----------------------------------------------
+  var searchIndex = null;
+  function norm(x) {
+    return String(x).toLowerCase().replace(/[`ʼ’‘]/g, "'").replace(/№/g, " ").replace(/\s+/g, " ").trim();
+  }
+  function buildSearchIndex() {
+    var idx = [];
+    DATA.stages.forEach(function (st) {
+      idx.push({ k: "Етап", t: st.title, sub: st.why, hash: "#/stage/" + st.id, hay: norm(st.title + " " + st.why), w: 3 });
+      st.concepts.forEach(function (c, i) {
+        idx.push({ k: "Поняття", t: c.replace(/`/g, ""), sub: st.title, hash: "#/concept/" + st.id + "/" + i, hay: norm(c + " " + st.title), w: 2 });
+      });
+      st.resources.forEach(function (r) {
+        idx.push({ k: "Ресурс", t: r.name, sub: st.title, hash: "#/stage/" + st.id, hay: norm(r.name + " " + r.note + " " + st.title), w: 1 });
+      });
+      st.tasks.forEach(function (t) {
+        var cwe = (t.cwe || []).map(function (c) { var id = c.replace(/^[~?@]/, ""); return "cwe-" + id + " " + id + " " + ((DATA.cwe || {})[id] || ""); }).join(" ");
+        idx.push({ k: "Завдання", t: (t.n ? "№" + t.n + " " : "") + t.title, sub: st.title, hash: "#/task/" + t.id,
+          hay: " " + norm((t.n || t.id) + " " + t.title + " " + t.desc + " " + (t.pattern || []).join(" ") + " " + cwe) + " ", num: t.n ? String(t.n) : "", w: 4 });
+      });
+    });
+    (DATA.sandboxes || []).forEach(function (x) {
+      idx.push({ k: "Пісочниця", t: x.title, sub: "▶ Пісочниці", hash: "#/play/" + x.id, hay: norm(x.title), w: 3 });
+    });
+    return idx;
+  }
+  function searchFor(q) {
+    var qn = norm(q);
+    if (!qn) return [];
+    if (!searchIndex) searchIndex = buildSearchIndex();
+    var toks = qn.split(" ");
+    var res = [];
+    searchIndex.forEach(function (e) {
+      for (var i = 0; i < toks.length; i++) {
+        // cwe-79 не має збігатися з cwe-799: порівнюємо повним словом
+        if (e.hay.indexOf(/^cwe-\d+$/.test(toks[i]) ? " " + toks[i] + " " : toks[i]) === -1) return;
+      }
+      var score = e.w + (norm(e.t).indexOf(qn) !== -1 ? 5 : 0) + (e.num && e.num === qn ? 20 : 0);
+      res.push({ e: e, score: score });
+    });
+    res.sort(function (a, b) { return b.score - a.score; });
+    return res.slice(0, 20).map(function (r) { return r.e; });
+  }
+
+  var searchBox = document.getElementById("q"), searchOut = document.getElementById("qres"), searchSel = -1;
+  function searchRender() {
+    var items = searchFor(searchBox.value);
+    searchSel = items.length ? 0 : -1;
+    if (!searchBox.value.trim()) { searchOut.hidden = true; return; }
+    searchOut.hidden = false;
+    searchOut.innerHTML = items.length ? items.map(function (e, i) {
+      return '<a role="option" class="qr' + (i === 0 ? " sel" : "") + '" href="' + e.hash + '"><span class="qk">' + e.k + "</span> " +
+        esc(e.t) + (e.sub ? '<small>' + esc(e.sub.length > 70 ? e.sub.slice(0, 70) + "…" : e.sub) + "</small>" : "") + "</a>";
+    }).join("") : '<p class="note" style="padding:8px 12px">Нічого не знайдено</p>';
+  }
+  function searchClose() { searchOut.hidden = true; searchBox.value = ""; searchBox.blur(); }
+  function searchMove(d) {
+    var rows = searchOut.querySelectorAll(".qr");
+    if (!rows.length) return;
+    rows[searchSel].classList.remove("sel");
+    searchSel = (searchSel + d + rows.length) % rows.length;
+    rows[searchSel].classList.add("sel");
+    rows[searchSel].scrollIntoView({ block: "nearest" });
+  }
+  if (searchBox) {
+    searchBox.addEventListener("input", searchRender);
+    searchBox.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown") { e.preventDefault(); searchMove(1); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); searchMove(-1); }
+      else if (e.key === "Enter") { var r = searchOut.querySelector(".qr.sel"); if (r) { location.hash = r.getAttribute("href"); searchClose(); } }
+      else if (e.key === "Escape") searchClose();
+    });
+    document.addEventListener("keydown", function (e) {
+      var typing = /^(input|textarea|select)$/i.test((e.target.tagName || ""));
+      if ((e.key === "/" && !typing && !e.ctrlKey && !e.metaKey) || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k")) {
+        e.preventDefault();
+        searchBox.focus();
+        searchBox.select();
+      }
+    });
+    document.addEventListener("click", function (e) {
+      if (e.target.closest("#qres a")) searchClose();
+      else if (!e.target.closest(".search")) searchOut.hidden = true;
+    });
+  }
+
   // ---------- пісочниці -----------------------------------------------------
   var sbLoading = {};
   function sbScript(src, cb) {

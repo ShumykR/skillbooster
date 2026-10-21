@@ -406,3 +406,21 @@ details.readme > summary { cursor: pointer; padding: 8px 12px; font-weight: 600;
 .sb-map { width: 100%; border-collapse: collapse; font-size: .9rem; }
 .sb-map th, .sb-map td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; }
 .sb-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+
+/* пошук у шапці */
+.search { position: relative; flex: 0 1 240px; min-width: 0; }
+.search input { width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+  color: var(--text); font: inherit; font-size: .9rem; }
+#qres { position: absolute; right: 0; top: calc(100% + 6px); width: min(480px, 92vw); max-height: 70vh; overflow-y: auto; z-index: 20;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 8px 28px rgba(0, 0, 0, .18); }
+#qres[hidden] { display: none; }
+.qr { display: block; padding: 8px 12px; color: var(--text); text-decoration: none; border-bottom: 1px solid var(--border); font-size: .9rem; }
+.qr:last-child { border-bottom: 0; }
+.qr.sel, .qr:hover { background: var(--surface-2); }
+.qr small { display: block; color: var(--muted); font-size: .78rem; }
+.qk { display: inline-block; min-width: 4.8em; font-size: .72rem; text-transform: uppercase; letter-spacing: .03em; color: var(--accent); }
+@media (max-width: 760px) {
+  .top-progress small { display: none; }
+  .search { flex: 1 1 120px; }
+  #qres { position: fixed; left: 8px; right: 8px; top: 62px; width: auto; }
+}
