@@ -10,7 +10,7 @@
 
   // ---------- сховище -------------------------------------------------------
   function emptyState() {
-    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], hints: {}, played: {}, failed: {}, settings: { baseUrl: "", model: "" } };
+    return { tasks: {}, verified: {}, checks: {}, concepts: {}, capstone: {}, days: [], hints: {}, played: {}, failed: {}, review: {}, settings: { baseUrl: "", model: "" } };
   }
   var OLD_AI = ["ai-api:1", "ai-llm:4", "ai-rag:2", "ai-evals:0", "ai-agents:1", "ai-agents:8", "ai-security:1", "ai-api:6", "ai-ops:8"];
   var state = load();
@@ -31,6 +31,7 @@
         hints: s.hints || e.hints,
         played: s.played || e.played,
         failed: s.failed || e.failed,
+        review: s.review || e.review,
         settings: Object.assign(e.settings, s.settings || {}),
       };
       migrateOldAi(out);
@@ -228,6 +229,11 @@
       '<div class="stat"><b>' + streak() + '</b><span>днів поспіль</span></div>' +
       '<div class="stat"><b>' + list.length + '</b><span>етапів</span></div></div>';
 
+    var due = dueKeys().length;
+    if (due) {
+      html += '<div class="card next-card"><div><small>Інтервальне повторення</small><strong>На повторення сьогодні: ' + due +
+        " " + (due === 1 ? "поняття" : "понять") + '</strong></div><a class="btn" href="#/review">Почати</a></div>';
+    }
     if (nt) {
       html += '<div class="card next-card"><div><small>' + (nt.doing ? "Продовжити" : "Наступне завдання") + " · " +
         nt.stage.icon + " " + esc(nt.stage.title) + "</small><strong>" + esc(nt.task.title) + "</strong></div>" +
@@ -259,7 +265,7 @@
       " · довів практикою " + s.conceptsProven + "/" + s.conceptsPractice +
       " · завдання " + s.tasksDone + "/" + s.tasksTotal + "</small></div></div>" +
       '<div class="why"><strong>Навіщо це на роботі.</strong> ' + esc(st.why) + "</div>" +
-      '<p><a class="chip" href="#/notes/' + st.id + '">📄 Шпаргалка етапу</a></p>';
+      '<p><a class="chip" href="#/notes/' + st.id + '">📄 Шпаргалка етапу</a> <a class="chip" href="#/exam/' + st.id + '">📝 Іспит етапу</a></p>';
 
     html += "<h2>Що треба знати</h2>" +
       '<p class="note">Галочка означає «розумію» (її ставить і пройдений тест 🧠). ' +
@@ -295,6 +301,97 @@
         return head + taskHtml(t);
       }).join("") + "</div>";
     return html;
+  }
+
+  // ---------- інтервальне повторення (Leitner) та іспит етапу ----------------
+  var BOXES = [1, 3, 7, 21, 60];   // днів до наступного повторення для box 1..5
+  var curRun = null;
+  function addDays(d, n) {
+    var t = new Date(d + "T12:00:00");
+    t.setDate(t.getDate() + n);
+    return t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0") + "-" + String(t.getDate()).padStart(2, "0");
+  }
+  // правильна відповідь піднімає на box вище, помилка повертає в box 1 і ставить позначку «варто повторити»
+  function reviewPass(key, ok) {
+    var r = state.review[key] || { box: 0 };
+    if (ok) { r.box = Math.min(BOXES.length, r.box + 1); r.weak = false; }
+    else { r.box = 1; r.weak = true; }
+    r.due = addDays(today(), BOXES[r.box - 1]);
+    state.review[key] = r;
+  }
+  function validKey(k) {
+    var p = k.split(":"), st = stageById(p[0]);
+    return !!(st && st.quiz && st.quiz[p[1]]);
+  }
+  function dueKeys() {
+    var t = today();
+    return Object.keys(state.review).filter(function (k) { return state.review[k].due <= t && validKey(k); }).sort();
+  }
+  function buildRun(mode, keys) {
+    return { mode: mode, finished: false, items: keys.map(function (k) {
+      var p = k.split(":"), qs = stageById(p[0]).quiz[p[1]], q = qs[Math.floor(Math.random() * qs.length)];
+      return { key: k, stage: p[0], i: +p[1], q: q, picked: null,
+        opts: shuffled(q.options.map(function (o, oi) { return { o: o, ok: oi === q.answer }; })) };
+    }) };
+  }
+  function runHtml(run, title, intro) {
+    return "<h1>" + title + "</h1>" + '<p class="note">' + intro + "</p>" +
+      '<div id="run">' + run.items.map(function (it, n) {
+        var st = stageById(it.stage);
+        return '<div class="qq" data-ri="' + n + '"><p><b>' + (n + 1) + ".</b> " + md(it.q.q) + '<br><small class="note">' + esc(st.title) +
+          " · " + md(st.concepts[it.i].split(":")[0]) + "</small></p>" +
+          it.opts.map(function (x, oi) {
+            return '<button class="qopt rq" data-ri="' + n + '" data-oi="' + oi + '">' + md(x.o, true) + "</button>";
+          }).join("") + '<p class="why-q" hidden>' + md(it.q.why) + "</p></div>";
+      }).join("") + '</div><div id="runRes" class="why" aria-live="polite" hidden></div>' +
+      (run.mode === "exam" ? '<p><button class="btn" data-run-finish disabled>Завершити іспит</button></p>' : "");
+  }
+  function renderReview() {
+    var keys = dueKeys();
+    if (!keys.length) {
+      curRun = null;
+      return "<h1>Повторення</h1><p class=\"lead\">На сьогодні нічого повторювати. Проходь тести 🧠 біля понять на сторінках етапів: вони потрапляють у розклад повторень (1, 3, 7, 21, 60 днів).</p>";
+    }
+    curRun = buildRun("review", keys);
+    return runHtml(curRun, "Повторення", "По одному питанню з кожного поняття, що настав час повторити. Відповідь одразу з поясненням. Помилка не знімає «розумію», але поверне поняття на початок розкладу.");
+  }
+  function renderExam(st) {
+    var idx = Object.keys(st.quiz || {});
+    if (!idx.length) return "<h1>Іспит етапу</h1><p>Для цього етапу ще немає питань.</p>";
+    curRun = buildRun("exam", shuffled(idx).slice(0, 10).map(function (i) { return st.id + ":" + i; }));
+    return '<div class="crumbs"><a href="#/stage/' + st.id + '">← ' + esc(st.title) + "</a> / Іспит</div>" +
+      runHtml(curRun, "Іспит: " + esc(st.title), curRun.items.length + " випадкових питань з різних понять. Пояснення з'являться лише після завершення.");
+  }
+  function revealItem(n) {
+    var it = curRun.items[n], qq = document.querySelector('#run .qq[data-ri="' + n + '"]');
+    qq.querySelectorAll(".qopt").forEach(function (b, oi) {
+      b.disabled = true;
+      b.classList.remove("sel");
+      if (it.opts[oi].ok) b.classList.add("right");
+      else if (oi === it.picked) b.classList.add("wrong");
+    });
+    qq.querySelector(".why-q").hidden = false;
+  }
+  function finishRun() {
+    var run = curRun, wrong = [];
+    if (!run || run.finished) return;
+    run.finished = true;
+    run.items.forEach(function (it, n) {
+      var ok = it.picked !== null && it.opts[it.picked].ok;
+      if (run.mode === "exam") revealItem(n);
+      if (run.mode === "review") reviewPass(it.key, ok);
+      else if (!ok) reviewPass(it.key, false);     // помилка на іспиті повертає поняття в розклад повторень
+      if (!ok) wrong.push(it);
+    });
+    touch();
+    var res = document.getElementById("runRes");
+    res.hidden = false;
+    res.innerHTML = "<strong>Правильно " + (run.items.length - wrong.length) + " з " + run.items.length + ".</strong>" +
+      (wrong.length ? " Повернись до понять: " + wrong.map(function (it) {
+        return '<a href="#/concept/' + it.stage + "/" + it.i + '">' + md(stageById(it.stage).concepts[it.i].split(":")[0]) + "</a>";
+      }).join(" · ") + "." : " Чистий результат.");
+    var fb = document.querySelector("[data-run-finish]");
+    if (fb) fb.hidden = true;
   }
 
   // ---------- пошук по сайту -----------------------------------------------
@@ -491,6 +588,9 @@
     if (qs.length) {
       meta += '<button class="qbtn" data-quiz="' + key + '" aria-expanded="false">🧠 Перевірити себе · ' + qs.length + "</button>";
     }
+    var rv = state.review[key];
+    if (rv && rv.weak) meta += '<span class="proof weak" title="Остання перевірка була з помилкою">↻ варто повторити</span>';
+    else if (rv && rv.due <= today()) meta += '<span class="proof due" title="Настав час інтервального повторення">↻ час повторити</span>';
     ((st.sandboxes && st.sandboxes[i]) || []).forEach(function (sid) {
       meta += '<a class="qbtn" href="#/play/' + sid + '">▶ Спробувати</a>';
     });
@@ -533,6 +633,8 @@
     qq.querySelector(".why-q").hidden = false;
     if (--quizRun.left > 0) return;
     var res = box.querySelector(".qres"), key = quizRun.key;
+    reviewPass(key, quizRun.wrong === 0);
+    save();
     if (quizRun.wrong === 0) {
       var p = key.split(":");
       state.concepts[p[0]] = state.concepts[p[0]] || {};
@@ -907,6 +1009,15 @@
     } else if (h.indexOf("#/play") === 0) {
       html = renderPlayList();
       title = "Пісочниці · SkillBooster";
+    } else if (h.indexOf("#/review") === 0) {
+      html = renderReview();
+      title = "Повторення · SkillBooster";
+    } else if (/^#\/exam\/[\w-]+/.test(h) && stageById(h.match(/^#\/exam\/([\w-]+)/)[1])) {
+      var es = stageById(h.match(/^#\/exam\/([\w-]+)/)[1]);
+      activeId = es.id;
+      setTrack(trackOf(es));
+      html = renderExam(es);
+      title = "Іспит: " + es.title + " · SkillBooster";
     } else if (h.indexOf("#/sync") === 0) {
       html = renderSync(syncIds(h), syncIds(h, "fail"));
       title = "Синхронізація · SkillBooster";
@@ -991,7 +1102,7 @@
     }
     var retry = e.target.closest("[data-quiz-retry]");
     if (retry) { openQuiz(retry.getAttribute("data-quiz-retry")); return; }
-    var opt = e.target.closest(".qopt");
+    var opt = e.target.closest(".qopt:not(.rq)");
     if (opt) { answerQuiz(opt); return; }
 
     if (e.target.id === "syncOk") {
@@ -1029,6 +1140,24 @@
     }
 
     if (e.target.closest("[data-print]")) { window.print(); return; }
+
+    var rq = e.target.closest(".rq");
+    if (rq && curRun && !curRun.finished) {
+      var rn = +rq.getAttribute("data-ri"), ro = +rq.getAttribute("data-oi"), rit = curRun.items[rn];
+      if (curRun.mode === "review") {
+        if (rit.picked !== null) return;
+        rit.picked = ro;
+        revealItem(rn);
+        if (curRun.items.every(function (x) { return x.picked !== null; })) finishRun();
+      } else {   // іспит: відповідь можна змінити до завершення
+        rit.picked = ro;
+        document.querySelectorAll('#run .qq[data-ri="' + rn + '"] .qopt').forEach(function (b) { b.classList.toggle("sel", b === rq); });
+        var fbtn = document.querySelector("[data-run-finish]");
+        if (fbtn) fbtn.disabled = !curRun.items.every(function (x) { return x.picked !== null; });
+      }
+      return;
+    }
+    if (e.target.closest("[data-run-finish]")) { finishRun(); return; }
 
     var hb = e.target.closest("[data-hint]");
     if (hb) {
@@ -1124,7 +1253,7 @@
           }
           var e0 = emptyState();
           state = {
-            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [], hints: s.hints || {}, played: s.played || {}, failed: s.failed || {},
+            tasks: s.tasks, verified: s.verified || {}, checks: s.checks || {}, concepts: s.concepts || {}, capstone: s.capstone || {}, days: s.days || [], hints: s.hints || {}, played: s.played || {}, failed: s.failed || {}, review: s.review || {},
             settings: Object.assign(e0.settings, s.settings || {}),
           };
           migrateOldAi(state);
