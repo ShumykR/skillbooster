@@ -512,3 +512,5 @@ details.notebox textarea { width: 100%; margin-top: 6px; padding: 8px; border: 1
 .cal-c.l2 { background: color-mix(in srgb, var(--ok) 55%, var(--surface-2)); }
 .cal-c.l3 { background: color-mix(in srgb, var(--ok) 78%, var(--surface-2)); }
 .cal-c.l4 { background: var(--ok); }
+.cmeta.read { margin-top: 4px; font-size: .85rem; }
+.cmeta.read a { color: var(--accent); }

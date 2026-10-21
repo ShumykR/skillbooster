@@ -586,7 +586,10 @@
       var qs = (st.quiz && st.quiz[i]) || [], ids = practiceOf(st, i);
       html += '<section class="nc"><h3>' + md(c) + "</h3>" +
         qs.map(function (q) { return "<p>" + md(q.why) + "</p>"; }).join("") +
-        (ids.length ? '<p class="note">Практика: ' + ids.map(taskChip).join(" ") + "</p>" : "") + "</section>";
+        (ids.length ? '<p class="note">Практика: ' + ids.map(taskChip).join(" ") + "</p>" : "") +
+        (((st.reading && st.reading[i]) || []).length ? '<p class="note">Читати: ' + st.reading[i].map(function (r) {
+          return '<a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer">' + esc(r.name) + "</a>";
+        }).join(" · ") + "</p>" : "") + "</section>";
     });
     html += "<h2>Ресурси</h2><ul>" + st.resources.map(function (r) {
       return '<li><a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer">' + esc(r.name) + "</a> — " + esc(r.note) + "</li>";
@@ -612,6 +615,10 @@
     if (qs.length) {
       meta += '<button class="qbtn" data-quiz="' + key + '" aria-expanded="false">🧠 Перевірити себе · ' + qs.length + "</button>";
     }
+    var rd = (st.reading && st.reading[i]) || [];
+    var readHtml = rd.length ? '<div class="cmeta read"><span class="proof">Читати:</span> ' + rd.map(function (r) {
+      return '<a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer">' + esc(r.name) + " ↗</a>";
+    }).join(" · ") + "</div>" : "";
     var rv = state.review[key];
     if (rv && rv.weak) meta += '<span class="proof weak" title="Остання перевірка була з помилкою">↻ варто повторити</span>';
     else if (rv && rv.due <= today()) meta += '<span class="proof due" title="Настав час інтервального повторення">↻ час повторити</span>';
@@ -621,6 +628,7 @@
     return '<li id="c-' + st.id + "-" + i + '"><label><input type="checkbox" data-concept="' + key + '"' +
       (conceptDone(st.id, i) ? " checked" : "") + "><span>" + md(st.concepts[i]) + "</span></label>" +
       (meta ? '<div class="cmeta">' + meta + "</div>" : "") +
+      readHtml +
       (qs.length ? '<div class="quiz" id="quiz-' + st.id + "-" + i + '" hidden></div>' : "") + "</li>";
   }
 

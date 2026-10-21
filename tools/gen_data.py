@@ -1002,6 +1002,13 @@ for s in stages:
     s["practice"] = [[x if isinstance(x, str) else f"t{x}" for x in row] for row in links]
     for tid in (x for row in s["practice"] for x in row):
         assert tid in _ids, f"PRACTICE[{s['id']}]: невідоме завдання {tid}"
+    reading = quiz_data.READING.get(s["id"], {})
+    for i, items in reading.items():
+        assert 0 <= i < len(s["concepts"]), f"READING[{s['id']}]: немає поняття {i}"
+        for name, url in items:
+            assert url.startswith("https://") and name.strip(), f"READING[{s['id']}][{i}]: {name!r} {url!r}"
+    if reading:
+        s["reading"] = {str(i): [{"name": n, "url": u} for n, u in items] for i, items in reading.items()}
     quiz = quiz_data.QUIZ.get(s["id"], {})
     for i, qs in quiz.items():
         assert 0 <= i < len(s["concepts"]), f"QUIZ[{s['id']}]: немає поняття {i}"

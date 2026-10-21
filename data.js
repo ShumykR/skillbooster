@@ -9475,6 +9475,58 @@ window.SKILLBOOSTER = {
      "t215"
     ]
    ],
+   "reading": {
+    "0": [
+     {
+      "name": "The Illustrated Transformer (Jay Alammar)",
+      "url": "https://jalammar.github.io/illustrated-transformer/"
+     },
+     {
+      "name": "Transformer Explainer",
+      "url": "https://poloclub.github.io/transformer-explainer/"
+     }
+    ],
+    "1": [
+     {
+      "name": "Tiktokenizer",
+      "url": "https://tiktokenizer.vercel.app/"
+     }
+    ],
+    "2": [
+     {
+      "name": "Hugging Face: How to generate text",
+      "url": "https://huggingface.co/blog/how-to-generate"
+     }
+    ],
+    "3": [
+     {
+      "name": "Anthropic: Extended thinking",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/extended-thinking"
+     }
+    ],
+    "4": [
+     {
+      "name": "MTEB leaderboard",
+      "url": "https://huggingface.co/spaces/mteb/leaderboard"
+     }
+    ],
+    "5": [
+     {
+      "name": "Pinecone: Hierarchical Navigable Small Worlds",
+      "url": "https://www.pinecone.io/learn/series/faiss/hnsw/"
+     }
+    ],
+    "6": [
+     {
+      "name": "3Blue1Brown: Теорема Байєса",
+      "url": "https://www.3blue1brown.com/lessons/bayes-theorem"
+     },
+     {
+      "name": "Seeing Theory: Bayesian Inference",
+      "url": "https://seeing-theory.brown.edu/bayesian-inference/index.html"
+     }
+    ]
+   },
    "quiz": {
     "0": [
      {
@@ -9907,6 +9959,54 @@ window.SKILLBOOSTER = {
      "t139"
     ]
    ],
+   "reading": {
+    "0": [
+     {
+      "name": "MDN: Using server-sent events",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events"
+     }
+    ],
+    "1": [
+     {
+      "name": "OpenAI: Structured Outputs",
+      "url": "https://developers.openai.com/api/docs/guides/structured-outputs"
+     }
+    ],
+    "2": [
+     {
+      "name": "Anthropic: Tool use",
+      "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"
+     }
+    ],
+    "3": [
+     {
+      "name": "Anthropic: Prompt engineering overview",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview"
+     },
+     {
+      "name": "DSPy",
+      "url": "https://dspy.ai/"
+     }
+    ],
+    "4": [
+     {
+      "name": "Anthropic: Effective context engineering for AI agents",
+      "url": "https://www.anthropic.com/research/effective-context-engineering-for-ai-agents"
+     }
+    ],
+    "5": [
+     {
+      "name": "Anthropic: Prompt caching",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching"
+     }
+    ],
+    "7": [
+     {
+      "name": "LiteLLM: документація",
+      "url": "https://docs.litellm.ai/"
+     }
+    ]
+   },
    "quiz": {
     "0": [
      {
@@ -10336,6 +10436,38 @@ window.SKILLBOOSTER = {
      "t182"
     ]
    ],
+   "reading": {
+    "1": [
+     {
+      "name": "Anthropic: Contextual Retrieval",
+      "url": "https://www.anthropic.com/research/contextual-retrieval"
+     }
+    ],
+    "2": [
+     {
+      "name": "Pinecone: Hybrid search",
+      "url": "https://docs.pinecone.io/guides/search/hybrid-search"
+     }
+    ],
+    "5": [
+     {
+      "name": "RAGAS: Faithfulness",
+      "url": "https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/faithfulness/"
+     }
+    ],
+    "6": [
+     {
+      "name": "Microsoft GraphRAG",
+      "url": "https://microsoft.github.io/graphrag/"
+     }
+    ],
+    "9": [
+     {
+      "name": "RAGAS: Context precision",
+      "url": "https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/context_precision/"
+     }
+    ]
+   },
    "quiz": {
     "0": [
      {
@@ -10928,6 +11060,38 @@ window.SKILLBOOSTER = {
      "t190"
     ]
    ],
+   "reading": {
+    "0": [
+     {
+      "name": "Anthropic: Building effective agents",
+      "url": "https://www.anthropic.com/research/building-effective-agents"
+     }
+    ],
+    "6": [
+     {
+      "name": "Temporal: документація",
+      "url": "https://docs.temporal.io/"
+     }
+    ],
+    "8": [
+     {
+      "name": "Model Context Protocol",
+      "url": "https://modelcontextprotocol.io/"
+     }
+    ],
+    "9": [
+     {
+      "name": "A2A Protocol",
+      "url": "https://a2a-protocol.org/"
+     }
+    ],
+    "11": [
+     {
+      "name": "12-Factor Agents",
+      "url": "https://github.com/humanlayer/12-factor-agents"
+     }
+    ]
+   },
    "quiz": {
     "0": [
      {
@@ -11423,6 +11587,30 @@ window.SKILLBOOSTER = {
      "t218"
     ]
    ],
+   "reading": {
+    "0": [
+     {
+      "name": "Hamel Husain: Your AI product needs evals",
+      "url": "https://hamel.dev/blog/posts/evals/"
+     }
+    ],
+    "5": [
+     {
+      "name": "Langfuse: документація",
+      "url": "https://langfuse.com/docs"
+     },
+     {
+      "name": "OpenTelemetry: GenAI semantic conventions",
+      "url": "https://opentelemetry.io/docs/specs/semconv/gen-ai/"
+     }
+    ],
+    "7": [
+     {
+      "name": "DSPy",
+      "url": "https://dspy.ai/"
+     }
+    ]
+   },
    "quiz": {
     "0": [
      {
@@ -11943,6 +12131,50 @@ window.SKILLBOOSTER = {
      "t194"
     ]
    ],
+   "reading": {
+    "0": [
+     {
+      "name": "OWASP Top 10 for LLM Applications",
+      "url": "https://genai.owasp.org/llm-top-10/"
+     }
+    ],
+    "1": [
+     {
+      "name": "Simon Willison: Prompt injection (серія)",
+      "url": "https://simonwillison.net/series/prompt-injection/"
+     }
+    ],
+    "3": [
+     {
+      "name": "Simon Willison: The lethal trifecta",
+      "url": "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
+     },
+     {
+      "name": "CaMeL: Defeating Prompt Injections by Design",
+      "url": "https://arxiv.org/abs/2503.18813"
+     }
+    ],
+    "7": [
+     {
+      "name": "Hugging Face: safetensors",
+      "url": "https://huggingface.co/docs/safetensors/index"
+     }
+    ],
+    "8": [
+     {
+      "name": "garak (NVIDIA)",
+      "url": "https://github.com/NVIDIA/garak"
+     },
+     {
+      "name": "promptfoo: red teaming",
+      "url": "https://www.promptfoo.dev/docs/red-team/"
+     },
+     {
+      "name": "MITRE ATLAS",
+      "url": "https://atlas.mitre.org/"
+     }
+    ]
+   },
    "quiz": {
     "0": [
      {
@@ -12463,6 +12695,36 @@ window.SKILLBOOSTER = {
      "t220"
     ]
    ],
+   "reading": {
+    "1": [
+     {
+      "name": "vLLM: документація",
+      "url": "https://docs.vllm.ai/en/latest/"
+     },
+     {
+      "name": "Ollama",
+      "url": "https://ollama.com/"
+     }
+    ],
+    "2": [
+     {
+      "name": "PagedAttention (vLLM paper)",
+      "url": "https://arxiv.org/abs/2309.06180"
+     }
+    ],
+    "4": [
+     {
+      "name": "Hugging Face PEFT",
+      "url": "https://huggingface.co/docs/peft/index"
+     }
+    ],
+    "8": [
+     {
+      "name": "Claude Code: документація",
+      "url": "https://code.claude.com/docs/en/overview"
+     }
+    ]
+   },
    "quiz": {
     "0": [
      {
@@ -12813,6 +13075,26 @@ window.SKILLBOOSTER = {
      "t210"
     ]
    ],
+   "reading": {
+    "0": [
+     {
+      "name": "EU AI Act Explorer",
+      "url": "https://artificialintelligenceact.eu/"
+     }
+    ],
+    "1": [
+     {
+      "name": "C2PA",
+      "url": "https://c2pa.org/"
+     }
+    ],
+    "5": [
+     {
+      "name": "NIST AI Risk Management Framework",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+     }
+    ]
+   },
    "quiz": {
     "0": [
      {
