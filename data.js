@@ -173,6 +173,21 @@ window.SKILLBOOSTER = {
    "tasks": [
     "t192"
    ]
+  },
+  {
+   "id": "agent-fsm",
+   "title": "Агент як скінченний автомат",
+   "icon": "🤖",
+   "track": "ai",
+   "concepts": [
+    [
+     "ai-agents",
+     3
+    ]
+   ],
+   "tasks": [
+    "t184"
+   ]
   }
  ],
  "tracks": [
@@ -11152,6 +11167,11 @@ window.SKILLBOOSTER = {
       "answer": 0,
       "why": "Коли щось ламається, треба бачити, що саме пішло в модель. Тому трасування важливе навіть із фреймворком."
      }
+    ]
+   },
+   "sandboxes": {
+    "3": [
+     "agent-fsm"
     ]
    }
   },

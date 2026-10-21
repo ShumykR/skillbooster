@@ -77,4 +77,6 @@ SANDBOX = {
                      "concepts": [("observability", 4)], "tasks": [104]},
     "eval-noise": {"title": "Шум в evals: коли різниця справжня", "icon": "📊",
                    "concepts": [("ai-evals", 3)], "tasks": [192]},
+    "agent-fsm": {"title": "Агент як скінченний автомат", "icon": "🤖",
+                  "concepts": [("ai-agents", 3)], "tasks": [184]},
 }

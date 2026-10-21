@@ -469,3 +469,13 @@ details.readme > summary { cursor: pointer; padding: 8px 12px; font-weight: 600;
 .sb-st.ok { background: var(--ok); } .sb-st.bad { background: var(--bad); } .sb-st.warn { background: var(--warn); }
 .sb-st.outage { box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .35); }
 .sb-verdict.warn { background: var(--warn-soft); color: var(--warn); }
+.sb-fsm { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0; }
+.sb-node { padding: 6px 10px; border: 2px solid var(--border); border-radius: 8px; font-size: .82rem; font-family: ui-monospace, Consolas, monospace; background: var(--surface); }
+.sb-node.cur { border-color: var(--accent); background: var(--surface-2); font-weight: 700; }
+.sb-node.fin.cur { border-color: var(--ok); }
+.sb-node.fail.cur { border-color: var(--bad); color: var(--bad); }
+.sb-node.flash { animation: sbflash .6s ease-out 1; }
+@keyframes sbflash { 0% { background: var(--bad-soft); box-shadow: 0 0 0 4px var(--bad); } 100% { box-shadow: 0 0 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .sb-node.flash { animation: none; border-color: var(--bad); } }
+.sb-arrow { color: var(--muted); }
+.sb-flow li.wait { border-left-color: var(--warn); }
