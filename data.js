@@ -6868,7 +6868,7 @@ window.SKILLBOOSTER = {
      "ai": false,
      "title": "Виправ криптографічні помилки",
      "desc": "наївний модуль із типовими помилками (`==` для порівняння MAC, `random` для токенів, MD5 для паролів, AES-ECB, статичний IV, повтор nonce у GCM, власна «схема підпису» `sha256(secret + data)`) треба виправити без зміни публічного API",
-     "check": "автотести (заготовка навмисно вразлива, як у №146)",
+     "check": "автотести (заготовка навмисно вразлива, як у №146; потрібна `cryptography`)",
      "cwe": [
       "208",
       "327",
@@ -6877,7 +6877,7 @@ window.SKILLBOOSTER = {
       "323",
       "329"
      ],
-     "kind": "автотест"
+     "auto": "t237_crypto_fixes"
     },
     {
      "id": "t238",
@@ -7277,7 +7277,7 @@ window.SKILLBOOSTER = {
       "367",
       "~841"
      ],
-     "kind": "автотест"
+     "auto": "t239_race_condition"
     },
     {
      "id": "t240",
@@ -7294,7 +7294,7 @@ window.SKILLBOOSTER = {
       "1336",
       "~134"
      ],
-     "kind": "автотест"
+     "auto": "t240_interpreter_fixes"
     },
     {
      "id": "t241",
@@ -7315,7 +7315,7 @@ window.SKILLBOOSTER = {
      "pattern": [
       "Fail closed"
      ],
-     "kind": "автотест"
+     "auto": "t241_fail_closed"
     },
     {
      "id": "t242",

@@ -6,3 +6,4 @@ pydantic>=2
 pydantic-settings>=2
 pyyaml>=6
 tzdata>=2024.1
+cryptography>=43

@@ -2,7 +2,7 @@
 
 > Файл **генерується** командою `python tools/gen_data.py` з тегів `*CWE:*` у `docs/tasks-catalog.md` і довідника `tools/cwe_data.py`. Руками не правити.
 
-Стан: 140 завдань з автоперевіркою, 266 завдань у каталозі, capstone M0–M12.
+Стан: 144 завдань з автоперевіркою, 266 завдань у каталозі, capstone M0–M12.
 
 ## Джерела й обмеження
 
@@ -28,16 +28,16 @@
 | A01 Broken Access Control | 40 | 15 | 12 | 3 | 0 | 0 | 0 |
 | A02 Security Misconfiguration | 16 | 8 | 7 | 1 | 0 | 0 | 0 |
 | A03 Software Supply Chain Failures | 6 | 3 | 1 | 2 | 0 | 0 | 0 |
-| A04 Cryptographic Failures | 32 | 8 | 5 | 3 | 0 | 0 | 0 |
+| A04 Cryptographic Failures | 32 | 8 | 6 | 2 | 0 | 0 | 0 |
 | A05 Injection | 37 | 8 | 5 | 3 | 0 | 0 | 0 |
 | A06 Insecure Design | 39 | 13 | 10 | 2 | 1 | 0 | 0 |
 | A07 Authentication Failures | 36 | 13 | 9 | 2 | 2 | 0 | 0 |
-| A08 Software or Data Integrity Failures | 14 | 5 | 2 | 3 | 0 | 0 | 0 |
+| A08 Software or Data Integrity Failures | 14 | 5 | 3 | 2 | 0 | 0 | 0 |
 | A09 Security Logging and Alerting Failures | 5 | 4 | 2 | 2 | 0 | 0 | 0 |
-| A10 Mishandling of Exceptional Conditions | 24 | 7 | 4 | 3 | 0 | 0 | 0 |
-| **Разом** | 249 | **84** | **57** | **24** | **3** | **0** | **0** |
+| A10 Mishandling of Exceptional Conditions | 24 | 7 | 6 | 1 | 0 | 0 | 0 |
+| **Разом** | 249 | **84** | **61** | **20** | **3** | **0** | **0** |
 
-З 84 ключових CWE: повноцінно покрито 57 (68%), частково 24, лише в каталозі 3, лише зовнішня лабораторія 0, немає взагалі 0.
+З 84 ключових CWE: повноцінно покрито 61 (73%), частково 20, лише в каталозі 3, лише зовнішня лабораторія 0, немає взагалі 0.
 
 ### A01:2025 Broken Access Control (40 CWE на owasp.org)
 
@@ -86,8 +86,8 @@
 |---|---|---|---|
 | CWE-319 | Cleartext Transmission of Sensitive Information | 🟡 | №67, №68, ~t86, ~t87, ~t57, №238 |
 | CWE-321 | Use of Hard-coded Cryptographic Key | 🟡 | №89, ~t54 |
-| CWE-327 | Broken or Risky Cryptographic Algorithm | 🟡 | ~t56, №237 |
-| CWE-330 | Insufficiently Random Values | ✅ | t157, №237, №255 |
+| CWE-327 | Broken or Risky Cryptographic Algorithm | ✅ | ~t56, t237 |
+| CWE-330 | Insufficiently Random Values | ✅ | t157, t237, №255 |
 | CWE-338 | Cryptographically Weak PRNG | ✅ | t157 |
 | CWE-347 | Improper Verification of Cryptographic Signature | ✅ | t41, t51, №232 |
 | CWE-759 | One-Way Hash without a Salt | ✅ | t157 |
@@ -113,14 +113,14 @@
 | CWE-73 | External Control of File Name or Path | ✅ | t144 |
 | CWE-269 | Improper Privilege Management | ✅ | t73, t93, №98, t52, №60, №245, №254, №213 |
 | CWE-311 | Missing Encryption of Sensitive Data | 🟡 | ~t84, ~t86, №231, №258 |
-| CWE-362 | Race Condition | ✅ | ~t25, t26, t27, t28, №239 |
+| CWE-362 | Race Condition | ✅ | ~t25, t26, t27, t28, t239 |
 | CWE-434 | Unrestricted Upload of File with Dangerous Type | ✅ | №13, t145 |
 | CWE-522 | Insufficiently Protected Credentials | ✅ | t157 |
 | CWE-539 | Use of Persistent Cookies Containing Sensitive Information | ✅ | t143 |
 | CWE-602 | Client-Side Enforcement of Server-Side Security | ✅ | t168 |
 | CWE-657 | Violation of Secure Design Principles | 📝 | №165 |
 | CWE-799 | Improper Control of Interaction Frequency | ✅ | t37, t53 |
-| CWE-841 | Improper Enforcement of Behavioral Workflow | 🟡 | ~t151, №223, №239, №243, №184 |
+| CWE-841 | Improper Enforcement of Behavioral Workflow | 🟡 | ~t151, №223, ~t239, №243, №184 |
 | CWE-1021 | Improper Restriction of Rendered UI Layers or Frames | ✅ | t57 |
 | CWE-1022 | Use of Web Link to Untrusted Target with window.opener Access | ✅ | t142 |
 
@@ -148,7 +148,7 @@
 |---|---|---|---|
 | CWE-345 | Insufficient Verification of Data Authenticity | ✅ | t41, t51, №232, №234, №249, №199 |
 | CWE-494 | Download of Code Without Integrity Check | 🟡 | ~t73, ~t55, №246, №249, №250, №199, №201 |
-| CWE-502 | Deserialization of Untrusted Data | 🟡 | ~t56, №240, №255, №201 |
+| CWE-502 | Deserialization of Untrusted Data | ✅ | ~t56, t240, №255, №201 |
 | CWE-829 | Inclusion of Functionality from Untrusted Control Sphere | 🟡 | ~t73, №245, №246, №249, №212 |
 | CWE-915 | Mass Assignment | ✅ | ~t156, t162 |
 
@@ -165,12 +165,12 @@
 
 | CWE | Назва | Статус | Де |
 |---|---|---|---|
-| CWE-209 | Error Message Containing Sensitive Information | ✅ | t7, №241 |
+| CWE-209 | Error Message Containing Sensitive Information | ✅ | t7, t241 |
 | CWE-248 | Uncaught Exception | ✅ | t7 |
 | CWE-460 | Improper Cleanup on Thrown Exception | 🟡 | ~t30, ~t31 |
 | CWE-550 | Server-generated Error Message with Sensitive Info | ✅ | t7 |
-| CWE-636 | Not Failing Securely ('Failing Open') | 🟡 | ~t153, ~t35, №109, ~t52, №241 |
-| CWE-703 | Improper Check or Handling of Exceptional Conditions | 🟡 | ~t7, ~t35, ~t43, №109, №241 |
+| CWE-636 | Not Failing Securely ('Failing Open') | ✅ | ~t153, ~t35, №109, ~t52, t241 |
+| CWE-703 | Improper Check or Handling of Exceptional Conditions | ✅ | ~t7, ~t35, ~t43, №109, t241 |
 | CWE-756 | Missing Custom Error Page | ✅ | t7 |
 
 ## CWE Top 25 (MITRE, 2025)
@@ -191,7 +191,7 @@
 | 12 | CWE-434 | Unrestricted Upload | ✅ | №13, t145 |
 | 13 | CWE-476 | NULL Pointer Dereference | ➖ | — |
 | 14 | CWE-121 | Stack-based Buffer Overflow | ➖ | — |
-| 15 | CWE-502 | Deserialization of Untrusted Data | 🟡 | ~t56, №240, №255, №201 |
+| 15 | CWE-502 | Deserialization of Untrusted Data | ✅ | ~t56, t240, №255, №201 |
 | 16 | CWE-122 | Heap-based Buffer Overflow | ➖ | — |
 | 17 | CWE-863 | Incorrect Authorization | ✅ | t52, №235, №182, №211, №217, t137, №197, №198, №213 |
 | 18 | CWE-20 | Improper Input Validation | ✅ | №5, ~t7, ~t153, t156, ~t146, ~t145, ~t127, №196 |
@@ -203,7 +203,7 @@
 | 24 | CWE-639 | Authorization Bypass via User-Controlled Key | ✅ | t16, №226, №50, t52, ~t162, №59, №235, №256, №182, №211, t137 |
 | 25 | CWE-770 | Allocation of Resources Without Limits | ✅ | t31, t37, №67, t93, ~t135 |
 
-З 25 слабкостей 7 стосуються пам'яті C/C++ (➖, для Python не актуальні). З решти 18: ✅ 13, 🟡 5, 📝 0, 🔗 0, ❌ 0.
+З 25 слабкостей 7 стосуються пам'яті C/C++ (➖, для Python не актуальні). З решти 18: ✅ 14, 🟡 4, 📝 0, 🔗 0, ❌ 0.
 
 ## Прогалини й пропоновані завдання
 
