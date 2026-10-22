@@ -21,14 +21,16 @@ jobs:
       - name: data.js і звіти актуальні
         run: |
           python tools/gen_data.py
-          git diff --exit-code -- data.js readmes.js docs tasks/README.md
-      - name: у кожного завдання є README, solution.py і test_solution.py
+          git diff --exit-code -- data.js docs tasks/README.md
+      - name: у кожного завдання є README, test_solution.py і solution.py (або пакет)
         run: |
           missing=0
           for d in tasks/t*_*/; do
-            for f in README.md solution.py test_solution.py; do
+            for f in README.md test_solution.py; do
               [ -f "$d$f" ] || { echo "::error::нема $d$f"; missing=1; }
             done
+            # solution.py, або пакет із __init__.py (багатофайлові завдання, напр. t01)
+            [ -f "$d""solution.py" ] || ls "$d"*/__init__.py >/dev/null 2>&1 || { echo "::error::нема ${d}solution.py чи пакета"; missing=1; }
           done
           exit $missing
 
